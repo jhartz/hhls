@@ -1,0 +1,14 @@
+{
+    "corrin": {
+        "type": "toggled"
+    },
+    
+    "stairwell_blacklights": {
+        "description": "Blacklights next to stairwell",
+        "type": "toggled"
+    },
+    
+    "movietheatre_lighting": {
+        "type": "dimmed"
+    }
+}
