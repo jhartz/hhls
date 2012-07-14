@@ -26,9 +26,9 @@ function handler(req, res) {
             myutil.writeError(res, 404);
         }
     } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, config.RESOURCES_DIR.length + 2) == "/" + config.RESOURCES_DIR + "/") {
-        staticserve.static(req, res);
+        staticserve.static(url, req, res);
     } else if (url.pathname.substring(0, config.VIDEO_DIR.length + 2) == "/" + config.VIDEO_DIR + "/" || url.pathname.substring(0, config.SOUND_DIR.length + 2) == "/" + config.SOUND_DIR + "/") {
-        staticserve.partial(req, res);
+        staticserve.partial(url, req, res);
     } else if (url.pathname == "/") {
         serveResources(req, res);
     } else if (url.pathname == "/control") {
@@ -58,7 +58,9 @@ function serveResources(req, res) {
         } else {
             var filelist = [];
             for (var i = 0; i < files.length; i++) {
-                filelist.push({file: files[i]});
+                if (files[i] != "README") {
+                    filelist.push({file: files[i]});
+                }
             }
             myutil.write(res, "resources.html", {dir: config.RESOURCES_DIR, files: filelist});
         }
@@ -85,7 +87,7 @@ function serveControl(req, res) {
                     if (videos[video][0] == "CONTAINS_JSON_DATA_FILE") {
                         videos[video].shift();
                         try {
-                            var control = JSON.parse(fs.readFileSync(config.VIDEO_DIR + "/" + video + ".json", "utf-8"));
+                            var control = JSON.parse(fs.readFileSync(path.join(config.VIDEO_DIR, video + ".json"), "utf-8"));
                         } catch (err) {
                             console.log("ERROR in serveControl, in CONTAINS_JSON_DATA_FILE...", err);
                         }
@@ -95,7 +97,7 @@ function serveControl(req, res) {
                     }
                     counter++;
                     if (counter == 1) videolist += "<tr>\n";
-                    videolist += '<td><button class="vidbtn" data-vidbtn="/' + config.VIDEO_DIR + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video])) + '"' + extra + '>' + myutil.escHTML(video) + '</button></td>\n';
+                    videolist += '<td><button class="vidbtn" data-vidbtn="/' + myutil.escHTML(config.VIDEO_DIR) + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video])) + '"' + extra + '>' + myutil.escHTML(video) + '</button></td>\n';
                     if (counter == 3) {
                         videolist += "</tr>\n";
                         counter = 0;
@@ -115,6 +117,7 @@ function serveControl(req, res) {
                             soundlist += '<option value="' + myutil.escHTML(sound) + '">' + myutil.escHTML(sound) + '</option>';
                         }
                     }
+                    
                     myutil.write(res, "control.html", {videos: videolist, sounds: soundlist, channels: JSON.stringify(settings.channels.data), keyboard: JSON.stringify(settings.keyboard.data), presets: JSON.stringify(settings.presets.data)});
                 }
             });

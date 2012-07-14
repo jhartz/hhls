@@ -18,16 +18,18 @@ exports.escHTML = function (html) {
     return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
 };
 
-exports.makeFileList = function (files, useMimes, separateJSON) {
+exports.makeFileList = function (files, useMimes, separateJSON, use_readme) {
     var filelist = {};
     for (var i = 0; i < files.length; i++) {
-        var bname = files[i].indexOf(".") != -1 ? files[i].substring(0, files[i].lastIndexOf(".")) : files[i];
-        var ext = files[i].indexOf(".") != -1 ? files[i].substring(files[i].lastIndexOf(".") + 1) : "";
-        if (!filelist[bname]) filelist[bname] = [];
-        if (separateJSON && ext.toLowerCase() == "json") {
-            filelist[bname].unshift("CONTAINS_JSON_DATA_FILE");
-        } else {
-            filelist[bname].push(useMimes ? [ext, mime.lookup(ext)] : ext);
+        if (use_readme || files[i] != "README") {
+            var bname = files[i].indexOf(".") != -1 ? files[i].substring(0, files[i].lastIndexOf(".")) : files[i];
+            var ext = files[i].indexOf(".") != -1 ? files[i].substring(files[i].lastIndexOf(".") + 1) : "";
+            if (!filelist[bname]) filelist[bname] = [];
+            if (separateJSON && ext.toLowerCase() == "json") {
+                filelist[bname].unshift("CONTAINS_JSON_DATA_FILE");
+            } else {
+                filelist[bname].push(useMimes ? [ext, mime.lookup(ext)] : ext);
+            }
         }
     }
     return filelist;
