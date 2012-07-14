@@ -1,0 +1,19 @@
+{
+    "a": {
+        "preset": "bob"
+    },
+    "t": {
+        "channel": "0",
+        "preset": "thunder1"
+    },
+    "z": {
+        "channel": "stairwell_blacklights",
+        "state": -1
+    },
+    "d": {
+        "channel": "movietheatre_lighting",
+        "preset": "dimtest"
+    },
+    
+    "NOTES": "The 'n' key is hard-coded to 'next' and the 's' key is hard-coded to 'stop all'"
+}

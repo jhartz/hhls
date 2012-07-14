@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Client - Haunted House</title>
+<style type="text/css">
+body {
+    font-size: 10pt;
+    font-family: sans-serif;
+}
+
+ul li {
+    display: inline;
+}
+
+ul li:before {
+    content: ", ";
+}
+
+ul li:first-child:before {
+    content: "";
+}
+
+span.btn {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+span.btn:hover {
+    text-decoration: none;
+}
+
+span.heading {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+table.bordered {
+    border-collapse: collapse;
+}
+
+table.bordered td {
+    border: 1px solid grey;
+    padding: 7px;
+}
+</style>
+<script type="text/javascript">
+var mynum = {{mynum}}, x = {{x}}, y = {{y}};
+</script>
+<script type="text/javascript" src="/static/client.frame.js"></script>
+</head>
+
+<body>
+
+<div id="panel" style="position: absolute; top: 1px; left: 1px; display: none;">
+    <span id="options" class="btn">Options</span><br>
+    <span id="status" style="font-style: italic;">Loading...</span><br>
+    <span id="status2" style="color: blue;"></span>
+</div>
+
+<div style="display: none;">
+{{{sounds}}}</div>
+
+<div id="bigstatuscontainer" style="position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-color: black; color: white; opacity: .9; padding: 10px; border: 1px solid white; overflow: auto;"><table style="width: 100%; height: 100%;"><tbody><tr><td>
+    <div id="panel_start" style="margin: auto; border: 1px solid grey;">
+        <form id="starterform">
+            <p>Select a channel:</p>
+            <p>{{{channels}}}</p>
+            <p><input type="submit" value="Go"></p>
+        </form>
+    </div>
+    <div id="panel_options" style="display: none;">
+        <table class="bordered" style="margin: auto;"><tbody>
+            <tr>
+                <td valign="top">
+                    <div class="heading">Loaded Sounds:</div>
+                    <ul id="sndlst" style="max-width: 230px; padding: 0; margin: 0 15px;"></ul>
+                </td>
+                <td valign="top">
+                    <div class="heading">Options:</div>
+                    <div style="margin-left: 15px;">
+                        <label for="slider">Volume:</label><br>
+                        <input id="slider" type="range" autocomplete="off" min="0" max="100" value="80"><br><br>
+                        <input id="noflash_check" type="checkbox"><label for="noflash_check"> No Flash</label><br><br>
+                        <table>
+                            <tr>
+                                <td><label for="oncolor">"On" color: </label></td>
+                                <td><input type="color" id="oncolor" value="#000000" size="8"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="offcolor">"Off" color: </label></td>
+                                <td><input type="color" id="offcolor" value="#FFFFFF" size="8"></td>
+                            </tr>
+                        </table>
+                        <br>
+                        <span id="close" class="btn">Close Connection</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="heading">Status History:</div>
+                    <div style="max-height: 160px; overflow: auto; margin-left: 15px;"><table><tbody id="statushistory"></tbody></table></div>
+                </td>
+            </tr>
+        </tbody></table>
+        <div style="text-align: center;">Channel: <span id="channel_label" style="font-style: italic;">[...]</span><br><span id="reloader" class="btn">Change Channel</span></div>
+        <div style="text-align: center; margin-top: 10px;"><button id="closer">Close</button></div>
+    </div>
+</td></tr></tbody></table></div>
+
+</body>
+</html>

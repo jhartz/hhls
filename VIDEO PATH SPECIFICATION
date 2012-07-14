@@ -1,0 +1,43 @@
+// JSON...
+
+[
+    {
+        "time": TIME,
+        "command": "COMMAND",
+        "data": DATA
+    }, ...
+]
+
+
+
+TIME is a time in the video in the form of "00:00" or "00:00:00" or "00:00:00.000" or 00 (seconds)
+
+
+COMMAND is one of:
+    cue*
+    pause
+    effects
+    stop
+    stopall
+
+* temporary (until we get better subtitle files)
+
+DATA depends on the COMMAND...
+    "command": "cue",
+    "data": "TEXT TO ADD TO CUE (empty string or null to clear)"
+
+    "command": "pause"
+
+    "command": "effect",
+    "data": "NAME OF PRESET"
+
+    "command": "effect",
+    "data": {
+        "light": [1,2,3,4],
+        "sound": "...",
+        "channel": "..."
+    }
+
+    "command": "stop"
+
+    "command": "stopall"
