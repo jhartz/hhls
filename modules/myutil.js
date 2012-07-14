@@ -1,4 +1,4 @@
-/* Util functions */
+// Haunted House Logistics Server - util functions
 
 
 // node modules

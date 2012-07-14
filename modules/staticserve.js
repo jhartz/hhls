@@ -1,4 +1,5 @@
-/* Handle serving static files */
+// Haunted House Logistics Server - static file handler
+// Provides different functions to handle serving static files
 
 
 // node modules

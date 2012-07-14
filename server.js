@@ -1,11 +1,4 @@
-// Haunted House Logistics Server - node.js server
-
-var PORT = process.env.PORT;
-var VIDEO_DIR = "videos";
-var SOUND_DIR = "sounds";
-var RESOURCES_DIR = "resources";
-var SETTINGS_DIR = "settings";
-
+// Haunted House Logistics Server - main node.js server
 
 // node modules
 var app = require("http").createServer(handler),
@@ -16,12 +9,13 @@ var app = require("http").createServer(handler),
     url_module = require("url");
 
 // my modules
-var myutil = require("./modules/myutil"),
+var config = require("./config"),
+    myutil = require("./modules/myutil"),
     staticserve = require("./modules/staticserve"),
     jsonsettings = require("./modules/jsonsettings");
 
 
-app.listen(PORT);
+app.listen(config.PORT);
 
 function handler(req, res) {
     var url = url_module.parse(req.url, true);
@@ -31,9 +25,9 @@ function handler(req, res) {
         } else {
             myutil.writeError(res, 404);
         }
-    } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, RESOURCES_DIR.length + 2) == "/" + RESOURCES_DIR + "/") {
+    } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, config.RESOURCES_DIR.length + 2) == "/" + config.RESOURCES_DIR + "/") {
         staticserve.static(req, res);
-    } else if (url.pathname.substring(0, VIDEO_DIR.length + 2) == "/" + VIDEO_DIR + "/" || url.pathname.substring(0, SOUND_DIR.length + 2) == "/" + SOUND_DIR + "/") {
+    } else if (url.pathname.substring(0, config.VIDEO_DIR.length + 2) == "/" + config.VIDEO_DIR + "/" || url.pathname.substring(0, config.SOUND_DIR.length + 2) == "/" + config.SOUND_DIR + "/") {
         staticserve.partial(req, res);
     } else if (url.pathname == "/") {
         serveResources(req, res);
@@ -58,7 +52,7 @@ function handler(req, res) {
 }
 
 function serveResources(req, res) {
-    fs.readdir(RESOURCES_DIR, function (err, files) {
+    fs.readdir(config.RESOURCES_DIR, function (err, files) {
         if (err) {
             myutil.writeError(res, 500);
         } else {
@@ -66,19 +60,19 @@ function serveResources(req, res) {
             for (var i = 0; i < files.length; i++) {
                 filelist.push({file: files[i]});
             }
-            myutil.write(res, "resources.html", {dir: RESOURCES_DIR, files: filelist});
+            myutil.write(res, "resources.html", {dir: config.RESOURCES_DIR, files: filelist});
         }
     });
 }
 
 var settings = {
-    channels: new jsonsettings.SettingsFile("channels.json", SETTINGS_DIR),
-    keyboard: new jsonsettings.SettingsFile("keyboard.json", SETTINGS_DIR),
-    presets: new jsonsettings.SettingsFile("presets.json", SETTINGS_DIR)
+    channels: new jsonsettings.SettingsFile("channels.json", config.SETTINGS_DIR),
+    keyboard: new jsonsettings.SettingsFile("keyboard.json", config.SETTINGS_DIR),
+    presets: new jsonsettings.SettingsFile("presets.json", config.SETTINGS_DIR)
 };
 
 function serveControl(req, res) {
-    fs.readdir(VIDEO_DIR, function (err, files) {
+    fs.readdir(config.VIDEO_DIR, function (err, files) {
         if (err) {
             myutil.writeError(res, 500);
         } else {
@@ -91,7 +85,7 @@ function serveControl(req, res) {
                     if (videos[video][0] == "CONTAINS_JSON_DATA_FILE") {
                         videos[video].shift();
                         try {
-                            var control = JSON.parse(fs.readFileSync(VIDEO_DIR + "/" + video + ".json", "utf-8"));
+                            var control = JSON.parse(fs.readFileSync(config.VIDEO_DIR + "/" + video + ".json", "utf-8"));
                         } catch (err) {
                             console.log("ERROR in serveControl, in CONTAINS_JSON_DATA_FILE...", err);
                         }
@@ -101,7 +95,7 @@ function serveControl(req, res) {
                     }
                     counter++;
                     if (counter == 1) videolist += "<tr>\n";
-                    videolist += '<td><button class="vidbtn" data-vidbtn="/' + VIDEO_DIR + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video])) + '"' + extra + '>' + myutil.escHTML(video) + '</button></td>\n';
+                    videolist += '<td><button class="vidbtn" data-vidbtn="/' + config.VIDEO_DIR + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video])) + '"' + extra + '>' + myutil.escHTML(video) + '</button></td>\n';
                     if (counter == 3) {
                         videolist += "</tr>\n";
                         counter = 0;
@@ -110,7 +104,7 @@ function serveControl(req, res) {
             }
             if (counter != 0) videolist += "</tr>";
             
-            fs.readdir(SOUND_DIR, function (err, files) {
+            fs.readdir(config.SOUND_DIR, function (err, files) {
                 if (err) {
                     myutil.writeError(res, 500);
                 } else {
@@ -205,7 +199,7 @@ function serveClientFrame(url, req, res) {
             x = parseInt(url.query.x, 10),
             y = parseInt(url.query.y, 10);
         if (!isNaN(mynum) && clients[mynum] && x && x > 0 && x <= clients[mynum].x && y && y > 0 && y <= clients[mynum].y) {
-            fs.readdir(SOUND_DIR, function (err, files) {
+            fs.readdir(config.SOUND_DIR, function (err, files) {
                 if (err) {
                     myutil.writeError(res, 500);
                 } else {
@@ -216,7 +210,7 @@ function serveClientFrame(url, req, res) {
                             soundlist += '<audio preload="auto" data-sound="' + myutil.escHTML(sound) + '">';
                             for (var i = 0; i < sounds[sound].length; i++) {
                                 var ext = sounds[sound][i][0], type = sounds[sound][i][1];
-                                soundlist += '<source src="/' + myutil.escHTML(SOUND_DIR) + '/' + myutil.escHTML(sound) + '.' + myutil.escHTML(ext) + '" type="' + myutil.escHTML(type) + '">';
+                                soundlist += '<source src="/' + myutil.escHTML(config.SOUND_DIR) + '/' + myutil.escHTML(sound) + '.' + myutil.escHTML(ext) + '" type="' + myutil.escHTML(type) + '">';
                             }
                             soundlist += '</audio>\n';
                         }

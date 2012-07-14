@@ -1,0 +1,7 @@
+This directory contains video files that can be played in the video player.
+
+If you include one video (same basename) in multiple formats (different extensions), the client will automatically figure out which one to use based on the client computer's compatibility.
+Example: movie.webm, movie.mp4, movie.ogv
+(Tthey're all the same video, but just in different formats; the client now has a choice in case it is not compatible with one of the formats.)
+
+The directory name can be configured in config.js

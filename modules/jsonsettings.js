@@ -1,4 +1,5 @@
-/* Handle JSON settings files */
+// Haunted House Logistics Server - JSON settings manager
+// Provides a simple way to read and write settings from a JSON file
 
 
 // node modules
