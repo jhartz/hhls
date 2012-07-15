@@ -9,13 +9,26 @@ section > div {
     font-size: 12pt;
 }
 
+td {
+    vertical-align: top;
+}
+
 button {
     min-width: 100px;
     font-size: 12pt;
 }
 
-td {
-    vertical-align: top;
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+li a {
+    color: black;
+}
+
+li a:hover {
+    text-decoration: underline;
 }
 </style>
 </head>
@@ -27,21 +40,13 @@ td {
         <table><tbody><tr>
             <td>
                 <p>Effects & Video:</p>
-                <form action="/client">
-                    <p><button>client</button></p>
-                </form>
-                <form action="/control">
-                    <p><button>control</button></p>
-                </form>
+                <p><a href="/client"><button>client</button></a></p>
+                <p><a href="/control"><button>control</button></a></p>
             </td>
             <td>
                 <p>Security Cameras:</p>
-                <form action="/camera/control">
-                    <p><button>View cameras</button></p>
-                </form>
-                <form action="/camera/client">
-                    <p><button>Attach a camera</button></p>
-                </form>
+                <p><a href="/cameras/viewer"><button>View cameras</button></a></p>
+                <p><a href="/cameras/attacher"><button>Attach a camera</button></a></p>
             </td>
         </tr></tbody></table>
     </div>
