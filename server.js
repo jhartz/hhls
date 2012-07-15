@@ -44,6 +44,17 @@ function handler(req, res) {
         } else {
             myutil.writeError(res, 404);
         }
+    } else if (url.pathname.substring(0, 8) == "/cameras") {
+        var urlpart = url.pathname.substring(9);
+        if (urlpart == "viewer") {
+            // TODO: make this
+            myutil.write(res, "cameras.viewer.html");
+        } else if (urlpart == "attacher") {
+            // TODO: make this
+            myutil.write(res, "cameras.attacher.html");
+        } else {
+            myutil.writeError(res, 404);
+        }
     } else if (url.pathname == "/test") {
         myutil.write(res, "test.html");
     } else {
