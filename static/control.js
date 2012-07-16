@@ -1,5 +1,5 @@
 function escHTML(html) {
-    // NOTE: Also in myutil.js and client.js
+    // NOTE: Also in myutil.js and client.frame.js
     return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
 }
 

@@ -14,7 +14,7 @@ if (process.env.NODE_ENV == "DEVELOPMENT") {
 }
 
 exports.escHTML = function (html) {
-    // NOTE: Also in control.js and client.js
+    // NOTE: Also in control.js and client.frame.js
     return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
 };
 
