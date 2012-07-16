@@ -144,7 +144,12 @@ function serveClient(url, req, res) {
     dns.reverse(req.connection.remoteAddress, function (err, domains) {
         var hostname = "";
         if (!err && domains && domains.length > 0) {
-            hostname = domains[0];
+            for (var i = 0; i < domains.length; i++) {
+                if (domains[i]) {
+                    hostname = domains[i];
+                    break;
+                }
+            }
         }
         
         if (url.query && url.query.location && url.query.layout) {
@@ -199,10 +204,20 @@ function serveClient(url, req, res) {
             
             myutil.write(res, "client2.html", {name: name, location: location, iframes: iframes}, {"Set-Cookie": ["name=" + name + cookieoptions, "location=" + location + cookieoptions]});
         } else {
-            var cookies = req.headers.cookie ? myutil.parseCookies(req.headers.cookie) : {},
-                name = cookies.name || "",
-                location = cookies.location || "";
-            myutil.write(res, "client.html", {hostname: hostname, name: name, location: location});
+            var cookies = req.headers.cookie ? myutil.parseCookies(req.headers.cookie) : {};
+            
+            var vars = {hostname: hostname};
+            vars.name = cookies.name || "";
+            vars.location = cookies.location || "";
+            vars.styling = typeof url.query.nostyle == "undefined";
+            if (url.query.layout && url.query.layout.trim().search(/^[1-9]x[1-9]$/) != -1) {
+                vars.show_layout = false;
+                vars.layout = url.query.layout.trim();
+            } else {
+                vars.show_layout = true;
+            }
+            
+            myutil.write(res, "client.html", vars);
         }
     });
 }

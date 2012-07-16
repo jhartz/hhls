@@ -3,51 +3,114 @@ function escHTML(html) {
     return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
 }
 
-function resizer() {
-    $("section > header").each(function () {
+function resizer(use_animate) {
+    $("section").not("minimized").children("header").each(function () {
         $(this).parent().css("padding-top", Math.round($(this).outerHeight()) + "px");
     });
-    $("section > footer").each(function () {
-        $(this).parent().css("padding-bottom", Math.round($(this).outerHeight() + 20) + "px");
+    $("section").not("minimized").children("footer").each(function () {
+        var extra = $(this).parent().is(".top") ? 20 : 0;
+        $(this).parent().css("padding-bottom", Math.round($(this).outerHeight() + extra) + "px");
     });
     
     var height = $("#dummy").outerHeight(true) - $("section.bottom").outerHeight(true);
     $("section.top").not(".minimized").each(function () {
         var diff = $(this).outerHeight(true) - $(this).height();
-        $(this).css({
-            height: Math.floor(height - diff) + "px",
-            width: "",
-            top: "",
-            left: "",
-            right: ""
+        $(this)[use_animate ? "animate" : "css"]({
+            height: Math.floor(height - diff) + "px"
         });
-    });
-    $("section.top.minimized").each(function () {
-        var anims = {
-            width: Math.floor(height / 2) + "px",
-            top: Math.floor(height / 2) + "px"
-        };
-        anims[$(this).is(".left") ? "left" : "right"] = (height / -4 + $(this).outerHeight() / 2) + "px";
-        $(this).animate(anims);
     });
 }
 
+var minimized_items = [];
+
 $(function () {
+    var test_buttons = function () {
+        // Disable tray buttons if 2 things are already opened
+        $("#minimized_tray button").attr("disabled", $("section.top").not(".minimized").length > 1);
+    };
+    
+    $("section.top > header").css("cursor", "pointer").click(function (event) {
+        var $section = $(this).parent();
+        
+        if (!$section.hasClass("minimized")) {
+            $section.addClass("minimized");
+            var section_id = minimized_items.length;
+            minimized_items[section_id] = $section[0];
+            
+            var donefunc = function () {
+                $section.css({
+                    display: "none",
+                    height: "",
+                    overflow: ""
+                }).removeClass("left").removeClass("right");
+                
+                // Make icon for tray
+                var $button = $("<button />");
+                $button.addClass("minimized_item");
+                $button.attr("data-section", section_id.toString());
+                $button.text($section.children("header").children("h1").text());
+                $("#minimized_tray").append($button);
+                
+                test_buttons();
+                
+                // Resize other opened section (if applicable)
+                if ($("section.top").not(".minimized").length == 1) {
+                    var $sect = $("section.top").not(".minimized");
+                    var props = {};
+                    if ($sect.is(".left")) props.right = "0%";
+                    if ($sect.is(".right")) props.left = "0%";
+                    $sect.animate(props, function () {
+                        $sect.removeClass("left").removeClass("right").css({
+                            left: "",
+                            right: ""
+                        });
+                    });
+                }
+            };
+            if ($section.hasClass("minimized_on_start")) {
+                $section.removeClass("minimized_on_start");
+                donefunc();
+            } else {
+                $section.css("overflow", "hidden");
+                $section.animate({height: "0px"}, donefunc);
+            }
+        }
+    });
+    
+    $("section.minimized").removeClass("minimized").addClass("minimized_on_start").children("header").click();
+    
+    $(document).on("click", "button.minimized_item", function (event) {
+        var section_id = Number($(this).attr("data-section"));
+        if (minimized_items[section_id]) {
+            var $section = $(minimized_items[section_id]);
+            minimized_items[section_id] = null;
+            
+            $(this).animate({width: 0}, function () {
+                $(this).remove();
+                
+                var donefunc = function () {
+                    $section.removeClass("minimized").css("height", "0px").css("display", "");
+                    test_buttons();
+                    resizer(true);
+                };
+                
+                if ($("section.top").not(".minimized").length == 0) {
+                    donefunc();
+                } else {
+                    $("section.top").not(".minimized").animate({right: "50%"}, function () {
+                        $("section.top").not(".minimized").addClass("left").css("right", "");
+                        $section.addClass("right");
+                        donefunc();
+                    });
+                }
+            });
+        }
+    });
+    
     video.init();
     effects.init();
     conn.init();
-    
     resizer();
-    
-    $("section.top > header").css("cursor", "pointer").click(function (event) {
-        if ($(this).parent().hasClass("minimized")) {
-            $(this).parent().removeClass("minimized");
-            resizer();
-        } else {
-            $(this).parent().addClass("minimized");
-            setTimeout(resizer, 1010);
-        }
-    });
 });
 
 $(window).resize(function () {
@@ -429,7 +492,7 @@ var effects = {
     update_channels: function () {
         var selected_channel = $("input[name=effects_channel]:checked", "#effects_form").val() || "0";
         
-        $("#effects_channels").html('<input type="radio" id="effects_channels_radio0" name="effects_channel" value="0" checked>&nbsp;<label for="effects_channels_radio0">Default Channel</label>');
+        var html = '<table><tbody><tr><td><input type="radio" id="effects_channels_radio0" name="effects_channel" value="0" checked></td><td><label for="effects_channels_radio0">Default Channel</label></td></tr>';
         var counter = 1;
         for (var channel in settings.channels) {
             if (settings.channels.hasOwnProperty(channel)) {
@@ -443,9 +506,12 @@ var effects = {
                     type = "dimmed";
                     css = "color: blue;";
                 }
-                $("#effects_channels").append('<br><input type="radio" id="effects_channels_radio' + counter + '" name="effects_channel" value="' + escHTML(channel) + '">&nbsp;<label for="effects_channels_radio' + counter + '" title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel) + '</label>');
+                html += '<tr><td valign="top"><input type="radio" id="effects_channels_radio' + counter + '" name="effects_channel" value="' + escHTML(channel) + '"></td><td><label for="effects_channels_radio' + counter + '" title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel).replace(/_/g, "_<wbr>") + '</label></td></tr>';
             }
         }
+        
+        html += '</tbody></table>';
+        $("#effects_channels").html(html);
         
         // Re-select previously selected channel
         $("input[name=effects-channel]", "#effects_form").each(function () {

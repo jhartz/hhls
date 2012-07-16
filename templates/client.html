@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Client - Haunted House</title>
-<link rel="stylesheet" type="text/css" href="/static/style.css">
+<title>Client - Haunted House</title>{{#styling}}
+<link rel="stylesheet" type="text/css" href="/static/style.css">{{/styling}}
 <style type="text/css">
 td {
     width: 50%;
@@ -17,24 +17,24 @@ td:first-child {
 </head>
 
 <body>
-<section>
-    <header><h1>Effects Client</h1></header>
+<section>{{#styling}}
+    <header><h1>Effects Client</h1></header>{{/styling}}
     <form action="/client" id="customizer_form">
         <table style="margin: auto;">
             <tr>
                 <td><label for="input_name">Computer Name: </label></td>
-                <td><input name="name" id="input_name" placeholder="{{hostname}}" value="{{name}}"></td>
+                <td><input name="name" id="input_name"{{#hostname}} placeholder="{{hostname}}"{{/hostname}}{{#name}} value="{{name}}"{{/name}}></td>
             </tr>
             <tr>
                 <td><label for="input_location">Computer Location: </label></td>
-                <td><input name="location" id="input_location" value="{{location}}"></td>
-            </tr>
+                <td><input name="location" id="input_location"{{#location}} value="{{location}}"{{/location}}></td>
+            </tr>{{#show_layout}}
             <tr>
                 <td><label>Layout: </label></td>
                 <td><select id="customizer_select" name="layout"><option value="1x1" selected>1x1</option><option value="1x2">1x2</option><option value="2x1">2x1</option><option value="2x2">2x2</option></select><span id="customizer_span" style="visibility: hidden;">&nbsp;</span></td>
-            </tr>
+            </tr>{{/show_layout}}
             <tr>
-                <td colspan="2" style="text-align: center;"><input type="submit" value="Go"></td>
+                <td colspan="2" style="text-align: center;">{{#layout}}<input type="hidden" name="layout" value="{{layout}}">{{/layout}}<input type="submit" value="Go"></td>
             </tr>
         </table>
     </form>

@@ -22,6 +22,10 @@ section {
     transition: background-color .2s linear;
 }
 
+section.flatfooter {
+    border-radius: 9px 9px 3px 3px;
+}
+
 section.flash {
     background-color: #1D353F;
 }
@@ -44,9 +48,10 @@ section.bottom {
 }
 
 section > header, section > footer {
-    padding: 5px 0;
     position: absolute;
     width: 100%;
+    padding: 5px 0;
+    
     background-color: #EDEFEE;
     background-image: -webkit-linear-gradient(top, #FAFCFB, #EDEFEE);
     background-image: -moz-linear-gradient(top, #FAFCFB, #EDEFEE);
@@ -70,6 +75,10 @@ section > footer {
     border-radius: 0 0 9px 9px;
 }
 
+section.flatfooter > footer {
+    border-radius: 0 0 3px 3px;
+}
+
 section > div {
     max-height: 100%;
     overflow: auto;
@@ -79,38 +88,6 @@ section > div {
 section > div > table {
     width: 100%;
     height: 100%;
-}
-
-section.minimized {
-    height: 0 !important;
-    padding-bottom: 0 !important;
-    margin: 0;
-    
-    -moz-transition: all 1s ease-in-out;
-    -webkit-transition: all 1s ease-in-out;
-    transition: all 1s ease-in-out;
-}
-
-section.left.minimized {
-    -moz-transform: rotate(-90deg);
-    -webkit-transform: rotate(-90deg);
-}
-
-section.right.minimized {
-    -moz-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-}
-
-section.minimized > header {
-    border-radius: 9px;
-    
-    -moz-transition: all 1s ease-in-out;
-    -webkit-transition: all 1s ease-in-out;
-    transition: all 1s ease-in-out;
-}
-
-section.minimized > footer, section.minimized > div {
-    display: none;
 }
 
 tr.top {
@@ -162,31 +139,38 @@ section > footer.buttonbox {
 }
 
 section > footer.buttonbox button {
-    border-bottom-style: none;
-    border-left-style: none;
     border-radius: 0;
     margin: 0;
     box-shadow: none;
+}
+
+section:not(.flatfooter) > footer.buttonbox button {
+    border-bottom-style: none;
+    border-left-style: none;
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+section.flatfooter > footer.buttonbox button {
+    border-radius: 3px;
+}
+
 section > footer.buttonbox button[disabled] {
     margin: 0 !important;
 }
 
-section > footer.buttonbox button:last-child {
+section:not(.flatfooter) > footer.buttonbox button:last-child {
     border-right-style: none;
 }
 
-section > footer.buttonbox > div:last-child > button:first-child {
-    border-radius: 0 0 0 9px;
+section:not(.flatfooter) > footer.buttonbox > div:last-child > button:first-child {
+    border-bottom-left-radius: 9px;
 }
 
-section > footer.buttonbox > div:last-child > button:last-child {
-    border-radius: 0 0 9px 0;
+section:not(.flatfooter) > footer.buttonbox > div:last-child > button:last-child {
+    border-bottom-right-radius: 9px;
 }
 
 span.lilbutton {
