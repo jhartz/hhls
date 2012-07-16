@@ -155,9 +155,10 @@ section:not(.flatfooter) > footer.buttonbox button {
 
 section.flatfooter > footer.buttonbox button {
     border-radius: 3px;
+    margin: 2px;
 }
 
-section > footer.buttonbox button[disabled] {
+section:not(.flatfooter) > footer.buttonbox button[disabled] {
     margin: 0 !important;
 }
 
