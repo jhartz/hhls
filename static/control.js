@@ -64,6 +64,7 @@ $(function () {
                             left: "",
                             right: ""
                         });
+                        resizer();
                     });
                 }
             };
@@ -87,23 +88,23 @@ $(function () {
             
             $(this).animate({width: 0}, function () {
                 $(this).remove();
-                
-                var donefunc = function () {
-                    $section.removeClass("minimized").css("height", "0px").css("display", "");
-                    test_buttons();
-                    resizer(true);
-                };
-                
-                if ($("section.top").not(".minimized").length == 0) {
-                    donefunc();
-                } else {
-                    $("section.top").not(".minimized").animate({right: "50%"}, function () {
-                        $("section.top").not(".minimized").addClass("left").css("right", "");
-                        $section.addClass("right");
-                        donefunc();
-                    });
-                }
             });
+            
+            var donefunc = function () {
+                $section.removeClass("minimized").css("height", "0px").css("display", "");
+                test_buttons();
+                resizer(true);
+            };
+            
+            if ($("section.top").not(".minimized").length == 0) {
+                donefunc();
+            } else {
+                $("section.top").not(".minimized").animate({right: "50%"}, function () {
+                    $("section.top").not(".minimized").addClass("left").css("right", "");
+                    $section.addClass("right");
+                    donefunc();
+                });
+            }
         }
     });
     
@@ -535,20 +536,22 @@ var effects = {
         }
     },
     
-    next: function () {
+    next: function (channel) {
         conn.sendmsg({
             about: "effects_cmd",
             data: {
-                command: "next"
+                command: "next",
+                channel: typeof channel == "undefined" ? null : channel
             }
         });
     },
     
-    stop: function () {
+    stop: function (channel) {
         conn.sendmsg({
             about: "effects_cmd",
             data: {
-                command: "stop"
+                command: "stop",
+                channel: typeof channel == "undefined" ? null : channel
             }
         });
     },
@@ -558,8 +561,8 @@ var effects = {
             about: "effects_cmd",
             data: {
                 command: "play",
+                channel: typeof channel == "undefined" ? null : channel,
                 prop: {
-                    channel: channel,
                     state: state
                 }
             }
@@ -570,7 +573,8 @@ var effects = {
         var details = settings.channels[channel];
         if (settings.presets[id]) {
             var preset = settings.presets[id];
-            this.sendpattern(channel, details.type == "dimmed" ? preset.dimness : preset.light, details.type == "dimmed" ? preset.time : preset.sound);
+            var dimmed = !!(details && details.type && details.type == "dimmed");
+            this.sendpattern(channel, dimmed ? preset.dimness : preset.light, dimmed ? preset.time : preset.sound);
         } else {
             alert("ERROR: Invalid preset: " + id);
         }
@@ -578,8 +582,8 @@ var effects = {
     
     sendpattern: function (channel, light_or_dimness, sound_or_time) {
         var details = settings.channels[channel];
-        var prop = {channel: channel};
-        if (details.type == "dimmed") {
+        var prop = {};
+        if (details && details.type && details.type == "dimmed") {
             prop.dimness = light_or_dimness;
             prop.time = sound_or_time;
         } else {
@@ -590,6 +594,7 @@ var effects = {
             about: "effects_cmd",
             data: {
                 command: "play",
+                channel: typeof channel == "undefined" ? null : channel,
                 prop: prop
             }
         });

@@ -324,6 +324,32 @@ function disconnect(mynum, x, y) {
         clients[mynum].frames[x][y].res.end();
         clients[mynum].frames[x][y].res = null;
     }
+    
+    var still_active = false;
+    for (var xi = 1; xi <= clients[mynum].x; xi++) {
+        if (still_active) break;
+        if (clients[mynum].frames[xi]) {
+            for (var yi = 1; yi <= clients[mynum].y; yi++) {
+                if (still_active) break;
+                if (clients[mynum].frames[xi][yi]) {
+                    if (clients[mynum].frames[xi][yi].active) {
+                        still_active = true;
+                    }
+                } else {
+                    // Might still be loading
+                    still_active = true;
+                }
+            }
+        } else {
+            // Might still be loading
+            still_active = true;
+        }
+    }
+    
+    if (!still_active) {
+        clients[mynum].active = false;
+    }
+    
     send_client_list();
 }
 
@@ -412,7 +438,7 @@ io.sockets.on("connection", function (socket) {
             if (data.about) {
                 switch (data.about) {
                     case "effects_cmd":
-                        send_msg(data.data);
+                        send_msg(data.data, data.data.channel);
                         break;
                     case "settings":
                         settings[data.data.setting] = data.data.settings;
