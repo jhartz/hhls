@@ -1,7 +1,48 @@
 This directory contains video files that can be played in the video player.
+The directory name can be changed in config.js
 
 If you include one video (same basename) in multiple formats (different extensions), the client will automatically figure out which one to use based on the client computer's compatibility.
 Example: movie.webm, movie.mp4, movie.ogv
-(Tthey're all the same video, but just in different formats; the client now has a choice in case it is not compatible with one of the formats.)
+(They're all the same video, but just in different formats; the client now has a choice in case it is not compatible with one of the formats.)
 
-The directory name can be configured in config.js
+You can run effects at specific times in the video by including details in a JSON file called basename.json where basename is the name of the video (without the extension).
+Example: movie.webm, movie.mp4, movie.json
+(The json file applies to all videos with the same basename.)
+
+Format for the JSON file:
+
+    [
+        {
+            "time": TIME,
+            "command": "COMMAND",
+            "data": DATA
+        }, ...
+    ]
+
+TIME is a time in the video in the form of "00:00" or "00:00:00" or "00:00:00.000" or 00 (seconds)
+
+COMMAND is one of:
+    cue       (shows text in the cue area; temporary (until we get better subtitle files))
+    pause*    (pauses the video)
+    effects   (plays an effect)
+    next*     (tells all clients to move on to next effect in cue)
+    stop*     (tells all clients to stop playing any effects and empty their queues)
+
+* no DATA with command
+
+DATA depends on the COMMAND...
+    "command": "cue",
+    "data": "TEXT TO SHOW IN CUE AREA (empty string or null to clear)"
+
+    "command": "effect",
+    "data": {
+        "preset": "...",
+        "channel": "..."
+    }
+
+    "command": "effect",
+    "data": {
+        "light": [1,2,3,4],
+        "sound": "...",
+        "channel": "..."
+    }
