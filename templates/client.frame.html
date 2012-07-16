@@ -39,7 +39,7 @@ table.bordered {
     border-collapse: collapse;
 }
 
-table.bordered td {
+table.bordered > tbody > tr > td {
     border: 1px solid grey;
     padding: 7px;
 }
@@ -61,13 +61,16 @@ var mynum = {{mynum}}, x = {{x}}, y = {{y}};
 <div style="display: none;">
 {{{sounds}}}</div>
 
-<div id="bigstatuscontainer" style="position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-color: black; color: white; opacity: .9; padding: 10px; border: 1px solid white; overflow: auto;"><table style="width: 100%; height: 100%;"><tbody><tr><td>
-    <div id="panel_start" style="margin: auto; border: 1px solid grey;">
-        <form id="starterform">
-            <p>Select a channel:</p>
-            <p>{{{channels}}}</p>
-            <p><input type="submit" value="Go"></p>
-        </form>
+<div id="bigstatuscontainer" style="position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-color: black; color: white; opacity: .9; padding: 10px; overflow: auto;"><table style="width: 100%; height: 100%;"><tbody><tr><td>
+    <div id="panel_start" style="margin: auto; border: 1px solid grey; border-radius: 5px;">
+        <div id="panel_start_loading" style="text-align: center;"><noscript><p style="text-align: center;">ERROR: JavaScript is required to view this page.</p></noscript></div>
+        <div id="panel_start_content">
+            <form id="starterform">
+                <p>Select a channel:</p>
+                <p>{{{channels}}}</p>
+                <p><input type="submit" value="Go"></p>
+            </form>
+        </div>
     </div>
     <div id="panel_options" style="display: none;">
         <table class="bordered" style="margin: auto;"><tbody>

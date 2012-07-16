@@ -20,28 +20,79 @@ iframe {
     border-style: none;
 }
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
 td {
     text-align: center;
     border: 1px solid #2E0587;
+}
+
+span.btn {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+span.btn:hover {
+    text-decoration: none;
+}
+
+
+#status {
+    width: 100%;
+    background-color: #2E0587;
+    color: white;
+    height: 24px;
+    overflow: hidden;
+}
+
+#status table td {
+    width: 25%;
+    padding-top: 2px;
+    vertical-align: top;
+    text-overflow: ellipsis;
+}
+
+
+#iframeholder {
+    position: absolute;
+    top: 24px;
+    bottom: 2px;
+    left: 0;
+    right: 0;
+}
+
+#iframeholder table {
+    height: 100%;
+}
+
+#iframeholder table td {
+    height: {{td_height}}%;
 }
 </style>
 <script type="text/javascript" src="/static/client2.js"></script>
 </head>
 
 <body>
-<div id="status" style="width: 100%; background-color: #2E0587; color: white;">
-    <table style="width: 100%; padding: 1px 0;">
-        <tr>
-            <td style="width: 25%;">{{location}}</td>
-            <td style="width: 25%;">{{name}}</td>
-            <td style="width: 25%;"><span id="closer" style="text-decoration: underline; cursor: pointer;" onclick="closeall()">Close All Connections</span></td>
-            <td style="width: 25%"><input id="intercom_checkbox" type="checkbox" checked><label for="intercom_checkbox"> Intercom</label></td>
-        </tr>
-    </table>
-</div>
+<div id="loading" style="text-align: center;"><noscript><p>ERROR: JavaScript is required to view this page.</p></noscript></div>
+<div id="maincontent">
+    <div id="status">
+        <table>
+            <tr>
+                <td>{{location}}</td>
+                <td>{{name}}</td>{{#closebtn}}
+                <td><span id="status_closeall" class="btn">Close All Connections</span></td>{{/closebtn}}
+                <td><input id="intercom_checkbox" type="checkbox" checked><label for="intercom_checkbox"> Intercom</label></td>
+            </tr>
+        </table>
+    </div>
 
-<div style="position: absolute; top: 24px; left: 0; right: 0; bottom: 0;">
-    <table id="iframes" style="width: 100%; height: 100%;"><tbody>{{{iframes}}}</tbody></table>
+    <div id="iframeholder">
+        <table>
+{{{iframes}}}        </table>
+    </div>
 </div>
 </body>
 </html>

@@ -190,19 +190,20 @@ function serveClient(url, req, res) {
             send_client_list();
             
             var iframes = "", x, y;
-            var td_height = Math.round(100 / yval);
             for (y = 1; y <= yval; y++) {
-                iframes += "<tr>";
+                iframes += "            <tr>\n";
                 for (x = 1; x <= xval; x++) {
-                    iframes += '<td style="height: ' + td_height + '%;"><iframe src="/client/frame?client=' + mynum + '&x=' + x + '&y=' + y + '" scrolling="no">Loading...</iframe></td>';
+                    iframes += '                <td><iframe src="/client/frame?client=' + mynum + '&amp;x=' + x + '&amp;y=' + y + '" scrolling="no">Loading...</iframe></td>\n';
                 }
-                iframes += "</tr>";
+                iframes += "            </tr>\n";
             }
             
             var d = new Date(), expires = new Date(d.getFullYear() + 1, 0, 1);
             var cookieoptions = "; Path=/; Expires=" + expires.toUTCString();
             
-            myutil.write(res, "client2.html", {name: name, location: location, iframes: iframes}, {"Set-Cookie": ["name=" + name + cookieoptions, "location=" + location + cookieoptions]});
+            var td_height = Math.round(100 / yval);
+            
+            myutil.write(res, "client2.html", {name: name, location: location, closebtn: (xval == 1 && yval == 1 ? false : true), td_height: td_height, iframes: iframes}, {"Set-Cookie": ["name=" + name + cookieoptions, "location=" + location + cookieoptions]});
         } else {
             var cookies = req.headers.cookie ? myutil.parseCookies(req.headers.cookie) : {};
             
@@ -294,15 +295,15 @@ function serveStream(url, req, res) {
             
             req.on("timeout", function () {
                 console.log("stream: TIMEOUT: " + mynum + ":" + x + "x" + y);
-                disconnect(mynum);
+                disconnect(mynum, x, y);
             });
             req.on("error", function () {
                 console.log("stream: ERROR: " + mynum + ":" + x + "x" + y);
-                disconnect(mynum);
+                disconnect(mynum, x, y);
             });
             req.on("close", function () {
                 console.log("stream: CLOSE: " + mynum + ":" + x + "x" + y);
-                disconnect(mynum);
+                disconnect(mynum, x, y);
             });
             
             res.write(":\n\n");
