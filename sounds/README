@@ -1,7 +1,6 @@
 This directory contains sound files that can be used as background sounds.
+The directory name can be changed in config.js
 
 If you include one sound (same basename) in multiple formats (different extensions), the client will automatically figure out which one to use based on the client computer's compatibility.
 Example: thunder.mp3, thunder.ogg, thunder.wav
-(Tthey're all the same sound, but just in different formats; the client now has a choice in case it is not compatible with one of the formats.)
-
-The directory name can be configured in config.js
+(They're all the same sound, but just in different formats; the client now has a choice in case it is not compatible with one of the formats.)
