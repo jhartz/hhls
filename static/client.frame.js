@@ -200,9 +200,10 @@ function closeconn() {
 
 window.onload = function () {
     if (!document.getElementById || !window.EventSource || !document.addEventListener || !document.getElementsByTagName) {
-        status();
-        alert("ERROR: Not all features are supported by this browser.\nPlease upgrade your browser and try again.");
+        alert("ERROR: Your browser does not support some of the JavaScript features required by this page.\nPlease upgrade to a more modern browser.");
     } else {
+        document.getElementById("panel_start_loading").innerHTML = "Loading...";
+        
         document.getElementById("options").addEventListener("click", function (event) {
             document.getElementById("bigstatuscontainer").style.display = "block";
             return false;
@@ -328,5 +329,8 @@ window.onload = function () {
                 }
             };
         }, false);
+        
+        document.getElementById("panel_start_loading").style.display = "none";
+        document.getElementById("panel_start_content").style.display = "block";
     }
 };
