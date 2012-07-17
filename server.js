@@ -229,44 +229,57 @@ function serveClientFrame(url, req, res) {
             x = parseInt(url.query.x, 10),
             y = parseInt(url.query.y, 10);
         if (!isNaN(mynum) && clients[mynum] && x && x > 0 && x <= clients[mynum].x && y && y > 0 && y <= clients[mynum].y) {
-            fs.readdir(config.SOUND_DIR, function (err, files) {
-                if (err) {
-                    myutil.writeError(res, 500);
+            if (url.query.channel && (url.query.channel == "0" || url.query.channel in settings.channels.data)) {
+                var channel = url.query.channel;
+                var details = settings.channels.data[channel] || {type: "timed"};
+                
+                var writeme = function (soundlist) {
+                    myutil.write(res, "clientframe2.html", {mynum: mynum, x: x, y: y, channel: channel.replace(/"/g, '\\"'), channeltype: details.type, sounds: soundlist || false});
+                };
+                
+                if (details.type == "timed") {
+                    fs.readdir(config.SOUND_DIR, function (err, files) {
+                        if (err) {
+                            myutil.writeError(res, 500);
+                        } else {
+                            var sounds = myutil.makeFileList(files, true);
+                            var soundlist = "";
+                            for (var sound in sounds) {
+                                if (sounds.hasOwnProperty(sound)) {
+                                    soundlist += '<audio preload="auto" data-sound="' + myutil.escHTML(sound) + '">';
+                                    for (var i = 0; i < sounds[sound].length; i++) {
+                                        var ext = sounds[sound][i][0], type = sounds[sound][i][1];
+                                        soundlist += '<source src="/' + myutil.escHTML(config.SOUND_DIR) + '/' + myutil.escHTML(sound) + '.' + myutil.escHTML(ext) + '" type="' + myutil.escHTML(type) + '">';
+                                    }
+                                    soundlist += '</audio>\n';
+                                }
+                            }
+                            
+                            writeme(soundlist);
+                        }
+                    });
                 } else {
-                    var sounds = myutil.makeFileList(files, true);
-                    var soundlist = "";
-                    for (var sound in sounds) {
-                        if (sounds.hasOwnProperty(sound)) {
-                            soundlist += '<audio preload="auto" data-sound="' + myutil.escHTML(sound) + '">';
-                            for (var i = 0; i < sounds[sound].length; i++) {
-                                var ext = sounds[sound][i][0], type = sounds[sound][i][1];
-                                soundlist += '<source src="/' + myutil.escHTML(config.SOUND_DIR) + '/' + myutil.escHTML(sound) + '.' + myutil.escHTML(ext) + '" type="' + myutil.escHTML(type) + '">';
-                            }
-                            soundlist += '</audio>\n';
-                        }
-                    }
-                    
-                    var channellist = '<input type="radio" name="channelradio" value="0" id="channel_radio0" checked><label for="channel_radio0"> Default Channel</label>';
-                    var counter = 0;
-                    for (var channel in settings.channels.data) {
-                        if (settings.channels.data.hasOwnProperty(channel)) {
-                            counter++;
-                            var details = settings.channels.data[channel];
-                            var css = "", type = "timed";
-                            if (details.type && details.type == "toggled") {
-                                css = "color: red;";
-                                type = "toggled";
-                            } else if (details.type && details.type == "dimmed") {
-                                css = "color: blue;";
-                                type = "dimmed";
-                            }
-                            channellist += '<br><input type="radio" name="channelradio" value="' + myutil.escHTML(channel) + '" id="channel_radio' + counter + '" data-type="' + type + '" data-description="' + myutil.escHTML(details.description || "") + '"><label for="channel_radio' + counter + '" style="' + css + '"' + (details.description ? ' title="' + myutil.escHTML(details.description) + '"' : '') + '> ' + myutil.escHTML(channel) + '</label>';
-                        }
-                    }
-                    
-                    myutil.write(res, "client.frame.html", {mynum: mynum, x: x, y: y, sounds: soundlist, channels: channellist});
+                    writeme();
                 }
-            });
+            } else {
+                var channellist = '<input type="radio" name="channel" value="0" id="channel_radio0" checked><label for="channel_radio0"> Default Channel</label>';
+                var counter = 0;
+                for (var channel in settings.channels.data) {
+                    if (settings.channels.data.hasOwnProperty(channel)) {
+                        counter++;
+                        var details = settings.channels.data[channel];
+                        var css = "";
+                        if (details.type && details.type == "toggled") {
+                            css = "color: red;";
+                        } else if (details.type && details.type == "dimmed") {
+                            css = "color: blue;";
+                        }
+                        channellist += '<br><input type="radio" name="channel" value="' + myutil.escHTML(channel) + '" id="channel_radio' + counter + '"><label for="channel_radio' + counter + '" style="' + css + '"' + (details.description ? ' title="' + myutil.escHTML(details.description) + '"' : '') + '> ' + myutil.escHTML(channel) + '</label>';
+                    }
+                }
+                
+                myutil.write(res, "clientframe.html", {mynum: mynum, x: x, y: y, channellist: channellist});
+            }
         } else {
             myutil.writeError(res, 404);
         }
