@@ -5,7 +5,6 @@ var is_on = false,
     volume = 80,
     sounds = {},
     source,
-    oncolorchange = function () {},
     oneffectplay = function () {},
     oneffectnext = function () {},
     oneffectstop = function () {};
@@ -52,21 +51,30 @@ function status(text, in_loading) {
     }
 }
 
+function dim(percent) {
+    document.getElementById("bg").style.opacity = percent / 100;
+}
+
 function on() {
-    document.body.style.backgroundColor = on_color;
-    document.body.style.color = off_color;
+    dim(100);
     is_on = true;
 }
 
 function off() {
-    document.body.style.backgroundColor = off_color;
-    document.body.style.color = on_color;
+    dim(0);
     is_on = false;
 }
 
 function toggle() {
     if (is_on) off();
     else on();
+}
+
+function updatecolor() {
+    document.body.style.backgroundColor = off_color;
+    document.body.style.textShadow = "1px 1px 1px " + off_color;
+    document.body.style.color = on_color;
+    document.getElementById("bg").style.backgroundColor = on_color;
 }
 
 function closeconn() {
@@ -104,7 +112,16 @@ window.onload = function () {
         }, false);
         
         document.getElementById("reloader").addEventListener("click", function (event) {
-            location.back();
+            location.href = "/client/frame?cid=" + cid + "&x=" + x + "&y=" + y;
+        }, false);
+        
+        document.getElementById("oncolor").addEventListener("change", function (event) {
+            on_color = document.getElementById("oncolor").value;
+            updatecolor();
+        }, false);
+        document.getElementById("offcolor").addEventListener("change", function (event) {
+            off_color = document.getElementById("offcolor").value;
+            updatecolor();
         }, false);
         
         if (document.getElementById("noflash_check")) {
@@ -112,16 +129,6 @@ window.onload = function () {
                 noflash = document.getElementById("noflash_check").checked;
             }, false);
         }
-        
-        document.getElementById("oncolor").addEventListener("change", function (event) {
-            on_color = document.getElementById("oncolor").value;
-            toggle();
-            toggle();
-        }, false);
-        document.getElementById("offcolor").addEventListener("change", function (event) {
-            off_color = document.getElementById("offcolor").value;
-           oncolorchange();
-        }, false);
         
         if (document.getElementById("slider")) {
             // If we have found this element, then sound is enabled
@@ -151,7 +158,7 @@ window.onload = function () {
         
         status("Connecting to server...", true);
         
-        source = new EventSource("/client/stream?channel=" + encodeURIComponent(channel) + "&client=" + mynum + "&x=" + x + "&y=" + y);
+        source = new EventSource("/client/stream?channel=" + encodeURIComponent(channel) + "&cid=" + cid + "&x=" + x + "&y=" + y);
         source.onopen = function (event) {
             status("Connected to server.");
             document.getElementById("close").style.display = "block";

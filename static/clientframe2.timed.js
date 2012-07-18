@@ -1,3 +1,5 @@
+// NOTE: This is similar to clientframe2.dimmed.js (update that when you update this)
+
 var queue = [];
 var stop_sound, stop_light;
 
@@ -125,13 +127,8 @@ function runseq() {
     }
 }
 
-oncolorchange = function () {
-    toggle();
-    toggle();
-};
-
-oneffectplay = function () {
-    queue.push(data.prop);
+oneffectplay = function (prop) {
+    queue.push(prop);
 };
 
 oneffectnext = function () {
