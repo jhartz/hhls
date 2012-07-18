@@ -3,7 +3,9 @@ window.onload = function () {
         document.getElementById("status_closeall").addEventListener("click", function (event) {
             var frames = document.getElementsByTagName("iframe");
             for (var i = 0; i < frames.length; i++) {
-                frames[i].contentWindow.closeconn();
+                if (frames[i] && frames[i].contentWindow && typeof frames[i].contentWindow.closeconn == "function") {
+                    frames[i].contentWindow.closeconn();
+                }
             }
         }, false);
         
