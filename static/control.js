@@ -381,11 +381,13 @@ var effects = {
     
     
     init: function () {
-        $("#effects_next").click(function () {
-            effects.next();
+        $("#effects_next").click(function (event) {
+            event.preventDefault();
+            effects.next(effects.channel);
         });
-        $("#effects_stop").click(function () {
-            effects.stop();
+        $("#effects_stop").click(function (event) {
+            event.preventDefault();
+            effects.stop(effects.channel);
         });
         
         $("li.effects_tocustom").click(function () {
@@ -440,12 +442,12 @@ var effects = {
                     effects.sendpreset(effects.channel, $("#effects_preset_" + effects.details.type).val());
                 } else {
                     if (effects.details.type == "dimmed") {
-                        var dimness = parseInt($("#effects_custom_dimness").val(), 10);
-                        var time = parseInt($("#effects_custom_time").val(), 10);
-                        if (isNaN(dimness)) {
+                        var dimness = Number($("#effects_custom_dimness").val());
+                        var time = Number($("#effects_custom_time").val() || 0);
+                        if (isNaN(dimness) || dimness > 100 || dimness < 0) {
                             alert("ERROR: Invalid dim level!");
                             return;
-                        } else if (isNaN(time)) {
+                        } else if (isNaN(time) || time < 0) {
                             alert("ERROR: Invalid time!");
                             return;
                         } else {
@@ -487,7 +489,7 @@ var effects = {
         if (!this.details.type) this.details.type = "timed";
         $("div.effects_panel").hide();
         $("#effects_" + this.details.type + "panel").show();
-        $("#effects_gocontainer")[this.details.type == "toggled" ? "hide" : "show"]();
+        $("#effects_gocontainer, #effects_nextstopcontainer")[this.details.type == "toggled" ? "hide" : "show"]();
     },
     
     update_channels: function () {

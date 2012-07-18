@@ -21,7 +21,7 @@ var settings = {
 <body>
 <section id="ctrl_miniclient" class="top minimized">
     <header><h1>Mini-Client</h1></header>
-    <div style="height: 100%; padding: 0; overflow: hidden;"><iframe src="/client?layout=1x1&nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
+    <div style="height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;"><iframe src="/client?layout=1x1&nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
 </section>
 
 <section id="ctrl_effects" class="top left">
@@ -29,43 +29,46 @@ var settings = {
     <div id="effects_waiting"><table><tr><td id="effects_statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
     <div id="effects_controls" style="display: none; min-height: 100%;">
         <form id="effects_form">
-            <table id="effects_table" style="width: 100%; border-collapse: collapse;"><tbody><tr>
-                <td style="width: 50%;"><div id="effects_channels" class="panelbox">Loading...</div></td>
-                <td style="width: 50%;">
-                    <div id="effects_timedpanel" class="panel effects_panel">
-                        <div class="front">
-                            <ul><li>Preset</li><li class="effects_tocustom">Custom</li></ul>
-                            <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_timed"></select><br><span class="lilbutton effects_preset_customize">Customize</span></div>
+            <table id="effects_table" style="width: 100%; border-collapse: collapse;"><tbody>
+                <tr>
+                    <td style="width: 50%;"><div id="effects_channels" class="panelbox">Loading...</div></td>
+                    <td style="width: 50%;">
+                        <div id="effects_timedpanel" class="panel effects_panel">
+                            <div class="front">
+                                <ul><li>Preset</li><li class="effects_tocustom">Custom</li></ul>
+                                <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_timed"></select><br><span class="lilbutton effects_preset_customize">Customize</span></div>
+                            </div>
+                            <div class="back">
+                                <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
+                                <div><br style="clear: both;"><label for="effects_custom_light">Lighting (list of millisecond intervals): </label><input id="effects_custom_light" pattern="([0-9]+ *,? *)+" placeholder="100,200,150, ..." x-moz-errormessage="Please enter a comma-separated list of integers"><br><label for="effects_custom_sound">Sound: </label><select id="effects_custom_sound"><option value="" selected>(none)</option>{{{sounds}}}</select></div>
+                            </div>
                         </div>
-                        <div class="back">
-                            <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
-                            <div><br style="clear: both;"><label for="effects_custom_light">Lighting (list of millisecond intervals): </label><input id="effects_custom_light" pattern="([0-9]+ *,? *)+" placeholder="100,200,150, ..." x-moz-errormessage="Please enter a comma-separated list of integers"><br><label for="effects_custom_sound">Sound: </label><select id="effects_custom_sound"><option value="" selected>(none)</option>{{{sounds}}}</select></div>
+                        <div id="effects_toggledpanel" class="panelbox effects_panel" style="display: none; text-align: center;">
+                            <table style="margin: auto;">
+                                <tr><td><button id="effects_toggledpanel_on">On</button></td><td><button id="effects_toggledpanel_off">Off</button></td></tr>
+                                <tr><td colspan="2"><button id="effects_toggledpanel_toggle">Toggle</button></td></tr>
+                            </table>
                         </div>
-                    </div>
-                    <div id="effects_toggledpanel" class="panelbox effects_panel" style="display: none; text-align: center;">
-                        <table style="margin: auto;">
-                            <tr><td><button id="effects_toggledpanel_on">On</button></td><td><button id="effects_toggledpanel_off">Off</button></td></tr>
-                            <tr><td colspan="2"><button id="effects_toggledpanel_toggle">Toggle</button></td></tr>
-                        </table>
-                    </div>
-                    <div id="effects_dimmedpanel" class="panel effects_panel" style="display: none;">
-                        <div class="front">
-                            <ul><li>Preset</li><li class="effects_tocustom">Custom</li></ul>
-                            <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_dimmed"></select><br><span class="lilbutton effects_preset_customize">Customize</span></div>
+                        <div id="effects_dimmedpanel" class="panel effects_panel" style="display: none;">
+                            <div class="front">
+                                <ul><li>Preset</li><li class="effects_tocustom">Custom</li></ul>
+                                <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_dimmed"></select><br><span class="lilbutton effects_preset_customize">Customize</span></div>
+                            </div>
+                            <div class="back">
+                                <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
+                                <div><br style="clear: both;"><label for="effects_custom_dimness">Dimness: </label><input type="range" id="effects_custom_dimness" size="3" pattern="(100|[0-9]{1,2}(\.[0-9]*)?)">&nbsp;<span id="effects_custom_dimness_label"></span><br><label for="effects_custom_time">Fading Time (seconds): </label><input type="number" id="effects_custom_time" size="3" pattern="[0-9]+(\.[0-9]*)?"></div>
+                            </div>
                         </div>
-                        <div class="back">
-                            <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
-                            <div><br style="clear: both;"><label for="effects_custom_dimness">Dimness: </label><input type="range" id="effects_custom_dimness" size="3" pattern="(100|[0-9]{1,2})">&nbsp;<span id="effects_custom_dimness_label"></span><br><label for="effects_custom_time">Fading Time (seconds): </label><input type="number" id="effects_custom_time" size="3" pattern="[0-9]+"></div>
-                        </div>
-                    </div>
-                </td>
-            </tr></tbody></table>
-            
-            <div id="effects_gocontainer" style="clear: both; text-align: center;"><button style="min-width: 100px;">Go</button></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;"><div id="effects_nextstopcontainer"><button id="effects_next" title="Stop current lighting/sound and move to next in queue">Next</button>&nbsp;<button id="effects_stop" title="Cancel all lighting/sound currently happening or in queue">Stop</button></div></td>
+                    <td style="text-align: center;"><div id="effects_gocontainer"><button style="min-width: 100px;">Go</button></div></td>
+                </tr>
+            </tbody></table>
         </form>
     </div>
     <footer class="buttonbox">
-        <div><button id="effects_next" title="Stop thunder/lightning currently happening and move to next in queue" style="width: 50%;" disabled>Next</button><button id="effects_stop" title="Cancel all thunder/lightning currently happening or in queue" style="width: 50%;" disabled>Stop</button></div>
         <div><button id="effects_intercom" style="width: 33%;" disabled>Intercom</button><button id="effects_channels" style="width: 33%;" disabled>Channels</button><button id="effects_keyboard" style="width: 34%;" disabled>Keyboard Shortcuts</button></div>
     </footer>
 </section>
