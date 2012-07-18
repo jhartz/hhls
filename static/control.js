@@ -24,6 +24,8 @@ function resizer(use_animate) {
 var minimized_items = [];
 
 $(function () {
+    $("section").show();
+    
     var test_buttons = function () {
         // Disable tray buttons if 2 things are already opened
         $("#minimized_tray button").attr("disabled", $("section.top").not(".minimized").length > 1);
@@ -125,48 +127,53 @@ var video = {
     pop: null,
     
     init: function () {
-        window.onunload = window.onbeforeunload = function () {
-            video.closewin();
-        };
-        
-        $("#video_openwin_go").click(function () {
-            video.openwin();
-        });
-        $("#video_openwin_skip").click(function () {
-            video.openwin(true);
-        });
-        
-        $("div.vidbtn").click(function () {
-            video.playvid(this.dataset.vidbtn, JSON.parse(this.dataset.formats), this.dataset.control ? JSON.parse(this.dataset.control) : null);
-        });
-        
-        // TODO: Use MediaController to sync videos (once browsers implement it)
-        // http://dev.w3.org/html5/spec/media-elements.html#synchronising-multiple-media-elements
-        // But how would we do that cross-window? (If we somehow clone a node and add it to another window, would it keep the relationship?)
-        // Or, maybe something like this: http://weblog.bocoup.com/html5-video-synchronizing-playback-of-two-videos/
-        var seekfunc = function () {
-            if (video.winref) {
-                var a = video.winref.document.getElementById("main_vid");
-                var b = document.getElementById("video_vid");
-                a.currentTime = b.currentTime;
-            }
-        };
-        $("#video_vid").on({
-            seeking: seekfunc,
-            seeked: seekfunc,
-            play: function () {
+        var testelem = document.createElement("video");
+        if (typeof testelem.canPlayType != "function" || !testelem.dataset) {
+            $("#video_openwin").html("<div>ERROR: Your browser does not support some of the HTML5 and JavaScript features required by the video player.</div><div>Please upgrade to a more modern browser to use the video player.</div>");
+        } else {
+            window.onunload = window.onbeforeunload = function () {
+                video.closewin();
+            };
+            
+            $("#video_openwin_go").click(function () {
+                video.openwin();
+            });
+            $("#video_openwin_skip").click(function () {
+                video.openwin(true);
+            });
+            
+            $("div.vidbtn").click(function () {
+                video.playvid(this.dataset.vidbtn, $.parseJSON(this.dataset.formats), this.dataset.control ? $.parseJSON(this.dataset.control) : null);
+            });
+            
+            // TODO: Use MediaController to sync videos (once browsers implement it)
+            // http://dev.w3.org/html5/spec/media-elements.html#synchronising-multiple-media-elements
+            // But how would we do that cross-window? (If we somehow clone a node and add it to another window, would it keep the relationship?)
+            // Or, maybe something like this: http://weblog.bocoup.com/html5-video-synchronizing-playback-of-two-videos/
+            var seekfunc = function () {
                 if (video.winref) {
-                    video.winref.document.getElementById("main_vid").play();
-                    seekfunc();
+                    var a = video.winref.document.getElementById("main_vid");
+                    var b = document.getElementById("video_vid");
+                    a.currentTime = b.currentTime;
                 }
-            },
-            pause: function () {
-                if (video.winref) {
-                    video.winref.document.getElementById("main_vid").pause();
-                    seekfunc();
+            };
+            $("#video_vid").on({
+                seeking: seekfunc,
+                seeked: seekfunc,
+                play: function () {
+                    if (video.winref) {
+                        video.winref.document.getElementById("main_vid").play();
+                        seekfunc();
+                    }
+                },
+                pause: function () {
+                    if (video.winref) {
+                        video.winref.document.getElementById("main_vid").pause();
+                        seekfunc();
+                    }
                 }
-            }
-        });
+            });
+        }
     },
     
     toggle: function (newbie) {
@@ -458,7 +465,7 @@ var effects = {
                         var sound = $("#effects_custom_sound").val();
                         if (light.lastIndexOf(",") == light.length - 1) light = light.slice(0, -1);
                         try {
-                            light = JSON.parse("[" + light + "]");
+                            light = $.parseJSON("[" + light + "]");
                         } catch (err) {
                             alert("ERROR: Invalid lighting pattern!\nDetails: " + err);
                             return;
@@ -621,88 +628,92 @@ var conn = {
     socket: null,
     
     init: function () {
-        /*
-        $("#conn_cancel").click(function () {
-            conn.socket.disconnect();
-            if (!(conn.socket && (conn.socket.connected || conn.socket.connecting || conn.socket.open || conn.socket.reconnecting))) {
-                $("#conn_cancel").hide();
-                setTimeout(function () {
+        if (typeof JSON == "undefined" || typeof JSON.parse != "function" || typeof Array.prototype.map != "function") {
+            this.showmsg("ERROR: Your browser does not support some of the JavaScript features required by this page.\nPlease upgrade to a more modern browser.");
+        } else {
+            /*
+            $("#conn_cancel").click(function () {
+                conn.socket.disconnect();
+                if (!(conn.socket && (conn.socket.connected || conn.socket.connecting || conn.socket.open || conn.socket.reconnecting))) {
                     $("#conn_cancel").hide();
-                    $("html, body").css("overflow", "hidden");
-                    $("section.top").animate({height: "100%"});
-                    $("section.bottom").animate({height: 0}, function () {
-                        $("section.bottom").hide();
-                        $("html, body").css("overflow", "");
-                        video.adjust();
-                    });
-                }, 1000);
-            }
-        });
-        */
-        
-        $(document).on("click", "span.clientitem", function () {
-            alert("More info on: " + $(this).text());
-        });
-        
-        this.socket = io.connect();
-        
-        this.socket.on("connecting", function () {
-            conn.showmsg("Connecting to server...");
-        });
-        this.socket.on("connect", function () {
-            conn.showmsg("Connected to server");
-            effects.toggle(true);
-            // In case this gets shown again (if there's an error, disconnect, etc.)
-            $("#effects_statuser").text("Server connection necessary");
-        });
-        this.socket.on("connect_failed", function () {
-            conn.showmsg("Failed to establish connection to server");
-            effects.toggle();
-        });
-        
-        this.socket.on("message", function (msg) {
-            try {
-                var data = JSON.parse(msg);
-                if (data && data.about) {
-                    switch (data.about) {
-                        case "clientlist":
-                            conn.showlist(data.data);
-                            break;
-                        case "settings":
-                            settings[data.data.setting] = data.data.settings;
-                            if (effects["update_" + data.data.setting]) effects["update_" + data.data.setting]();
-                            break;
-                        default:
-                            conn.showmsg("ERROR: Invalid message received from server:\n" + msg);
-                    }
-                } else {
-                    conn.showmsg("ERROR: Invalid data received from server:\n" + msg);
+                    setTimeout(function () {
+                        $("#conn_cancel").hide();
+                        $("html, body").css("overflow", "hidden");
+                        $("section.top").animate({height: "100%"});
+                        $("section.bottom").animate({height: 0}, function () {
+                            $("section.bottom").hide();
+                            $("html, body").css("overflow", "");
+                            video.adjust();
+                        });
+                    }, 1000);
                 }
-            } catch (err) {
-                conn.showmsg("ERROR: Invalid JSON received from server:\n" + msg);
-            }
-        });
-        
-        this.socket.on("disconnect", function () {
-            conn.showmsg("Disconnected from server");
-            effects.toggle();
-        });
-        conn.socket.on("error", function () {
-            conn.showmsg("Error connecting to server");
-            effects.toggle();
-        });
-        conn.socket.on("reconnect", function () {
-            conn.showmsg("Reconnected to server");
-            effects.toggle(true);
-        });
-        conn.socket.on("reconnecting", function () {
-            conn.showmsg("Reconnecting to server...");
-            effects.toggle();
-        });
-        conn.socket.on("reconnect_failed", function () {
-            conn.showmsg("Failed to reconnect to server");
-            effects.toggle();
-        });
+            });
+            */
+            
+            $(document).on("click", "span.clientitem", function () {
+                alert("More info on: " + $(this).text());
+            });
+            
+            this.socket = io.connect();
+            
+            this.socket.on("connecting", function () {
+                conn.showmsg("Connecting to server...");
+            });
+            this.socket.on("connect", function () {
+                conn.showmsg("Connected to server");
+                effects.toggle(true);
+                // In case this gets shown again (if there's an error, disconnect, etc.)
+                $("#effects_statuser").text("Server connection necessary");
+            });
+            this.socket.on("connect_failed", function () {
+                conn.showmsg("Failed to establish connection to server");
+                effects.toggle();
+            });
+            
+            this.socket.on("message", function (msg) {
+                try {
+                    var data = $.parseJSON(msg);
+                    if (data && data.about) {
+                        switch (data.about) {
+                            case "clientlist":
+                                conn.showlist(data.data);
+                                break;
+                            case "settings":
+                                settings[data.data.setting] = data.data.settings;
+                                if (effects["update_" + data.data.setting]) effects["update_" + data.data.setting]();
+                                break;
+                            default:
+                                conn.showmsg("ERROR: Invalid message received from server:\n" + msg);
+                        }
+                    } else {
+                        conn.showmsg("ERROR: Invalid data received from server:\n" + msg);
+                    }
+                } catch (err) {
+                    conn.showmsg("ERROR: Invalid JSON received from server:\n" + msg);
+                }
+            });
+            
+            this.socket.on("disconnect", function () {
+                conn.showmsg("Disconnected from server");
+                effects.toggle();
+            });
+            conn.socket.on("error", function () {
+                conn.showmsg("Error connecting to server");
+                effects.toggle();
+            });
+            conn.socket.on("reconnect", function () {
+                conn.showmsg("Reconnected to server");
+                effects.toggle(true);
+            });
+            conn.socket.on("reconnecting", function () {
+                conn.showmsg("Reconnecting to server...");
+                effects.toggle();
+            });
+            conn.socket.on("reconnect_failed", function () {
+                conn.showmsg("Failed to reconnect to server");
+                effects.toggle();
+            });
+        }
     },
     
     sendmsg: function (jsonmsg) {

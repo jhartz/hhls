@@ -93,8 +93,10 @@ function closeconn() {
 }
 
 window.onload = function () {
-    if (!document.getElementById || !window.EventSource || !document.addEventListener || !document.getElementsByTagName) {
+    if (!document.getElementById || !document.addEventListener || !document.getElementsByTagName) {
         alert("ERROR: Your browser does not support some of the JavaScript features required by this page.\nPlease upgrade to a more modern browser.");
+    } else if (!window.EventSource) {
+        alert("ERROR: Your browser does not support Server-Sent Events.\nPlease upgrade to a more modern browser.");
     } else {
         status("Loading...", true);
         

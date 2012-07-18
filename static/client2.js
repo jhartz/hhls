@@ -1,5 +1,5 @@
 window.onload = function () {
-    if (document.getElementById && document.addEventListener) {
+    if (document.getElementById && document.getElementsByTagName && document.addEventListener) {
         document.getElementById("status_closeall").addEventListener("click", function (event) {
             var frames = document.getElementsByTagName("iframe");
             for (var i = 0; i < frames.length; i++) {
