@@ -176,10 +176,10 @@ function serveClient(url, req, res) {
                 yval = 1;
             }
             
-            var mynum = clients.length;
-            console.log("SERVING CLIENT: " + mynum);
+            var cid = clients.length;
+            console.log("SERVING CLIENT: " + cid);
             clients.push({
-                active: true,
+                active: false,
                 name: name,
                 location: location,
                 ip: req.connection.remoteAddress,
@@ -187,13 +187,12 @@ function serveClient(url, req, res) {
                 y: yval,
                 frames: {}
             });
-            send_client_list();
             
             var iframes = "", x, y;
             for (y = 1; y <= yval; y++) {
                 iframes += "            <tr>\n";
                 for (x = 1; x <= xval; x++) {
-                    iframes += '                <td><iframe src="/client/frame?client=' + mynum + '&amp;x=' + x + '&amp;y=' + y + '" scrolling="no">Loading...</iframe></td>\n';
+                    iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + '" scrolling="no">Loading...</iframe></td>\n';
                 }
                 iframes += "            </tr>\n";
             }
@@ -210,8 +209,8 @@ function serveClient(url, req, res) {
             var vars = {hostname: hostname};
             vars.name = cookies.name || "";
             vars.location = cookies.location || "";
-            vars.styling = typeof url.query.nostyle == "undefined";
-            if (url.query.layout && url.query.layout.trim().search(/^[1-9]x[1-9]$/) != -1) {
+            vars.styling = !!(url.query && typeof url.query.nostyle == "undefined");
+            if (url.query && url.query.layout && url.query.layout.trim().search(/^[1-9]x[1-9]$/) != -1) {
                 vars.show_layout = false;
                 vars.layout = url.query.layout.trim();
             } else {
@@ -224,17 +223,17 @@ function serveClient(url, req, res) {
 }
 
 function serveClientFrame(url, req, res) {
-    if (url.query.client && url.query.x && url.query.y) {
-        var mynum = parseInt(url.query.client, 10),
+    if (url.query && url.query.cid && url.query.x && url.query.y) {
+        var cid = parseInt(url.query.cid, 10),
             x = parseInt(url.query.x, 10),
             y = parseInt(url.query.y, 10);
-        if (!isNaN(mynum) && clients[mynum] && x && x > 0 && x <= clients[mynum].x && y && y > 0 && y <= clients[mynum].y) {
+        if (!isNaN(cid) && clients[cid] && x && x > 0 && x <= clients[cid].x && y && y > 0 && y <= clients[cid].y) {
             if (url.query.channel && (url.query.channel == "0" || url.query.channel in settings.channels.data)) {
                 var channel = url.query.channel;
                 var details = settings.channels.data[channel] || {type: "timed"};
                 
                 var writeme = function (soundlist) {
-                    myutil.write(res, "clientframe2.html", {mynum: mynum, x: x, y: y, channel: channel.replace(/"/g, '\\"'), channeltype: details.type, sounds: soundlist || false});
+                    myutil.write(res, "clientframe2.html", {cid: cid, x: x, y: y, channel: channel.replace(/"/g, '\\"'), channeltype: details.type, sounds: soundlist || false});
                 };
                 
                 if (details.type == "timed") {
@@ -278,7 +277,7 @@ function serveClientFrame(url, req, res) {
                     }
                 }
                 
-                myutil.write(res, "clientframe.html", {mynum: mynum, x: x, y: y, channellist: channellist});
+                myutil.write(res, "clientframe.html", {cid: cid, x: x, y: y, channellist: channellist});
             }
         } else {
             myutil.writeError(res, 404);
@@ -289,34 +288,35 @@ function serveClientFrame(url, req, res) {
 }
 
 function serveStream(url, req, res) {
-    if (typeof url.query.client != "undefined" && url.query.x && url.query.y && typeof url.query.channel != "undefined") {
-        var mynum = parseInt(url.query.client, 10),
+    if (url.query && url.query.cid && url.query.x && url.query.y && url.query.channel) {
+        var cid = parseInt(url.query.cid, 10),
             x = parseInt(url.query.x, 10),
             y = parseInt(url.query.y, 10),
             channel = url.query.channel;
-        if (clients[mynum] && x > 0 && x <= clients[mynum].x && y > 0 && y <= clients[mynum].y && (channel == 0 || channel in settings.channels.data)) {
+        if (clients[cid] && x > 0 && x <= clients[cid].x && y > 0 && y <= clients[cid].y && (channel == "0" || channel in settings.channels.data)) {
             res.writeHead(200, {
                 "Content-Type": "text/event-stream",
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive"
             });
             
-            console.log("SERVING STREAM: " + mynum + ":" + x + "x" + y);
+            console.log("SERVING STREAM: " + cid + ":" + x + "x" + y);
             
-            if (!clients[mynum].frames[x]) clients[mynum].frames[x] = {};
-            clients[mynum].frames[x][y] = {active: true, res: res, channel: channel};
+            clients[cid].active = true;
+            if (!clients[cid].frames[x]) clients[cid].frames[x] = {};
+            clients[cid].frames[x][y] = {active: true, res: res, channel: channel};
             
             req.on("timeout", function () {
-                console.log("stream: TIMEOUT: " + mynum + ":" + x + "x" + y);
-                disconnect(mynum, x, y);
+                console.log("stream: TIMEOUT: " + cid + ":" + x + "x" + y);
+                disconnect(cid, x, y);
             });
             req.on("error", function () {
-                console.log("stream: ERROR: " + mynum + ":" + x + "x" + y);
-                disconnect(mynum, x, y);
+                console.log("stream: ERROR: " + cid + ":" + x + "x" + y);
+                disconnect(cid, x, y);
             });
             req.on("close", function () {
-                console.log("stream: CLOSE: " + mynum + ":" + x + "x" + y);
-                disconnect(mynum, x, y);
+                console.log("stream: CLOSE: " + cid + ":" + x + "x" + y);
+                disconnect(cid, x, y);
             });
             
             res.write(":\n\n");
@@ -330,37 +330,31 @@ function serveStream(url, req, res) {
     }
 }
 
-function disconnect(mynum, x, y) {
-    console.log("stream DISCONNECT: " + mynum + ":" + x + "x" + y);
-    clients[mynum].frames[x][y].active = false;
-    if (clients[mynum].frames[x][y].res) {
-        clients[mynum].frames[x][y].res.end();
-        clients[mynum].frames[x][y].res = null;
+function disconnect(cid, x, y) {
+    console.log("stream DISCONNECT: " + cid + ":" + x + "x" + y);
+    clients[cid].frames[x][y].active = false;
+    if (clients[cid].frames[x][y].res) {
+        clients[cid].frames[x][y].res.end();
+        clients[cid].frames[x][y].res = null;
     }
     
     var still_active = false;
-    for (var xi = 1; xi <= clients[mynum].x; xi++) {
+    for (var xi = 1; xi <= clients[cid].x; xi++) {
         if (still_active) break;
-        if (clients[mynum].frames[xi]) {
-            for (var yi = 1; yi <= clients[mynum].y; yi++) {
+        if (clients[cid].frames[xi]) {
+            for (var yi = 1; yi <= clients[cid].y; yi++) {
                 if (still_active) break;
-                if (clients[mynum].frames[xi][yi]) {
-                    if (clients[mynum].frames[xi][yi].active) {
+                if (clients[cid].frames[xi][yi]) {
+                    if (clients[cid].frames[xi][yi].active) {
                         still_active = true;
                     }
-                } else {
-                    // Might still be loading
-                    still_active = true;
                 }
             }
-        } else {
-            // Might still be loading
-            still_active = true;
         }
     }
     
     if (!still_active) {
-        clients[mynum].active = false;
+        clients[cid].active = false;
     }
     
     send_client_list();
@@ -412,6 +406,7 @@ function send_client_list() {
     for (var i = 0; i < clients.length; i++) {
         if (clients[i] && clients[i].active) {
             var client = {
+                cid: i,
                 name: clients[i].name,
                 location: clients[i].location,
                 ip: clients[i].ip,
