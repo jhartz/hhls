@@ -142,15 +142,15 @@ section > footer.buttonbox button {
     border-radius: 0;
     margin: 0;
     box-shadow: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 section:not(.flatfooter) > footer.buttonbox button {
     border-bottom-style: none;
     border-left-style: none;
     width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 section.flatfooter > footer.buttonbox button {
