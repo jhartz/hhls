@@ -22,7 +22,7 @@ var settings = {
 <noscript><section style="text-align: center;">ERROR: JavaScript is required to view this page.</section></noscript>
 <section id="ctrl_miniclient" class="top minimized" style="display: none;">
     <header><h1>Mini-Client</h1></header>
-    <div style="height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;"><iframe src="/client?layout=1x1&nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
+    <div style="height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;"><iframe src="/client?layout=1x1&amp;nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
 </section>
 
 <section id="ctrl_effects" class="top left" style="display: none;">
@@ -77,28 +77,18 @@ var settings = {
 <section id="ctrl_video" class="top right" style="display: none;">
     <header><h1>Video Controls</h1></header>
     <div id="video_openwin" style="text-align: center;">
-        <div><button id="video_openwin_go" style="font-size: inherit;">Open video-playing window</button></div>
-        <div><span id="video_openwin_skip" class="lilbutton">skip</span></div>
+        <p><button id="video_openwin_go" style="font-size: inherit;">Open video-playing window</button></p>
+        <p><span id="video_openwin_skip" class="lilbutton">skip</span></p>
     </div>
-    <div id="video_playing" style="display: none;">
+    <div id="video_selection" style="display: none;">
         <table>
-            <tr class="top">
-                <td valign="top">
-                    <div id="video_selection">
-                        <table>
 
 {{{videos}}}
-                        </table>
-                    </div>
-                </td>
-                <td id="video_container" style="visibility: hidden;">
-                    <video id="video_vid" preload="auto" controls title="While seeking the videos (or if the videos become out of sync), click and hold on the seek bar for a few seconds and then release."></video>
-                </td>
-            </tr>
-            <tr class="bottom">
-                <td colspan="2"><div id="visual_cue_container"><div id="visual_cue">[visual cue area]</div></div></td>
-            </tr>
         </table>
+    </div>
+    <div id="video_playing" style="display: none; height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;">
+        <table style="width: 100%; height: 100%; border-style: none; border-collapse: collapse;"><tr><td style="text-align: center;"><video id="video_vid" preload="auto" controls title="While seeking the videos (or if the videos become out of sync), click and hold on the seek bar for a few seconds and then release." style="background-color: black;"></video></td></tr></table>
+        <div id="visual_cue_container" style="display: none;"><div id="visual_cue">[visual cue area]</div></div>
     </div>
 </section>
 

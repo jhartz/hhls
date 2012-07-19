@@ -15,10 +15,17 @@ function resizer(use_animate) {
     var height = $("#dummy").outerHeight(true) - $("section.bottom").outerHeight(true);
     $("section.top").not(".minimized").each(function () {
         var diff = $(this).outerHeight(true) - $(this).height();
-        $(this)[use_animate ? "animate" : "css"]({
-            height: Math.floor(height - diff) + "px"
-        });
+        var newheight = Math.floor(height - diff) + "px";
+        if (use_animate) {
+            $(this).animate({height: newheight}, function () {
+                video.adjust();
+            });
+        } else {
+            $(this).css("height", newheight);
+        }
     });
+    
+    video.adjust();
 }
 
 var minimized_items = [];
@@ -118,13 +125,13 @@ $(function () {
 
 $(window).resize(function () {
     resizer();
-    video.adjust();
 });
 
 var video = {
     winref: null,
     nowinref: false,
     pop: null,
+    RESIZE_VIDEO_TO_SCREEN: false,
     
     init: function () {
         var testelem = document.createElement("video");
@@ -142,7 +149,7 @@ var video = {
                 video.openwin(true);
             });
             
-            $("div.vidbtn").click(function () {
+            $("button.vidbtn").click(function () {
                 video.playvid(this.dataset.vidbtn, $.parseJSON(this.dataset.formats), this.dataset.control ? $.parseJSON(this.dataset.control) : null);
             });
             
@@ -177,6 +184,7 @@ var video = {
     },
     
     toggle: function (newbie) {
+        // TODO: Do pretty "sliding" effect
         $("#ctrl_video > div").hide();
         $(document.getElementById("video_" + newbie)).show();
         this.adjust();
@@ -231,7 +239,7 @@ var video = {
         }
         
         if (this.nowinref || this.winref) {
-            this.toggle("playing");
+            this.toggle("selection");
         }
     },
     
@@ -250,15 +258,16 @@ var video = {
         this.cue();
         $("#video_vid")[0].pause();
         $("#video_vid")[0].src = "";
-        $("#video_container").css("visibility", "hidden");
         if (this.winref) {
             this.winref.document.getElementById("main_vid").pause();
             this.winref.document.getElementById("main_vid").src = "";
         }
+        this.toggle("selection");
     },
     
     playvid: function (vid, formats, control) {
         this.stopallvid();
+            console.log(arguments);
         if (vid && formats && formats.length > 0) {
             var ext = "";
             var maybe = [];
@@ -307,7 +316,7 @@ var video = {
                 }
             }
             
-            $("#video_container").css("visibility", "visible");
+            this.toggle("playing");
         }
     },
     
@@ -347,16 +356,36 @@ var video = {
     },
     
     adjust: function () {
-        // Adjust width/height of preview
-        $("#video_vid").css("height", "1px").css("width", "1px");
-        $("#video_selection").css("height", "1px");
-        var h = $("#video_container").height();
-        var ratio = screen.width / screen.height;
-        var width = Math.floor(h * ratio);
-        var height = Math.floor(h);
-        $("#video_vid").css("height", height + "px").css("width", width + "px");
-        $("#video_selection").css("height", height + "px");
-        $("#video_container").css("width", width + "px");
+        if (!$("#ctrl_video").is(".minimized") && $("#video_playing").css("display") != "none") {
+            // Adjust width/height of video preview
+            $("#video_vid").css("width", "1px").css("height", "1px");
+            
+            var maxwidth = $("#ctrl_video").width();
+            var maxheight = $("#ctrl_video").height();
+            
+            var width, height;
+            var ratio;
+            if (this.RESIZE_VIDEO_TO_SCREEN) {
+                ratio = screen.width / screen.height;
+            } else if ($("#video_vid")[0].videoWidth && $("#video_vid")[0].videoHeight) {
+                ratio = $("#video_vid")[0].videoWidth / $("#video_vid")[0].videoHeight;
+            }
+            if (ratio) {
+                var mywidth = Math.floor(maxheight * ratio);
+                var myheight = Math.floor(maxwidth / ratio);
+                if (myheight < maxheight) {
+                    width = maxwidth;
+                    height = myheight;
+                } else {
+                    width = mywidth;
+                    height = maxheight;
+                }
+            } else {
+                width = maxwidth;
+                height = maxheight;
+            }
+            $("#video_vid").css("width", width + "px").css("height", height + "px");
+        }
     },
     
     cue: function (text) {

@@ -155,7 +155,7 @@ section:not(.flatfooter) > footer.buttonbox button {
 
 section.flatfooter > footer.buttonbox button {
     border-radius: 3px;
-    margin: 2px;
+    margin: 2px !important;
 }
 
 section:not(.flatfooter) > footer.buttonbox button[disabled] {
@@ -188,14 +188,6 @@ span.lilbutton > a, div.button > a {
     text-decoration: inherit;
 }
 
-#video_container {
-    background-color: black;
-}
-
-video {
-    outline: 1px dotted;
-}
-
 #video_selection {
     overflow: auto;
 }
@@ -207,6 +199,7 @@ video {
 #video_selection table td {
     padding: 15px;
     width: 33%;
+    text-align: center;
 }
 
 #visual_cue_container {
