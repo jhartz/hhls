@@ -27,8 +27,10 @@ var settings = {
 
 <section id="ctrl_effects" class="top left" style="display: none;">
     <header><h1>Effects Controller</h1></header>
+    
     <div id="effects_waiting"><table><tr><td id="effects_statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
-    <div id="effects_controls" style="display: none; min-height: 100%;">
+    
+    <div id="effects_controls" data-level="1" style="display: none; min-height: 100%;">
         <form id="effects_form">
             <table id="effects_table" style="width: 100%; border-collapse: collapse;"><tbody>
                 <tr>
@@ -69,8 +71,23 @@ var settings = {
             </tbody></table>
         </form>
     </div>
+    
+    <div id="effects_intercom" data-level="2" style="display: none;">
+        <h2>Intercom</h2>
+    </div>
+    
+    
+    <div id="effects_channelman" data-level="2" style="display: none;">
+        <h2>Channel Manager</h2>
+    </div>
+    
+    
+    <div id="effects_keyboard" data-level="2" style="display: none;">
+        <h2>Keyboard Shortcuts</h2>
+    </div>
+    
     <footer class="buttonbox">
-        <div><button id="effects_intercom" style="width: 33%;" disabled>Intercom</button><button id="effects_channels" style="width: 33%;" disabled>Channels</button><button id="effects_keyboard" style="width: 34%;" disabled>Keyboard Shortcuts</button></div>
+        <div><button data-btn="intercom" style="width: 33%;" disabled>Intercom</button><button data-btn="channelman" style="width: 33%;" disabled>Channels</button><button data-btn="keyboard" style="width: 34%;" disabled>Keyboard Shortcuts</button></div>
     </footer>
 </section>
 
@@ -80,15 +97,19 @@ var settings = {
         <p><button id="video_openwin_go" style="font-size: inherit;">Open video-playing window</button></p>
         <p><span id="video_openwin_skip" class="lilbutton">skip</span></p>
     </div>
+    
     <div id="video_selection" style="display: none;">
         <table>
 
 {{{videos}}}
         </table>
+        <div id="video_selection_back" class="bottombtn" style="display: none;"><button>Back to video</button></div>
     </div>
+    
     <div id="video_playing" style="display: none; height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;">
         <table style="width: 100%; height: 100%; border-style: none; border-collapse: collapse;"><tr><td style="text-align: center;"><video id="video_vid" preload="auto" controls title="While seeking the videos (or if the videos become out of sync), click and hold on the seek bar for a few seconds and then release." style="background-color: black;"></video></td></tr></table>
         <div id="visual_cue_container" style="display: none;"><div id="visual_cue">[visual cue area]</div></div>
+        <div id="video_playing_back" class="topbtn"><button>Back to video list</button></div>
     </div>
 </section>
 

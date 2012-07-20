@@ -14,6 +14,8 @@ function resizer(use_animate) {
     
     var height = $("#dummy").outerHeight(true) - $("section.bottom").outerHeight(true);
     $("section.top").not(".minimized").each(function () {
+        $(this).find("div.topbtn").css("top", $(this).css("padding-top"));
+        
         var diff = $(this).outerHeight(true) - $(this).height();
         var newheight = Math.floor(height - diff) + "px";
         if (use_animate) {
@@ -127,11 +129,93 @@ $(window).resize(function () {
     resizer();
 });
 
+function toggle(section, newelem, oncomplete) {
+    var $section = $(section);
+    var $oldelem = $section.children("div:visible");
+    var $newelem = $(newelem);
+    
+    if ($oldelem.attr("data-level") && !isNaN(parseInt($oldelem.attr("data-level"), 10)) &&
+        $newelem.attr("data-level") && !isNaN(parseInt($newelem.attr("data-level"), 10))) {
+        var oldlevel = parseInt($oldelem.attr("data-level"), 10);
+        var newlevel = parseInt($newelem.attr("data-level"), 10);
+        var width = $section.width() - 21;
+        if (newlevel > oldlevel) {
+            // slide $newelem on top of $oldelem
+            $section.css("overflow", "hidden");
+            $newelem.css({
+                position: "absolute",
+                left: width + "px",
+                top: $section.css("padding-top"),
+                width: width + "px",
+                height: "100%",
+                background: "inherit",
+                "box-shadow": "-4px 0 2px #ccc",
+                opacity: 0.1
+            }).show();
+            $oldelem.find(".panel:visible").addClass("wasvisible").hide();
+            $newelem.animate({left: 0, opacity: 1}, function () {
+                $oldelem.hide();
+                $oldelem.find(".wasvisible").show().removeClass("wasvisible");
+                $newelem.css({
+                    position: "",
+                    left: "",
+                    top: "",
+                    width: "",
+                    height: "",
+                    background: "",
+                    "box-shadow": "",
+                    opacity: ""
+                });
+                $section.css("overflow", "");
+                if (typeof oncomplete == "function") oncomplete();
+            });
+            return;
+        } else if (oldlevel > newlevel) {
+            // slide $oldelem off of $newelem
+            $section.css("overflow", "hidden");
+            $oldelem.css({
+                position: "absolute",
+                left: 0,
+                top: $section.css("padding-top"),
+                width: width + "px",
+                height: "100%",
+                background: "inherit",
+                "box-shadow": "-4px 0 2px #ccc",
+                opacity: 1
+            });
+            $newelem.show();
+            $newelem.find(".panel:visible").addClass("wasvisible").hide();
+            $oldelem.animate({left: width + "px", opacity: 0.1}, function () {
+                $oldelem.hide();
+                $newelem.find(".wasvisible").show().removeClass("wasvisible");
+                $oldelem.css({
+                    position: "",
+                    left: "",
+                    top: "",
+                    width: "",
+                    height: "",
+                    background: "",
+                    "box-shadow": "",
+                    opacity: ""
+                });
+                $section.css("overflow", "");
+                if (typeof oncomplete == "function") oncomplete();
+            });
+            return;
+        }
+    }
+    
+    // If we're still here, we didn't slide
+    $oldelem.hide();
+    $newelem.show();
+    if (typeof oncomplete == "function") oncomplete();
+}
+
 var video = {
     winref: null,
     nowinref: false,
     pop: null,
-    RESIZE_VIDEO_TO_SCREEN: false,
+    RESIZE_VIDEO_TO_SCREEN_DIMENSIONS: false,
     
     init: function () {
         var testelem = document.createElement("video");
@@ -151,6 +235,13 @@ var video = {
             
             $("button.vidbtn").click(function () {
                 video.playvid(this.dataset.vidbtn, $.parseJSON(this.dataset.formats), this.dataset.control ? $.parseJSON(this.dataset.control) : null);
+            });
+            
+            $("#video_selection_back > button").click(function () {
+                video.toggle("playing");
+            });
+            $("#video_playing_back > button").click(function () {
+                video.toggle("selection");
             });
             
             // TODO: Use MediaController to sync videos (once browsers implement it)
@@ -184,10 +275,9 @@ var video = {
     },
     
     toggle: function (newbie) {
-        // TODO: Do pretty "sliding" effect
-        $("#ctrl_video > div").hide();
-        $(document.getElementById("video_" + newbie)).show();
-        this.adjust();
+        toggle($("#ctrl_video")[0], document.getElementById("video_" + newbie), function () {
+            video.adjust();
+        });
     },
     
     openwin: function (skip) {
@@ -262,12 +352,12 @@ var video = {
             this.winref.document.getElementById("main_vid").pause();
             this.winref.document.getElementById("main_vid").src = "";
         }
+        $("#video_selection_back").hide();
         this.toggle("selection");
     },
     
     playvid: function (vid, formats, control) {
-        this.stopallvid();
-            console.log(arguments);
+        //this.stopallvid();
         if (vid && formats && formats.length > 0) {
             var ext = "";
             var maybe = [];
@@ -316,6 +406,7 @@ var video = {
                 }
             }
             
+            $("#video_selection_back").show();
             this.toggle("playing");
         }
     },
@@ -357,19 +448,21 @@ var video = {
     
     adjust: function () {
         if (!$("#ctrl_video").is(".minimized") && $("#video_playing").css("display") != "none") {
+            console.log("ADJUSTING");
             // Adjust width/height of video preview
             $("#video_vid").css("width", "1px").css("height", "1px");
             
             var maxwidth = $("#ctrl_video").width();
             var maxheight = $("#ctrl_video").height();
             
-            var width, height;
             var ratio;
-            if (this.RESIZE_VIDEO_TO_SCREEN) {
+            if (this.RESIZE_VIDEO_TO_SCREEN_DIMENSIONS) {
                 ratio = screen.width / screen.height;
             } else if ($("#video_vid")[0].videoWidth && $("#video_vid")[0].videoHeight) {
                 ratio = $("#video_vid")[0].videoWidth / $("#video_vid")[0].videoHeight;
+                console.log("Adjusting to video... ratio: " + ratio);
             }
+            var width, height;
             if (ratio) {
                 var mywidth = Math.floor(maxheight * ratio);
                 var myheight = Math.floor(maxwidth / ratio);
@@ -381,9 +474,11 @@ var video = {
                     height = maxheight;
                 }
             } else {
+                console.log("no ratio");
                 width = maxwidth;
                 height = maxheight;
             }
+            console.log("resizing to: " + width + " x " + height);
             $("#video_vid").css("width", width + "px").css("height", height + "px");
         }
     },
@@ -465,6 +560,17 @@ var effects = {
             effects.update_channel_details();
         });
         
+        $("#ctrl_effects > footer button").click(function () {
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active");
+                effects.toggle("controls");
+            } else {
+                $("#ctrl_effects > footer button").removeClass("active");
+                $(this).addClass("active");
+                effects.toggle($(this).attr("data-btn"));
+            }
+        });
+        
         // Load settings
         this.update_channels();
         this.update_keyboard();
@@ -506,16 +612,9 @@ var effects = {
         });
     },
     
-    toggle: function (controls) {
-        if (controls) {
-            $("#effects_waiting").hide();
-            $("#effects_controls").show();
-            $("#ctrl_effects footer.buttonbox button").attr("disabled", false);
-        } else {
-            $("#effects_controls").hide();
-            $("#effects_waiting").show();
-            $("#ctrl_effects footer.buttonbox button").attr("disabled", true);
-        }
+    toggle: function (newbie) {
+        toggle($("#ctrl_effects")[0], document.getElementById("effects_" + newbie));
+        $("#ctrl_effects footer.buttonbox button").attr("disabled", newbie == "waiting");
     },
     
     update_channel_details: function () {
@@ -691,13 +790,13 @@ var conn = {
             });
             this.socket.on("connect", function () {
                 conn.showmsg("Connected to server");
-                effects.toggle(true);
+                effects.toggle("controls");
                 // In case this gets shown again (if there's an error, disconnect, etc.)
                 $("#effects_statuser").text("Server connection necessary");
             });
             this.socket.on("connect_failed", function () {
                 conn.showmsg("Failed to establish connection to server");
-                effects.toggle();
+                effects.toggle("waiting");
             });
             
             this.socket.on("message", function (msg) {
@@ -725,23 +824,23 @@ var conn = {
             
             this.socket.on("disconnect", function () {
                 conn.showmsg("Disconnected from server");
-                effects.toggle();
+                effects.toggle("waiting");
             });
             conn.socket.on("error", function () {
                 conn.showmsg("Error connecting to server");
-                effects.toggle();
+                effects.toggle("waiting");
             });
             conn.socket.on("reconnect", function () {
                 conn.showmsg("Reconnected to server");
-                effects.toggle(true);
+                effects.toggle("controls");
             });
             conn.socket.on("reconnecting", function () {
                 conn.showmsg("Reconnecting to server...");
-                effects.toggle();
+                effects.toggle("waiting");
             });
             conn.socket.on("reconnect_failed", function () {
                 conn.showmsg("Failed to reconnect to server");
-                effects.toggle();
+                effects.toggle("waiting");
             });
         }
     },
