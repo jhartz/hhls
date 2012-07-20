@@ -198,5 +198,7 @@ window.onload = function () {
                 status("Connection ERROR! Status: " + source.readyState, true);
             }
         };
+        
+        if (typeof old_prop != "undefined") oneffectplay(old_prop);
     }
 };

@@ -81,9 +81,15 @@ function serveResources(req, res) {
 }
 
 var settings = {
-    channels: new jsonsettings.SettingsFile({filename: "channels.json"}),
-    keyboard: new jsonsettings.SettingsFile({filename: "keyboard.json"}),
-    presets: new jsonsettings.SettingsFile({filename: "presets.json"})
+    channels: new jsonsettings.SettingsFile({filename: "channels.json", onupdate: function () {
+        send_setting("channels");
+    }}),
+    keyboard: new jsonsettings.SettingsFile({filename: "keyboard.json", onupdate: function () {
+        send_setting("keyboard");
+    }}),
+    presets: new jsonsettings.SettingsFile({filename: "presets.json", onupdate: function () {
+        send_setting("presets");
+    }})
 };
 
 function serveControl(req, res) {
@@ -235,7 +241,18 @@ function serveClientFrame(url, req, res) {
                 var details = settings.channels.data[channel] || {type: "timed"};
                 
                 var writeme = function (soundlist) {
-                    myutil.write(res, "clientframe2.html", {cid: cid, x: x, y: y, channel: channel.replace(/"/g, '\\"'), channeltype: details.type, sounds: soundlist || false});
+                    var old_prop = false;
+                    if (typeof details.dimness != "undefined") {
+                        old_prop = '{dimness: ' + details.dimness + '}';
+                    } else if (typeof details.state != "undefined") {
+                        old_prop = '{state: ' + details.state + '}';
+                    }
+                    myutil.write(res, "clientframe2.html", {
+                        cid: cid, x: x, y: y,
+                        channel: channel.replace(/"/g, '\\"'), channeltype: details.type,
+                        sounds: soundlist || false,
+                        old_prop: old_prop
+                    });
                 };
                 
                 if (details.type == "timed") {
@@ -468,7 +485,6 @@ io.sockets.on("connection", function (socket) {
                     case "settings":
                         settings[msg.data.setting].data = msg.data.settings;
                         settings[msg.data.setting].update();
-                        send_setting(msg.data.setting);
                         break;
                     default:
                         send_forward(msg.about, msg.data);
