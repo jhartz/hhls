@@ -553,9 +553,10 @@ var effects = {
         $("#effects_channels").html(html);
         
         // Re-select previously selected channel
-        $("input[name=effects-channel]", "#effects_form").each(function () {
-            if (this.value == selected_channel) this.select();
+        $("input[name=effects_channel]", "#effects_form").each(function () {
+            if (this.value == selected_channel) this.checked = true;
         });
+        this.update_channel_details();
     },
     
     update_keyboard: function () {
