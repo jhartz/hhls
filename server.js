@@ -15,6 +15,8 @@ var config = require("./config"),
     jsonsettings = require("./modules/jsonsettings");
 
 
+jsonsettings.default_settings_dir = config.SETTINGS_DIR;
+
 app.listen(config.PORT);
 
 function handler(req, res) {
@@ -79,9 +81,9 @@ function serveResources(req, res) {
 }
 
 var settings = {
-    channels: new jsonsettings.SettingsFile("channels.json", config.SETTINGS_DIR),
-    keyboard: new jsonsettings.SettingsFile("keyboard.json", config.SETTINGS_DIR),
-    presets: new jsonsettings.SettingsFile("presets.json", config.SETTINGS_DIR)
+    channels: new jsonsettings.SettingsFile({filename: "channels.json"}),
+    keyboard: new jsonsettings.SettingsFile({filename: "keyboard.json"}),
+    presets: new jsonsettings.SettingsFile({filename: "presets.json"})
 };
 
 function serveControl(req, res) {
@@ -434,27 +436,42 @@ function send_client_list() {
 function send_setting(setting) {
     send_forward("settings", {
         setting: setting,
-        settings: settings[setting]
+        settings: settings[setting].data
     });
 }
 
 io.sockets.on("connection", function (socket) {
-    socket.on("message", function (msg) {
-        console.log("msg received: " + msg);
+    socket.on("message", function (message) {
+        console.log("msg received: " + message);
         try {
-            var data = JSON.parse(msg);
-            if (data.about) {
-                switch (data.about) {
+            var msg = JSON.parse(message);
+            if (msg.about) {
+                switch (msg.about) {
                     case "effects_cmd":
-                        send_msg(data.data, data.data.channel);
+                        send_msg(msg.data, msg.data.channel);
+                        if (msg.data.command == "play") {
+                            if (typeof msg.data.prop.dimness != "undefined") {
+                                settings.channels.data[msg.data.channel].dimness = msg.data.prop.dimness;
+                                settings.channels.update();
+                            } else if (typeof msg.data.prop.state != "undefined") {
+                                var state = settings.channels.data[msg.data.channel].state || 0;
+                                if (msg.data.prop.state == -1) {
+                                    state = Number(!state);
+                                } else {
+                                    state = msg.data.prop.state;
+                                }
+                                settings.channels.data[msg.data.channel].state = state;
+                                settings.channels.update();
+                            }
+                        }
                         break;
                     case "settings":
-                        settings[data.data.setting] = data.data.settings;
-                        settings[data.data.setting].update();
-                        send_setting(data.data.setting);
+                        settings[msg.data.setting].data = msg.data.settings;
+                        settings[msg.data.setting].update();
+                        send_setting(msg.data.setting);
                         break;
                     default:
-                        send_forward(data.about, data.data);
+                        send_forward(msg.about, msg.data);
                 }
             } else {
                 console.log("no 'about'");
