@@ -1,0 +1,15 @@
+{
+  "name": "jsonsettings",
+  "version": "0.1",
+  "description": "A simple way to read and write settings from a JSON file",
+  "license": "MIT",
+  "keywords": [
+    "json"
+  ],
+  "author": {
+    "name": "Jake Hartz",
+    "email": "jake33@rocketmail.com",
+    "url": "http://jhartz.github.com/"
+  },
+  "main": "jsonsettings.js"
+}
