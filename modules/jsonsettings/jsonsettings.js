@@ -10,7 +10,6 @@ exports.SettingsFile = function (options) {
     
     this.loaded = false;
     
-    if (!this.options.onload) this.options.onload = function () {};
     if (!this.options.onerror) this.options.onerror = function (err) {
         if (typeof err == "string") {
             // TODO: Make into an error
@@ -18,6 +17,7 @@ exports.SettingsFile = function (options) {
         }
         throw err;
     };
+    if (!this.options.onload) this.options.onload = function () {};
     if (!this.options.onupdate) this.options.onupdate = function () {};
     
     var add_watchers = function (obj, bigman) {
@@ -114,5 +114,5 @@ exports.SettingsFile = function (options) {
         });
     };
     
-    if (this.filename) this.load();
+    if (this.options.filename) this.load();
 };
