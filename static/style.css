@@ -238,20 +238,11 @@ table.pretty {
     padding: 0;
 }
 
-table.pretty td {
+table.pretty td, table.pretty th {
     margin: 0;
-    padding: 0;
+    padding: 5px;
     font-size: 10pt;
-    border-bottom: 1px solid #344A55;
-    border-right: 1px solid #344A55;
-}
-
-table.pretty tr td:last-child {
-    border-right: none;
-}
-
-table.pretty tr:last-child td {
-    border-bottom: none;
+    border: 1px solid #344A55;
 }
 
 div.topbtn {
