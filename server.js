@@ -34,7 +34,7 @@ function handler(req, res) {
     } else if (url.pathname == "/") {
         serveResources(req, res);
     } else if (url.pathname == "/control") {
-        serveControl(req, res);
+        serveControl(url, req, res);
     } else if (url.pathname.substring(0, 7) == "/client") {
         var urlpart = url.pathname.substring(8);
         if (urlpart == "") {
@@ -92,56 +92,64 @@ var settings = {
     }})
 };
 
-function serveControl(req, res) {
-    fs.readdir(config.VIDEO_DIR, function (err, files) {
-        if (err) {
-            myutil.writeError(res, 500);
-        } else {
-            var videos = myutil.makeFileList(files, true, true);
-            var videolist = "";
-            var counter = 0;
-            for (var video in videos) {
-                if (videos.hasOwnProperty(video)) {
-                    var extra = "";
-                    if (videos[video][0] == "CONTAINS_JSON_DATA_FILE") {
-                        videos[video].shift();
-                        try {
-                            var control = JSON.parse(fs.readFileSync(path.join(config.VIDEO_DIR, video + ".json"), "utf-8"));
-                        } catch (err) {
-                            console.log("ERROR in serveControl, in CONTAINS_JSON_DATA_FILE...", err);
-                        }
-                        if (control) {
-                            extra += ' data-control="' + myutil.escHTML(JSON.stringify(control)) + '"';
-                        }
-                    }
-                    counter++;
-                    if (counter == 1) videolist += "<tr>\n";
-                    videolist += '<td><button class="vidbtn" data-vidbtn="/' + myutil.escHTML(config.VIDEO_DIR) + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video])) + '"' + extra + '>' + myutil.escHTML(video) + '</button></td>\n';
-                    if (counter == 3) {
-                        videolist += "</tr>\n";
-                        counter = 0;
+function serveControl(url, req, res) {
+    var writeme = function (videolist) {
+        fs.readdir(config.SOUND_DIR, function (err, files) {
+            if (err) {
+                myutil.writeError(res, 500);
+            } else {
+                var soundlist = "";
+                var sounds = myutil.makeFileList(files);
+                for (var sound in sounds) {
+                    if (sounds.hasOwnProperty(sound)) {
+                        soundlist += '<option value="' + myutil.escHTML(sound) + '">' + myutil.escHTML(sound) + '</option>';
                     }
                 }
+                
+                myutil.write(res, "control.html", {videos: videolist || false, sounds: soundlist, channels: JSON.stringify(settings.channels.data), keyboard: JSON.stringify(settings.keyboard.data), presets: JSON.stringify(settings.presets.data)});
             }
-            if (counter != 0) videolist += "</tr>";
-            
-            fs.readdir(config.SOUND_DIR, function (err, files) {
-                if (err) {
-                    myutil.writeError(res, 500);
-                } else {
-                    var soundlist = "";
-                    var sounds = myutil.makeFileList(files);
-                    for (var sound in sounds) {
-                        if (sounds.hasOwnProperty(sound)) {
-                            soundlist += '<option value="' + myutil.escHTML(sound) + '">' + myutil.escHTML(sound) + '</option>';
+        });
+    };
+    
+    if (url.query && typeof url.query.novideo != "undefined") {
+        writeme();
+    } else {
+        fs.readdir(config.VIDEO_DIR, function (err, files) {
+            if (err) {
+                myutil.writeError(res, 500);
+            } else {
+                var videos = myutil.makeFileList(files, true, true);
+                var videolist = "";
+                var counter = 0;
+                for (var video in videos) {
+                    if (videos.hasOwnProperty(video)) {
+                        var extra = "";
+                        if (videos[video][0] == "CONTAINS_JSON_DATA_FILE") {
+                            videos[video].shift();
+                            try {
+                                var control = JSON.parse(fs.readFileSync(path.join(config.VIDEO_DIR, video + ".json"), "utf-8"));
+                            } catch (err) {
+                                console.log("ERROR in serveControl, in CONTAINS_JSON_DATA_FILE...", err);
+                            }
+                            if (control) {
+                                extra += ' data-control="' + myutil.escHTML(JSON.stringify(control)) + '"';
+                            }
+                        }
+                        counter++;
+                        if (counter == 1) videolist += "<tr>\n";
+                        videolist += '<td><button class="vidbtn" data-vidbtn="/' + myutil.escHTML(config.VIDEO_DIR) + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video])) + '"' + extra + ' style="min-width: 50%;">' + myutil.escHTML(video) + '</button></td>\n';
+                        if (counter == 3) {
+                            videolist += "</tr>\n";
+                            counter = 0;
                         }
                     }
-                    
-                    myutil.write(res, "control.html", {videos: videolist, sounds: soundlist, channels: JSON.stringify(settings.channels.data), keyboard: JSON.stringify(settings.keyboard.data), presets: JSON.stringify(settings.presets.data)});
                 }
-            });
-        }
-    });
+                if (counter != 0) videolist += "</tr>";
+                
+                writeme(videolist);
+            }
+        });
+    }
 }
 
 // client stuff
