@@ -13,7 +13,5 @@
     "d": {
         "channel": "movietheatre_lighting",
         "preset": "dimtest"
-    },
-    
-    "NOTES": "The 'n' key is hard-coded to 'next' and the 's' key is hard-coded to 'stop all'"
+    }
 }
