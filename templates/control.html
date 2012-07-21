@@ -15,17 +15,16 @@ var settings = {
     presets: {{{presets}}}
 };
 </script>
-<script type="text/javascript" src="/static/control.js"></script>
+<script type="text/javascript" src="/static/control.js"></script>{{#videos}}
+<script type="text/javascript" src="/static/control.video.js"></script>{{/videos}}
+<script type="text/javascript" src="/static/control.effects.js"></script>
+<script type="text/javascript" src="/static/control.conn.js"></script>
 </head>
 
 <body>
 <noscript><section style="text-align: center;">ERROR: JavaScript is required to view this page.</section></noscript>
-<section id="ctrl_miniclient" class="top minimized" style="display: none;">
-    <header><h1>Mini-Client</h1></header>
-    <div style="height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;"><iframe src="/client?layout=1x1&amp;nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
-</section>
 
-<section id="ctrl_effects" class="top left" style="display: none;">
+<section id="ctrl_effects" class="top" style="display: none;">
     <header><h1>Effects Controller</h1></header>
     
     <div id="effects_waiting"><table><tr><td id="effects_statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
@@ -39,11 +38,11 @@ var settings = {
                         <div id="effects_timedpanel" class="panel effects_panel">
                             <div class="front">
                                 <ul><li>Preset</li><li class="effects_tocustom">Custom</li></ul>
-                                <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_timed"></select><br><span class="lilbutton effects_preset_customize">Customize</span></div>
+                                <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_timed"></select><p style="text-align: right;"><span class="lilbutton effects_preset_customize">Customize</span></p></div>
                             </div>
                             <div class="back">
                                 <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
-                                <div><br style="clear: both;"><label for="effects_custom_light">Lighting (list of millisecond intervals): </label><input id="effects_custom_light" pattern="([0-9]+ *,? *)+" placeholder="100,200,150, ..." x-moz-errormessage="Please enter a comma-separated list of integers"><br><label for="effects_custom_sound">Sound: </label><select id="effects_custom_sound"><option value="" selected>(none)</option>{{{sounds}}}</select></div>
+                                <div><br style="clear: both;"><label for="effects_custom_light">Lighting (list of millisecond intervals): </label><input id="effects_custom_light" pattern="([0-9]+ *,? *)+" placeholder="100,200,150, ..." x-moz-errormessage="Please enter a comma-separated list of integers"><br><label for="effects_custom_sound">Sound: </label><select id="effects_custom_sound"><option value="" selected>(none)</option>{{{sounds}}}</select><p style="text-align: right;"><span class="lilbutton effects_custom_customize">Save as Preset</span></p></div>
                             </div>
                         </div>
                         <div id="effects_toggledpanel" class="panelbox effects_panel" style="display: none; text-align: center;">
@@ -55,11 +54,11 @@ var settings = {
                         <div id="effects_dimmedpanel" class="panel effects_panel" style="display: none;">
                             <div class="front">
                                 <ul><li>Preset</li><li class="effects_tocustom">Custom</li></ul>
-                                <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_dimmed"></select><br><span class="lilbutton effects_preset_customize">Customize</span></div>
+                                <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_dimmed"></select><p style="text-align: right;"><span class="lilbutton effects_preset_customize">Customize</span></p></div>
                             </div>
                             <div class="back">
                                 <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
-                                <div><br style="clear: both;"><label for="effects_custom_dimness">Dimness: </label><input type="range" id="effects_custom_dimness" size="3" pattern="(100|[0-9]{1,2}(\.[0-9]*)?)">&nbsp;<span id="effects_custom_dimness_label"></span><br><label for="effects_custom_time">Fading Time (seconds): </label><input type="number" id="effects_custom_time" size="3" pattern="[0-9]+(\.[0-9]*)?"></div>
+                                <div><br style="clear: both;"><label for="effects_custom_dimness">Dimness: </label><input type="range" id="effects_custom_dimness" size="3" pattern="(100|[0-9]{1,2}(\.[0-9]*)?)">&nbsp;<span id="effects_custom_dimness_label"></span><br><label for="effects_custom_time">Fading Time (seconds): </label><input type="number" id="effects_custom_time" size="3" pattern="[0-9]+(\.[0-9]*)?"><p style="text-align: right;"><span class="lilbutton effects_custom_customize">Save as Preset</span></p></div>
                             </div>
                         </div>
                     </td>
@@ -84,14 +83,48 @@ var settings = {
     
     <div id="effects_keyboard" data-level="2" style="display: none;">
         <h2>Keyboard Shortcuts</h2>
+        <table class="pretty" style="width: auto; margin: auto;">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="effects_keyboard_tbody"></tbody>
+        </table>
+        <p style="text-align: center; font-size: 10pt;">NOTE: All keyboard shortcuts are automatically kept in sync with every other control page on other computers.</p>
+        <div id="effects_keyboard_editor" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 10px; background-color: black; color: white; opacity: .9; border-radius: 9px; z-index: 999; overflow: auto; text-align: center;">
+            <p><u>Edit Keyboard Shortcut</u></p>
+            <p style="font-style: italic;">Key: <span id="effects_keyboard_editor_key">&mdash;</span></p>
+            <form id="effects_keyboard_editor_form">
+                <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white;">
+                    <div style="text-align: right;"><span id="effects_keyboard_editor_delete" class="lilbutton">Delete</span></div>
+                    <p>Channel: <select id="effects_keyboard_editor_channel"></select></p>
+                    <div id="effects_keyboard_editor_channelstuff">
+                        <div id="effects_keyboard_editor_channeltimed">
+                            <p><select id="effects_keyboard_editor_channeltimed_typeselect"><option value="preset" selected>preset</option><option value="custom">custom</option></select></p>
+                            <p id="effects_keyboard_editor_channeltimed_presetcontainer"><select id="effects_keyboard_editor_channeltimed_preset"></select></p>
+                            <p id="effects_keyboard_editor_channeltimed_customcontainer">TODO: custom</p>
+                        </div>
+                        <p id="effects_keyboard_editor_channeltoggled"><select id="effects_keyboard_editor_state"><option value="1">on</option><option value="0">off</option><option value="-1">toggled</option></select></p>
+                        <div id="effects_keyboard_editor_channeldimmed">
+                            <p><select id="effects_keyboard_editor_channeldimmed_typeselect"><option value="preset" selected>preset</option><option value="custom">custom</option></select></p>
+                            <p id="effects_keyboard_editor_channeldimmed_presetcontainer"><select id="effects_keyboard_editor_channeldimmed_preset"></select></p>
+                            <p id="effects_keyboard_editor_channeldimmed_customcontainer">TODO: custom</p>
+                        </div>
+                    </div>
+                </td></tr></tbody></table>
+            </form>
+            <p><span id="effects_keyboard_editor_submitter" class="lilbutton">Update</span></p>
+        </div>
     </div>
     
     <footer class="buttonbox">
         <div><button data-btn="intercom" style="width: 33%;" disabled>Intercom</button><button data-btn="channelman" style="width: 33%;" disabled>Channels</button><button data-btn="keyboard" style="width: 34%;" disabled>Keyboard Shortcuts</button></div>
     </footer>
 </section>
-
-<section id="ctrl_video" class="top right" style="display: none;">
+{{#videos}}
+<section id="ctrl_video" class="top minimized" style="display: none;">
     <header><h1>Video Controls</h1></header>
     <div id="video_openwin" style="text-align: center;">
         <p><button id="video_openwin_go" style="font-size: inherit;">Open video-playing window</button></p>
@@ -111,6 +144,11 @@ var settings = {
         <div id="visual_cue_container" style="display: none;"><div id="visual_cue">[visual cue area]</div></div>
         <div id="video_playing_back" class="topbtn"><button>Back to video list</button></div>
     </div>
+</section>
+{{/videos}}
+<section id="ctrl_miniclient" class="top minimized" style="display: none;">
+    <header><h1>Mini-Client</h1></header>
+    <div style="height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;"><iframe src="/client?layout=1x1&amp;nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
 </section>
 
 <section class="bottom flatfooter" style="display: none;">
