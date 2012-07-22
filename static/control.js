@@ -7,7 +7,7 @@ function resizer(use_animate) {
     $("section").not("minimized").children("header").each(function () {
         $(this).parent().css("padding-top", Math.round($(this).outerHeight()) + "px");
     });
-    $("section").not("minimized").children("footer").each(function () {
+    $("section").not("minimized").children("footer:visible").each(function () {
         var extra = $(this).parent().is(".top") ? 20 : 0;
         $(this).parent().css("padding-bottom", Math.round($(this).outerHeight() + extra) + "px");
     });
@@ -32,6 +32,7 @@ function resizer(use_animate) {
 
 var minimized_items = [];
 var init = [];
+var blockers = {};
 
 $(function () {
     $("section").show();
@@ -39,6 +40,14 @@ $(function () {
     var test_buttons = function () {
         // Disable tray buttons if 2 things are already opened
         $("#minimized_tray button").attr("disabled", $("section.top").not(".minimized").length > 1);
+        
+        // Hide tray if there are no buttons; show it if there are
+        if ($("section.top.minimized").length == 0) {
+            $("#minimized_tray").parent().hide().parent().css("padding-bottom", "");
+        } else {
+            $("#minimized_tray").parent().show();
+            resizer();
+        }
     };
     
     $("section.top > header").css("cursor", "pointer").click(function (event) {
@@ -90,7 +99,11 @@ $(function () {
         }
     });
     
-    $("section.minimized").removeClass("minimized").addClass("minimized_on_start").children("header").click();
+    if ($("section.minimized").length) {
+        $("section.minimized").removeClass("minimized").addClass("minimized_on_start").children("header").click();
+    } else {
+        test_buttons();
+    }
     
     $(document).on("click", "button.minimized_item", function (event) {
         var section_id = Number($(this).attr("data-section"));
@@ -131,6 +144,16 @@ $(function () {
 
 $(window).resize(function () {
     resizer();
+});
+
+$(window).on("beforeunload", function () {
+    for (var blocker in blockers) {
+        if (blockers.hasOwnProperty(blocker)) {
+            if (blockers[blocker]) {
+                return blockers[blocker];
+            }
+        }
+    }
 });
 
 function toggle(section, newelem, oncomplete) {

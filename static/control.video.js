@@ -9,9 +9,9 @@ var video = {
         if (typeof testelem.canPlayType != "function" || !testelem.dataset) {
             $("#video_openwin").html("<div>ERROR: Your browser does not support some of the HTML5 and JavaScript features required by the video player.</div><div>Please upgrade to a more modern browser to use the video player.</div>");
         } else {
-            window.onunload = window.onbeforeunload = function () {
+            $(window).on("unload beforeunload", function () {
                 video.closewin();
-            };
+            });
             
             $("#video_openwin_go").click(function () {
                 video.openwin();

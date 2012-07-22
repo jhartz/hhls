@@ -64,8 +64,12 @@ var settings = {
                     </td>
                 </tr>
                 <tr>
-                    <td style="text-align: center;"><div id="effects_nextstopcontainer"><button id="effects_next" title="Stop current lighting/sound and move to next in queue">Next</button>&nbsp;<button id="effects_stop" title="Cancel all lighting/sound currently happening or in queue">Stop</button></div></td>
-                    <td style="text-align: center;"><div id="effects_gocontainer"><button style="min-width: 100px;">Go</button></div></td>
+                    <td><table class="onlywhennotoggle" style="margin: auto;"><tr><td><button id="effects_next" title="Stop current lighting/sound and move to next in queue">Next</button></td><td><button id="effects_stop" title="Cancel all lighting/sound currently happening or in queue">Stop</button></td></tr></table></td>
+                    <td style="text-align: center;"><div class="onlywhennotoggle"><button style="min-width: 100px;">Go</button></div></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td style="text-align: center; font-size: 10pt;"><span id="effects_savekeyboard" class="lilbutton">Save <span class="onlywhennotoggle">as </span>Keyboard Shortcut</span></td>
                 </tr>
             </tbody></table>
         </form>
@@ -87,35 +91,23 @@ var settings = {
             <thead>
                 <tr>
                     <th>Key</th>
+                    <th>Channel</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody id="effects_keyboard_tbody"></tbody>
         </table>
         <p style="text-align: center; font-size: 10pt;">NOTE: All keyboard shortcuts are automatically kept in sync with every other control page on other computers.</p>
+        
         <div id="effects_keyboard_editor" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 10px; background-color: black; color: white; opacity: .9; border-radius: 9px; z-index: 999; overflow: auto; text-align: center;">
             <p><u>Edit Keyboard Shortcut</u></p>
-            <p style="font-style: italic;">Key: <span id="effects_keyboard_editor_key">&mdash;</span></p>
-            <form id="effects_keyboard_editor_form">
-                <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white;">
-                    <div style="text-align: right;"><span id="effects_keyboard_editor_delete" class="lilbutton">Delete</span></div>
-                    <p>Channel: <select id="effects_keyboard_editor_channel"></select></p>
-                    <div id="effects_keyboard_editor_channelstuff">
-                        <div id="effects_keyboard_editor_channeltimed">
-                            <p><select id="effects_keyboard_editor_channeltimed_typeselect"><option value="preset" selected>preset</option><option value="custom">custom</option></select></p>
-                            <p id="effects_keyboard_editor_channeltimed_presetcontainer"><select id="effects_keyboard_editor_channeltimed_preset"></select></p>
-                            <p id="effects_keyboard_editor_channeltimed_customcontainer">TODO: custom</p>
-                        </div>
-                        <p id="effects_keyboard_editor_channeltoggled"><select id="effects_keyboard_editor_state"><option value="1">on</option><option value="0">off</option><option value="-1">toggled</option></select></p>
-                        <div id="effects_keyboard_editor_channeldimmed">
-                            <p><select id="effects_keyboard_editor_channeldimmed_typeselect"><option value="preset" selected>preset</option><option value="custom">custom</option></select></p>
-                            <p id="effects_keyboard_editor_channeldimmed_presetcontainer"><select id="effects_keyboard_editor_channeldimmed_preset"></select></p>
-                            <p id="effects_keyboard_editor_channeldimmed_customcontainer">TODO: custom</p>
-                        </div>
-                    </div>
-                </td></tr></tbody></table>
-            </form>
-            <p><span id="effects_keyboard_editor_submitter" class="lilbutton">Update</span></p>
+            <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white; text-align: left;">
+                <p>Key: <select id="effects_keyboard_editor_key"></select></p>
+                <p>Channel: <span id="effects_keyboard_editor_channel">&mdash;</span></p>
+                <p id="effects_keyboard_editor_action"></p>
+                <p id="effects_keyboard_editor_channeltoggled">State: <select id="effects_keyboard_editor_state"><option value="1">on</option><option value="0">off</option><option value="-1">toggled</option></select></p>
+            </td></tr></tbody></table>
+            <p><span id="effects_keyboard_editor_submitter" class="lilbutton">Save</span>&nbsp;&nbsp;<span id="effects_keyboard_editor_canceller" class="lilbutton">Cancel</span></p>
         </div>
     </div>
     
@@ -145,12 +137,12 @@ var settings = {
         <div id="video_playing_back" class="topbtn"><button>Back to video list</button></div>
     </div>
 </section>
-{{/videos}}
+{{/videos}}{{#miniclient}}
 <section id="ctrl_miniclient" class="top minimized" style="display: none;">
     <header><h1>Mini-Client</h1></header>
     <div style="height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;"><iframe src="/client?layout=1x1&amp;nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
 </section>
-
+{{/miniclient}}
 <section class="bottom flatfooter" style="display: none;">
     <header><h1><span id="client_title">Server Connection</span></h1></header>
     <div id="client_list" style="text-align: center;">Loading...</div>
