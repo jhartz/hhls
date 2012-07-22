@@ -1,17 +1,90 @@
 {
-    "a": {
-        "preset": "bob"
-    },
-    "t": {
+    "g": {
         "channel": "0",
-        "preset": "thunder1"
+        "command": "play",
+        "prop": {
+            "preset": "bob"
+        }
     },
-    "z": {
+    "k": {
+        "channel": "0",
+        "command": "play",
+        "prop": {
+            "light": [
+                100,
+                150,
+                150,
+                200,
+                100,
+                600,
+                100,
+                100,
+                100,
+                100,
+                100,
+                100,
+                200,
+                200,
+                100,
+                150,
+                200,
+                150,
+                70,
+                80,
+                70,
+                80,
+                70,
+                2000,
+                2000,
+                2000,
+                2000
+            ],
+            "sound": "thunder1"
+        }
+    },
+    "a": {
+        "channel": "corrin",
+        "command": "play",
+        "prop": {
+            "preset": "thunder2"
+        }
+    },
+    "b": {
         "channel": "stairwell_blacklights",
-        "state": -1
+        "command": "play",
+        "prop": {
+            "state": -1
+        }
+    },
+    "c": {
+        "channel": "movietheatre_lighting",
+        "command": "play",
+        "prop": {
+            "dimness": 90,
+            "time": 0
+        }
     },
     "d": {
         "channel": "movietheatre_lighting",
-        "preset": "dimtest"
+        "command": "play",
+        "prop": {
+            "dimness": 90,
+            "time": 4
+        }
+    },
+    " ": {
+        "channel": "movietheatre_lighting",
+        "command": "play",
+        "prop": {
+            "dimness": 0,
+            "time": 3
+        }
+    },
+    "/": {
+        "channel": "stairwell_blacklights",
+        "command": "play",
+        "prop": {
+            "state": 0
+        }
     }
 }
