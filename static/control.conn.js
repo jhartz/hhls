@@ -2,7 +2,7 @@ var conn = {
     socket: null,
     
     init: function () {
-        if (typeof JSON == "undefined" || typeof JSON.parse != "function" || typeof Array.prototype.map != "function") {
+        if (typeof JSON == "undefined" || typeof JSON.stringify != "function" || typeof Array.prototype.map != "function") {
             this.showmsg("ERROR: Your browser does not support some of the JavaScript features required by this page.\nPlease upgrade to a more modern browser.");
         } else {
             /*
