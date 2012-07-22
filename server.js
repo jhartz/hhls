@@ -106,7 +106,7 @@ function serveControl(url, req, res) {
                     }
                 }
                 
-                myutil.write(res, "control.html", {videos: videolist || false, sounds: soundlist, channels: JSON.stringify(settings.channels.data), keyboard: JSON.stringify(settings.keyboard.data), presets: JSON.stringify(settings.presets.data)});
+                myutil.write(res, "control.html", {videos: videolist || false, sounds: soundlist, miniclient: !!(!url.query || typeof url.query.nominiclient == "undefined"), channels: JSON.stringify(settings.channels.data), keyboard: JSON.stringify(settings.keyboard.data), presets: JSON.stringify(settings.presets.data)});
             }
         });
     };
