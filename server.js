@@ -168,27 +168,23 @@ function serveClient(url, req, res) {
             }
         }
         
-        if (url.query && url.query.location && url.query.layout) {
-            var name = (url.query.name || hostname).trim();
-            var location = url.query.location.trim();
+        if (url.query && myutil.fquery(url.query.location) && myutil.fquery(url.query.layout)) {
+            var name = (myutil.fquery(url.query.name) || hostname).trim();
+            var location = myutil.fquery(url.query.location).trim();
             
             var xval, yval;
-            if (url.query.layout == "custom") {
-                xval = url.query.layout_x;
-                yval = url.query.layout_y;
+            if (myutil.fquery(url.query.layout) == "custom") {
+                xval = myutil.fquery(url.query.layout_x, "int");
+                yval = myutil.fquery(url.query.layout_y, "int");
             } else {
-                var split = url.query.layout.split("x");
-                xval = split[0];
-                yval = split[1];
+                var split = myutil.fquery(url.query.layout).split("x");
+                xval = parseInt(split[0], 10);
+                yval = parseInt(split[1], 10);
             }
-            if (xval && parseInt(xval, 10) > 0 && parseInt(xval, 10) < 10) {
-                xval = parseInt(xval, 10);
-            } else {
+            if (!xval || xval < 1 || xval > 9) {
                 xval = 1;
             }
-            if (yval && parseInt(yval, 10) > 0 && parseInt(yval, 10) < 10) {
-                yval = parseInt(yval, 10);
-            } else {
+            if (!yval || yval < 1 || yval > 9) {
                 yval = 1;
             }
             
@@ -208,7 +204,9 @@ function serveClient(url, req, res) {
             for (y = 1; y <= yval; y++) {
                 iframes += "            <tr>\n";
                 for (x = 1; x <= xval; x++) {
-                    iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + '" scrolling="no">Loading...</iframe></td>\n';
+                    var extra = "";
+                    if (myutil.fquery(url.query["channel_" + x + "x" + y])) extra += "&channel=" + encodeURIComponent(myutil.fquery(url.query["channel_" + x + "x" + y]));
+                    iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + myutil.escHTML(extra) + '" scrolling="no">Loading...</iframe></td>\n';
                 }
                 iframes += "            </tr>\n";
             }
@@ -226,9 +224,9 @@ function serveClient(url, req, res) {
             vars.name = cookies.name || "";
             vars.location = cookies.location || "";
             vars.styling = !!(url.query && typeof url.query.nostyle == "undefined");
-            if (url.query && url.query.layout && url.query.layout.trim().search(/^[1-9]x[1-9]$/) != -1) {
+            if (url.query && myutil.fquery(url.query.layout) && myutil.fquery(url.query.layout).trim().search(/^[1-9]x[1-9]$/) != -1) {
                 vars.show_layout = false;
-                vars.layout = url.query.layout.trim();
+                vars.layout = myutil.fquery(url.query.layout).trim();
             } else {
                 vars.show_layout = true;
             }
@@ -239,13 +237,13 @@ function serveClient(url, req, res) {
 }
 
 function serveClientFrame(url, req, res) {
-    if (url.query && url.query.cid && url.query.x && url.query.y) {
-        var cid = parseInt(url.query.cid, 10),
-            x = parseInt(url.query.x, 10),
-            y = parseInt(url.query.y, 10);
-        if (!isNaN(cid) && clients[cid] && x && x > 0 && x <= clients[cid].x && y && y > 0 && y <= clients[cid].y) {
-            if (url.query.channel && (url.query.channel == "0" || url.query.channel in settings.channels.data)) {
-                var channel = url.query.channel;
+    if (url.query && !isNaN(myutil.fquery(url.query.cid, "int")) && myutil.fquery(url.query.x, "int") && myutil.fquery(url.query.y, "int")) {
+        var cid = myutil.fquery(url.query.cid, "int"),
+            x = myutil.fquery(url.query.x, "int"),
+            y = myutil.fquery(url.query.y, "int");
+        if (clients[cid] && x > 0 && x <= clients[cid].x && y > 0 && y <= clients[cid].y) {
+            if (myutil.fquery(url.query.channel) && (myutil.fquery(url.query.channel) == "0" || myutil.fquery(url.query.channel) in settings.channels.data)) {
+                var channel = myutil.fquery(url.query.channel);
                 var details = settings.channels.data[channel] || {type: "timed"};
                 
                 var writeme = function (soundlist) {
@@ -315,10 +313,10 @@ function serveClientFrame(url, req, res) {
 }
 
 function serveStream(url, req, res) {
-    if (url.query && url.query.cid && url.query.x && url.query.y && url.query.channel) {
-        var cid = parseInt(url.query.cid, 10),
-            x = parseInt(url.query.x, 10),
-            y = parseInt(url.query.y, 10),
+    if (url.query && !isNaN(myutil.fquery(url.query.cid, "int")) && myutil.fquery(url.query.x, "int") && myutil.fquery(url.query.y, "int") && myutil.fquery(url.query.channel)) {
+        var cid = myutil.fquery(url.query.cid, "int"),
+            x = myutil.fquery(url.query.x, "int"),
+            y = myutil.fquery(url.query.y, "int"),
             channel = url.query.channel;
         if (clients[cid] && x > 0 && x <= clients[cid].x && y > 0 && y <= clients[cid].y && (channel == "0" || channel in settings.channels.data)) {
             res.writeHead(200, {
