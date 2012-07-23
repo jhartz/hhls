@@ -1,3 +1,16 @@
+function client_channel(x, y, channel) {
+    if (history.replaceState) {
+        var oldquery = "&" + location.search.substring(1);
+        if (oldquery.indexOf("&channel_" + x + "x" + y + "=") != -1) {
+            var badquery = oldquery.substring(oldquery.indexOf("&channel_" + x + "x" + y + "=") + 1);
+            oldquery = oldquery.substring(0, oldquery.indexOf("&channel_" + x + "x" + y + "="));
+            if (badquery.indexOf("&") != -1) oldquery += badquery.substring(badquery.indexOf("&"));
+        }
+        oldquery = oldquery.substring(1);
+        history.replaceState({}, "", location.pathname + "?" + oldquery + "&channel_" + x + "x" + y + "=" + encodeURIComponent(channel));
+    }
+}
+
 window.onload = function () {
     if (document.getElementById && document.getElementsByTagName && document.addEventListener) {
         if (document.getElementById("status_closeall")) {

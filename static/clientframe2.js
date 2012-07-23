@@ -158,6 +158,11 @@ window.onload = function () {
             }
         }
         
+        // Tell parent what channel we are (so it can record it in its URL)
+        try {
+            parent.client_channel(x, y, channel);
+        } catch (err) {}
+        
         status("Connecting to server...", true);
         
         source = new EventSource("/client/stream?channel=" + encodeURIComponent(channel) + "&cid=" + cid + "&x=" + x + "&y=" + y);
