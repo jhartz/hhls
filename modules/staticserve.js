@@ -13,9 +13,9 @@ var myutil = require("./myutil");
 
 var staticfiles = new static.Server();
 
-exports.static = function (url, req, res, use_readme) {
+exports.static = function (url, req, res, include_readme) {
     var bname = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
-    if (bname == "README" && !use_readme) {
+    if (bname == "README" && !include_readme) {
         myutil.writeError(res, 404);
     } else if (bname.indexOf(".") == -1) {
         // No extension... assume plain text
