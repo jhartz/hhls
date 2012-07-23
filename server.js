@@ -137,7 +137,7 @@ function serveControl(url, req, res) {
                         }
                         counter++;
                         if (counter == 1) videolist += "<tr>\n";
-                        videolist += '<td><button class="vidbtn" data-vidbtn="/' + myutil.escHTML(config.VIDEO_DIR) + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video])) + '"' + extra + ' style="min-width: 50%;">' + myutil.escHTML(video) + '</button></td>\n';
+                        videolist += '<td><button type="button" class="vidbtn" data-vidbtn="/' + myutil.escHTML(config.VIDEO_DIR) + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video])) + '"' + extra + ' style="min-width: 50%;">' + myutil.escHTML(video) + '</button></td>\n';
                         if (counter == 3) {
                             videolist += "</tr>\n";
                             counter = 0;

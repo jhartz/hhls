@@ -67,6 +67,7 @@ $(function () {
                 
                 // Make icon for tray
                 var $button = $("<button />");
+                $button.attr("type", "button");
                 $button.addClass("minimized_item");
                 $button.attr("data-section", section_id.toString());
                 $button.text($section.children("header").children("h1").text());
