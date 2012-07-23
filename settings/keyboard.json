@@ -86,5 +86,13 @@
         "prop": {
             "state": 0
         }
+    },
+    "e": {
+        "channel": "0",
+        "command": "play",
+        "prop": {
+            "light": "auto",
+            "sound": "thunder1"
+        }
     }
 }
