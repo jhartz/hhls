@@ -177,12 +177,13 @@ function toggle(section, newelem, oncomplete) {
                 height: "100%",
                 background: "inherit",
                 "box-shadow": "-4px 0 2px #ccc",
-                opacity: 0.1
+                opacity: 0.1,
+                "z-index": "999"
             }).show();
-            $oldelem.find(".panel:visible").addClass("wasvisible").hide();
+            //$oldelem.find(".panel:visible").addClass("wasvisible").hide();
             $newelem.animate({left: 0, opacity: 1}, function () {
                 $oldelem.hide();
-                $oldelem.find(".wasvisible").show().removeClass("wasvisible");
+                //$oldelem.find(".wasvisible").show().removeClass("wasvisible");
                 $newelem.css({
                     position: "",
                     left: "",
@@ -191,7 +192,8 @@ function toggle(section, newelem, oncomplete) {
                     height: "",
                     background: "",
                     "box-shadow": "",
-                    opacity: ""
+                    opacity: "",
+                    "z-index": ""
                 });
                 $section.css("overflow", "");
                 if (typeof oncomplete == "function") oncomplete();
@@ -208,13 +210,14 @@ function toggle(section, newelem, oncomplete) {
                 height: "100%",
                 background: "inherit",
                 "box-shadow": "-4px 0 2px #ccc",
-                opacity: 1
+                opacity: 1,
+                "z-index": "999"
             });
             $newelem.show();
-            $newelem.find(".panel:visible").addClass("wasvisible").hide();
+            //$newelem.find(".panel:visible").addClass("wasvisible").hide();
             $oldelem.animate({left: width + "px", opacity: 0.1}, function () {
                 $oldelem.hide();
-                $newelem.find(".wasvisible").show().removeClass("wasvisible");
+                //$newelem.find(".wasvisible").show().removeClass("wasvisible");
                 $oldelem.css({
                     position: "",
                     left: "",
@@ -223,7 +226,8 @@ function toggle(section, newelem, oncomplete) {
                     height: "",
                     background: "",
                     "box-shadow": "",
-                    opacity: ""
+                    opacity: "",
+                    "z-index": ""
                 });
                 $section.css("overflow", "");
                 if (typeof oncomplete == "function") oncomplete();
