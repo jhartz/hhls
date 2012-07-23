@@ -60,6 +60,10 @@ var effects = {
             effects.update_channel_details();
         });
         
+        $("input[name=effects_custom_lighttype]").change(function () {
+            $("#effects_custom_light").css("visibility", $("#effects_custom_lighttype_list")[0].checked ? "visible" : "hidden");
+        });
+        
         $(document).on("click", ".effects_keyboard_deleter", function (event) {
             effects.keyboard_editor_delete($(this).attr("data-key"));
         });
@@ -186,14 +190,19 @@ var effects = {
                         }
                     }
                 } else {
+                    var lighttype = $("input[name=effects_custom_lighttype]:checked").val();
                     var light = $.trim($("#effects_custom_light").val());
                     var sound = $("#effects_custom_sound").val();
-                    if (light.lastIndexOf(",") == light.length - 1) light = light.slice(0, -1);
-                    try {
-                        light = $.parseJSON("[" + light + "]");
-                    } catch (err) {
-                        alert("ERROR: Invalid lighting pattern!\nDetails: " + err);
-                        return;
+                    if (lighttype == "auto") {
+                        light = "auto";
+                    } else {
+                        if (light.lastIndexOf(",") == light.length - 1) light = light.slice(0, -1);
+                        try {
+                            light = $.parseJSON("[" + light + "]");
+                        } catch (err) {
+                            alert("ERROR: Invalid lighting pattern!\nDetails: " + err);
+                            return;
+                        }
                     }
                     if (reason == "keyboard") {
                         this.keyboard_editor({
@@ -322,7 +331,12 @@ var effects = {
                 if (data.prop.preset) {
                     html += "Preset: " + escHTML(data.prop.preset);
                 } else if (data.prop.light) {
-                    html += 'Light: <span title="' + escHTML(JSON.stringify(data.prop.light)) + '" style="cursor: default; font-style: italic;">(custom lighting sequence)</span>';
+                    html += 'Light: ';
+                    if (data.prop.light == "auto") {
+                        html += 'auto';
+                    } else {
+                        html += '<span title="' + escHTML(JSON.stringify(data.prop.light)) + '" style="cursor: default; font-style: italic;">(custom lighting sequence)</span>';
+                    }
                     if (data.prop.sound) html += "<br>Sound: " + data.prop.sound;
                 } else if (typeof data.prop.dimness != "undefined") {
                     html += "Dimness: " + data.prop.dimness;

@@ -245,6 +245,11 @@ table.pretty td, table.pretty th {
     border: 1px solid #344A55;
 }
 
+table.topped > tbody > tr > td, table.topped > tr > td {
+    vertical-align: top;
+    white-space: nowrap;
+}
+
 div.topbtn {
     position: absolute;
     top: 0;

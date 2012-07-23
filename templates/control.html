@@ -31,7 +31,7 @@ var settings = {
     
     <div id="effects_controls" data-level="1" style="display: none; min-height: 100%;">
         <form id="effects_form">
-            <table id="effects_table" style="width: 100%; border-collapse: collapse;"><tbody>
+            <table id="effects_table" class="topped" style="width: 100%; border-collapse: collapse;"><tbody>
                 <tr>
                     <td style="width: 50%;"><div id="effects_channels" class="panelbox">Loading...</div></td>
                     <td style="width: 50%;">
@@ -42,7 +42,25 @@ var settings = {
                             </div>
                             <div class="back">
                                 <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
-                                <div><br style="clear: both;"><label for="effects_custom_light">Lighting (list of millisecond intervals): </label><input id="effects_custom_light" pattern="([0-9]+ *,? *)+" placeholder="100,200,150, ..." x-moz-errormessage="Please enter a comma-separated list of integers"><br><label for="effects_custom_sound">Sound: </label><select id="effects_custom_sound"><option value="" selected>(none)</option>{{{sounds}}}</select><p style="text-align: right;"><span class="lilbutton effects_custom_customize">Save as Preset</span></p></div>
+                                <div><br style="clear: both;">
+                                    <table class="topped">
+                                        <tr>
+                                            <td>Lighting:</td>
+                                            <td><input type="radio" id="effects_custom_lighttype_auto" name="effects_custom_lighttype" value="auto"></td>
+                                            <td><label for="effects_custom_lighttype_auto">Automatic based on sound</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td><input type="radio" id="effects_custom_lighttype_list" name="effects_custom_lighttype" value="list" checked></td>
+                                            <td><label for="effects_custom_lighttype_list">List of millisecond intervals</label><br><input id="effects_custom_light" pattern="([0-9]+ *,? *)+" placeholder="100,200,150, ..." x-moz-errormessage="Please enter a comma-separated list of integers" title="NOTE: 1000 ms = 1 sec"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sound:</td>
+                                            <td colspan="2"><select id="effects_custom_sound"><option value="" selected>(none)</option>{{{sounds}}}</select></td>
+                                        </tr>
+                                    </table>
+                                    <p style="text-align: right;"><span class="lilbutton effects_custom_customize">Save as Preset</span></p>
+                                </div>
                             </div>
                         </div>
                         <div id="effects_toggledpanel" class="panelbox effects_panel" style="display: none; text-align: center;">
@@ -58,7 +76,11 @@ var settings = {
                             </div>
                             <div class="back">
                                 <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
-                                <div><br style="clear: both;"><label for="effects_custom_dimness">Dimness: </label><input type="range" id="effects_custom_dimness" size="3" pattern="(100|[0-9]{1,2}(\.[0-9]*)?)">&nbsp;<span id="effects_custom_dimness_label"></span><br><label for="effects_custom_time">Fading Time (seconds): </label><input type="number" id="effects_custom_time" size="3" pattern="[0-9]+(\.[0-9]*)?"><p style="text-align: right;"><span class="lilbutton effects_custom_customize">Save as Preset</span></p></div>
+                                <div><br style="clear: both;">
+                                    <p><label for="effects_custom_dimness">Dimness: </label><input type="range" id="effects_custom_dimness" size="3" pattern="(100|[0-9]{1,2}(\.[0-9]*)?)">&nbsp;<span id="effects_custom_dimness_label"></span></p>
+                                    <p><label for="effects_custom_time">Fading Time (seconds): </label><input type="number" id="effects_custom_time" size="3" pattern="[0-9]+(\.[0-9]*)?"></p>
+                                    <p style="text-align: right;"><span class="lilbutton effects_custom_customize">Save as Preset</span></p>
+                                </div>
                             </div>
                         </div>
                     </td>
