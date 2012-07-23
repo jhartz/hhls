@@ -1,7 +1,7 @@
 var is_on = false,
     noflash = false,
-    on_color = "#000000",
-    off_color = "#FFFFFF",
+    oncolor = "#000000",
+    offcolor = "#FFFFFF",
     volume = 80,
     sounds = {},
     source,
@@ -17,12 +17,14 @@ function escHTML(html) {
 function status(text, in_loading) {
     if (in_loading) {
         document.getElementById("loading").style.display = "block";
-        document.getElementById("panel").style.display = "none";
+        document.getElementById("leftpanel").style.display = "none";
+        document.getElementById("rightpanel").style.display = "none";
         
         document.getElementById("loading").innerHTML = escHTML(text || "").replace(/\n/g, "<br>");
     } else {
         document.getElementById("loading").style.display = "none";
-        document.getElementById("panel").style.display = "block";
+        document.getElementById("leftpanel").style.display = "block";
+        document.getElementById("rightpanel").style.display = "block";
         
         if (!text) {
             document.getElementById("status").innerHTML = "";
@@ -42,10 +44,10 @@ function status(text, in_loading) {
             
             var elem = document.createElement("tr");
             elem.innerHTML = "<td>" + A + "</td><td>" + B + "</td>";
-            if (document.getElementById("statushistory").childNodes.length > 0) {
-                document.getElementById("statushistory").insertBefore(elem, document.getElementById("statushistory").childNodes[0]);
+            if (document.getElementById("options_statushistory").childNodes.length > 0) {
+                document.getElementById("options_statushistory").insertBefore(elem, document.getElementById("options_statushistory").childNodes[0]);
             } else {
-                document.getElementById("statushistory").appendChild(elem);
+                document.getElementById("options_statushistory").appendChild(elem);
             }
         }
     }
@@ -71,17 +73,17 @@ function toggle() {
 }
 
 function updatecolor() {
-    document.body.style.backgroundColor = off_color;
-    document.body.style.textShadow = "1px 1px 1px " + off_color;
-    document.body.style.color = on_color;
-    document.getElementById("bg").style.backgroundColor = on_color;
+    document.body.style.backgroundColor = offcolor;
+    document.body.style.textShadow = "1px 1px 1px " + offcolor;
+    document.body.style.color = oncolor;
+    document.getElementById("bg").style.backgroundColor = oncolor;
 }
 
 function closeconn() {
     if (source) {
         status("Disconnecting from server...");
         if (typeof source.close == "function") source.close();
-        document.getElementById("close").style.display = "none";
+        document.getElementById("options_closeconn").style.display = "none";
         setTimeout(function loopsieloopsieloo() {
             if (source.readyState == 2) {
                 status("Disconnected from server.");
@@ -100,47 +102,47 @@ window.onload = function () {
     } else {
         status("Loading...", true);
         
-        document.getElementById("options").addEventListener("click", function (event) {
-            document.getElementById("bigstatuscontainer").style.display = "block";
+        document.getElementById("options_btn").addEventListener("click", function (event) {
+            document.getElementById("options").style.display = "block";
             return false;
         }, false);
-        document.getElementById("closer").addEventListener("click", function (event) {
-            document.getElementById("bigstatuscontainer").style.display = "none";
+        document.getElementById("options_close").addEventListener("click", function (event) {
+            document.getElementById("options").style.display = "none";
             return false;
         }, false);
         
-        document.getElementById("close").addEventListener("click", function (event) {
+        document.getElementById("options_closeconn").addEventListener("click", function (event) {
             closeconn();
         }, false);
         
-        document.getElementById("reloader").addEventListener("click", function (event) {
+        document.getElementById("options_changechannel").addEventListener("click", function (event) {
             location.href = "/client/frame?cid=" + cid + "&x=" + x + "&y=" + y;
         }, false);
         
-        document.getElementById("oncolor").addEventListener("change", function (event) {
-            on_color = document.getElementById("oncolor").value;
+        document.getElementById("options_oncolor").addEventListener("change", function (event) {
+            oncolor = document.getElementById("options_oncolor").value;
             updatecolor();
         }, false);
-        document.getElementById("offcolor").addEventListener("change", function (event) {
-            off_color = document.getElementById("offcolor").value;
+        document.getElementById("options_offcolor").addEventListener("change", function (event) {
+            offcolor = document.getElementById("options_offcolor").value;
             updatecolor();
         }, false);
         
-        if (document.getElementById("noflash_check")) {
-            document.getElementById("noflash_check").addEventListener("change", function (event) {
-                noflash = document.getElementById("noflash_check").checked;
+        if (document.getElementById("options_noflash")) {
+            document.getElementById("options_noflash").addEventListener("change", function (event) {
+                noflash = document.getElementById("options_noflash").checked;
             }, false);
         }
         
-        if (document.getElementById("slider")) {
+        if (document.getElementById("options_volume")) {
             // If we have found this element, then sound is enabled
             
-            document.getElementById("slider").addEventListener("change", function (event) {
-                volume = parseInt(document.getElementById("slider").value, 10);
+            document.getElementById("options_volume").addEventListener("change", function (event) {
+                volume = parseInt(document.getElementById("options_volume").value, 10);
                 if (isNaN(volume)) {
-                    document.getElementById("slider").value = volume = 80;
+                    document.getElementById("options_volume").value = volume = 80;
                 } else if (volume < 0) {
-                    document.getElementById("slider").value = volume = 0;
+                    document.getElementById("options_volume").value = volume = 0;
                 }
                 
                 var audios = document.getElementsByTagName("audio");
@@ -154,7 +156,7 @@ window.onload = function () {
             for (var i = 0; i < soundlist.length; i++) {
                 sounds[soundlist[i].dataset.sound] = soundlist[i];
                 // TODO: run this below on the audio's onload (if it's not already loaded)
-                document.getElementById("sndlst").innerHTML += '<li>' + escHTML(soundlist[i].dataset.sound) + '</li>';
+                document.getElementById("options_soundlist").innerHTML += '<li>' + escHTML(soundlist[i].dataset.sound) + '</li>';
             }
         }
         
@@ -168,7 +170,7 @@ window.onload = function () {
         source = new EventSource("/client/stream?channel=" + encodeURIComponent(channel) + "&cid=" + cid + "&x=" + x + "&y=" + y);
         source.onopen = function (event) {
             status("Connected to server.");
-            document.getElementById("close").style.display = "block";
+            document.getElementById("options_closeconn").style.display = "block";
         };
         source.onmessage = function (event) {
             try {

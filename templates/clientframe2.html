@@ -69,9 +69,12 @@ var channel = "{{{channel}}}", channeltype = "{{{channeltype}}}";
 
 <div id="loading" style="position: absolute; left: 0; right: 0; text-align: center;"><noscript><p>ERROR: JavaScript is required to view this page.</p></noscript></div>
 
-<div id="panel" style="position: absolute; top: 1px; left: 1px; display: none;">
-    <span id="options" class="btn">Options</span><br>
-    <span id="status" style="font-style: italic;">Loading...</span><br>
+<div id="leftpanel" style="position: absolute; top: 1px; left: 1px; display: none;">
+    <span id="status" style="font-style: italic;">Loading...</span>
+</div>
+
+<div id="rightpanel" style="position: absolute; top: 1px; right: 1px; display: none;">
+    <span id="options_btn" class="btn">Options</span>
 </div>
 
 <div id="bottompanel" style="position: absolute; bottom: 1px; left: 1px; right: 1px;">
@@ -82,44 +85,44 @@ var channel = "{{{channel}}}", channeltype = "{{{channeltype}}}";
 <div style="display: none;">
 {{{sounds}}}</div>
 {{/sounds}}
-<div id="bigstatuscontainer" style="position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-color: black; color: white; text-shadow: none; padding: 10px; overflow: auto; display: none;"><table style="width: 100%; height: 100%;"><tbody><tr><td>
-    <div id="panel_options">
+<div id="options" style="position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-color: black; color: white; text-shadow: none; padding: 10px; overflow: auto; display: none;"><table style="width: 100%; height: 100%;"><tbody><tr><td>
+    <div>
         <table class="bordered" style="margin: auto;"><tbody>
             <tr>{{#sounds}}
                 <td valign="top">
                     <div class="heading">Loaded Sounds:</div>
-                    <ul id="sndlst" style="max-width: 230px; padding: 0; margin: 0 15px;"></ul>
+                    <ul id="options_soundlist" style="max-width: 230px; padding: 0; margin: 0 15px;"></ul>
                 </td>{{/sounds}}
                 <td valign="top">
                     <div class="heading">Options:</div>
                     <div style="margin-left: 15px;">{{#sounds}}
-                        <label for="slider">Volume:</label><br>
-                        <input id="slider" type="range" autocomplete="off" min="0" max="100" value="80"><br><br>
-                        <span id="noflash_container"><input id="noflash_check" type="checkbox"><label for="noflash_check"> No Flash</label><br><br></span>{{/sounds}}
+                        <label for="options_volume">Volume:</label><br>
+                        <input id="options_volume" type="range" autocomplete="off" min="0" max="100" value="80"><br><br>
+                        <input id="options_noflash" type="checkbox"><label for="options_noflash"> No Flash</label><br><br>{{/sounds}}
                         <table>
                             <tr>
-                                <td><label for="oncolor">"On" color: </label></td>
-                                <td><input type="color" id="oncolor" value="#000000" size="8"></td>
+                                <td><label for="options_oncolor">"On" color: </label></td>
+                                <td><input type="color" id="options_oncolor" value="#000000" size="8"></td>
                             </tr>
                             <tr>
-                                <td><label for="offcolor">"Off" color: </label></td>
-                                <td><input type="color" id="offcolor" value="#FFFFFF" size="8"></td>
+                                <td><label for="options_offcolor">"Off" color: </label></td>
+                                <td><input type="color" id="options_offcolor" value="#FFFFFF" size="8"></td>
                             </tr>
                         </table>
                         <br>
-                        <span id="close" class="btn">Close Connection</span>
+                        <span id="options_closeconn" class="btn">Close Connection</span>
                     </div>
                 </td>
             </tr>
             <tr>
                 <td{{#sounds}} colspan="2"{{/sounds}}>
                     <div class="heading">Status History:</div>
-                    <div style="max-height: 160px; overflow: auto; margin-left: 15px;"><table><tbody id="statushistory"></tbody></table></div>
+                    <div style="max-height: 160px; overflow: auto; margin-left: 15px;"><table><tbody id="options_statushistory"></tbody></table></div>
                 </td>
             </tr>
         </tbody></table>
-        <div style="text-align: center;">Channel: <span id="channel_label" style="font-style: italic;">{{channel}}</span> ({{channeltype}})<br><span id="reloader" class="btn">Change Channel</span></div>
-        <div style="text-align: center; margin-top: 10px;"><button id="closer">Close</button></div>
+        <div style="text-align: center;">Channel: <span style="font-style: italic;">{{channel}}</span> ({{channeltype}})<br><span id="options_changechannel" class="btn">Change Channel</span></div>
+        <div style="text-align: center; margin-top: 10px;"><button id="options_close">Close</button></div>
     </div>
 </td></tr></tbody></table></div>
 
