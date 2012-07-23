@@ -3,14 +3,20 @@
 
 // node modules
 var util = require("util"),
+    path = require("path"),
     mu = require("mu2"),
     mime = require("mime");
 
+// my modules
+var config = require("../config");
 
-mu.root = __dirname + "/../templates";
+
+mu.root = path.join(__dirname, "..", config.TEMPLATES_DIR || "templates");
 
 if (process.env.NODE_ENV == "DEVELOPMENT") {
     mu.clearCache();
+} else {
+    console.log("Using mu cache");
 }
 
 exports.escHTML = function (html) {
@@ -46,6 +52,10 @@ exports.write = function (res, templ_name, vars, status, headers) {
     if (!headers["Content-Type"]) headers["Content-Type"] = "text/html";
     if (!headers["Cache-Control"]) headers["Cache-Control"] = "no-cache";
     res.writeHead(status || 200, headers);
+    
+    if (process.env.NODE_ENV == "DEVELOPMENT") {
+        mu.clearCache();
+    }
     var stream = mu.compileAndRender(templ_name, vars || {});
     util.pump(stream, res);
 };
@@ -67,6 +77,42 @@ exports.writeError = function (res, num, details) {
         }
     }
     exports.write(res, "error.html", {num: num, details: details}, num);
+};
+
+// "Format query" - to test/format a member of require("url").parse(..., true).query
+exports.fquery = function (querystring, helperfunc) {
+    var formatter = function (endstring) {
+        if (typeof helperfunc == "string") {
+            switch (helperfunc.toLowerCase()) {
+                case "int":
+                    return parseInt(endstring, 10);
+                    break;
+                case "num":
+                case "number":
+                    return Number(endstring);
+                    break;
+                default:
+                    return endstring;
+            }
+        } else if (typeof helperfunc == "function") {
+            return helperfunc(endstring);
+        } else {
+            return endstring;
+        }
+    };
+    
+    if (Array.isArray(querystring)) {
+        var real = "";
+        querystring.forEach(function (item) {
+            if (!real && item) real = item;
+        });
+        if (!real) real = querystring[0];
+        return formatter(real);
+    } else if (typeof querystring == "string") {
+        return formatter(querystring);
+    } else {
+        return formatter("");
+    }
 };
 
 exports.parseCookies = function (cookiestring) {
