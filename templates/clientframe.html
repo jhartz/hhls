@@ -3,17 +3,31 @@
 <head>
 <meta charset="utf-8">
 <title>Client - Haunted House</title>
+<script type="text/javascript" src="/static/clientframe.js"></script>
 </head>
 
 <body>
 <div style="position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-color: black; color: white; padding: 10px; overflow: auto;"><table style="width: 100%; height: 100%;"><tbody><tr><td>
-    <div id="panel_start" style="margin: auto; border: 1px solid grey; border-radius: 5px; padding: 10px;">
-        <form action="/client/frame">
-            <input type="hidden" name="cid" value="{{cid}}"><input type="hidden" name="x" value="{{x}}"><input type="hidden" name="y" value="{{y}}">
-            <p>Select a channel:</p>
-            <p>{{{channellist}}}</p>
-            <p><input type="submit" value="Go"></p>
-        </form>
+    <div id="loading" style="text-align: center;"><noscript><p>ERROR: JavaScript is required to view this page.</p></noscript></div>
+    <div id="panel_start" style="display: none; margin: auto; border: 1px solid grey; border-radius: 5px; padding: 10px;">
+        <div id="ext_controller">
+            <p style="text-align: center;"><button id="ext_user">Use External Controller</button></p>
+            <p style="text-align: center;"><button id="ext_skipper" style="border: none;">Skip</button></p>
+        </div>
+        <div id="noext_controller">
+            <form id="former" action="/client/frame">
+                <input type="hidden" name="cid" value="{{cid}}"><input type="hidden" name="x" value="{{x}}"><input type="hidden" name="y" value="{{y}}"><input type="hidden" id="useext" name="useext" value="no">
+                <p>Select a channel:</p>
+                <p>{{{channellist}}}</p>
+                <div id="ext_options" style="display: none;">
+                    <p>Detected devices:</p>
+                    <p id="ext_devicelist"><input type="radio" id="ext_device1" name="ext_device" value="deviceid">&nbsp;<label for="ext_device1">Example Device Name</label></p>
+                    <p><input type="radio" id="ext_device_custom" name="ext_device" value="custom">&nbsp;<label for="ext_device_custom">Custom Executable</label></p>
+                    <p>
+                </div>
+                <p><input type="submit" value="Go"></p>
+            </form>
+        </div>
     </div>
 </td></tr></tbody></table></div>
 </body>
