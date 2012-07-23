@@ -4,6 +4,7 @@
 
 // node modules
 var fs = require("fs"),
+    path = require("path"),
     mime = require("mime"),
     static = require("node-static");
 
@@ -19,8 +20,15 @@ exports.static = function (url, req, res, include_readme) {
         myutil.writeError(res, 404);
     } else if (bname.indexOf(".") == -1) {
         // No extension... assume plain text
-        res.writeHead(200, {"Content-Type": "text/plain"});
-        fs.createReadStream(url.pathname.substring(1)).pipe(res);
+        var pathname = url.pathname.substring(1).replace(/\//g, path.sep);
+        fs.lstat(pathname, function (err, stats) {
+            if (!err && stats.isFile()) {
+                res.writeHead(200, {"Content-Type": "text/plain"});
+                fs.createReadStream(pathname).pipe(res);
+            } else {
+                myutil.writeError(res, 404);
+            }
+        });
     } else {
         req.addListener("end", function () {
             staticfiles.serve(req, res, function (err, resp) {
