@@ -122,6 +122,9 @@ function runseq() {
                     alert("TODO!");
                     // TODO: fade the background light-dark-etc. based on volume of sound
                 }
+            } else {
+                // No light or sound
+                oneffectnext();
             }
         }
     }
