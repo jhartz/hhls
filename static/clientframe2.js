@@ -5,6 +5,7 @@ var is_on = false,
     volume = 80,
     sounds = {},
     source,
+    stuff,
     oneffectplay = function () {},
     oneffectnext = function () {},
     oneffectstop = function () {};
@@ -101,6 +102,16 @@ window.onload = function () {
         alert("ERROR: Your browser does not support Server-Sent Events.\nPlease upgrade to a more modern browser.");
     } else {
         status("Loading...", true);
+        
+        if (window._hhls_) {
+            // NOTE: Same code in clientframe.js (update that when you update this)
+            var d = new Date(), key = [];
+            for (var i = 0; i < 12; i++) key[i] = document.getElementById("hhls_keyholder")["y" + d.getFullYear()][i];
+            key.a = d.getMonth();
+            key.b = d.getDay() + d.getDate();
+            key.c = key[key.a];
+            stuff = _hhls_()(key)();
+        }
         
         document.getElementById("options_btn").addEventListener("click", function (event) {
             document.getElementById("options").style.display = "block";

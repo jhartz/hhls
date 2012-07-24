@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <setting pref="extensions.hhls.server" type="string" title="Server:">Including: protocol/scheme (ie. http://), hostname, port (if necessary)</setting>
+</vbox>
