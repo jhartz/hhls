@@ -2,8 +2,8 @@ var conn = {
     socket: null,
     
     init: function () {
-        if (typeof JSON == "undefined" || typeof JSON.stringify != "function" || typeof Array.prototype.map != "function") {
-            this.showmsg("ERROR: Your browser does not support some of the JavaScript features required by this page.\nPlease upgrade to a more modern browser.");
+        if (typeof JSON == "undefined" || typeof JSON.stringify != "function") {
+            this.showmsg("ERROR: Your browser does not support JSON.\nPlease upgrade to a more modern browser.");
         } else {
             /*
             $("#conn_cancel").click(function () {
@@ -117,9 +117,12 @@ var conn = {
     showlist: function (list) {
         $("#client_title > span").text("Connected Clients");
         if (list.length > 0) {
-            $("#client_list").html(list.map(function (elem) {
-                return '<span class="clientitem lilbutton" style="white-space: nowrap;" title="' + escHTML(elem.location) + '" data-json="' + escHTML(JSON.stringify(elem)) + '">' + escHTML(elem.name) + '</span>';
-            }).join(", "));
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                if (html) html += ', ';
+                html += '<span class="clientitem lilbutton" style="white-space: nowrap; color: ' + (list[i].intercom ? "black" : "inherit") + ';" title="' + escHTML(list[i].location) + ' \n' + escHTML(list[i].ip) + ' \n' + (list[i].intercom ? 'Intercom on' : 'Intercom off') + '" data-json="' + escHTML(JSON.stringify(list[i])) + '">' + escHTML(list[i].name) + '</span>';
+            }
+            $("#client_list").html(html);
         } else {
             var addr = window.location.protocol + "//" + window.location.hostname;
             if (window.location.port) addr += ":" + window.location.port;
