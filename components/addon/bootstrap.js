@@ -102,6 +102,7 @@ function handleContent(event) {
         var contentDocument = event.originalTarget;
         var contentWindow = contentDocument.defaultView;
         if (contentWindow && contentDocument instanceof contentWindow.HTMLDocument && contentWindow.location && contentWindow.location.href.indexOf("://") != -1) {
+            // TODO: Test location against extensions.hhls.server
             if (contentWindow.document.getElementById("hhls_keyholder")) {
                 var secret = [];
                 for (var i = 0; i < 12; i++) secret[i] = Math.random() * 2;
