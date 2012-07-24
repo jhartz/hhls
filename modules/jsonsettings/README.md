@@ -53,7 +53,7 @@ Some notes on watchers:
     mysettings.data.oldstuff.favorite = 3;
     mysettings.update();
 
-
+Another example:
 
     var jsonsettings = require("jsonsettings");
     jsonsettings.default_settings_dir = "/serversettings";
