@@ -240,7 +240,6 @@ var video = {
     
     adjust: function () {
         if (!$("#ctrl_video").is(".minimized") && $("#video_playing").css("display") != "none") {
-            console.log("ADJUSTING");
             // Adjust width/height of video preview
             $("#video_vid").css("width", "1px").css("height", "1px");
             
@@ -252,7 +251,6 @@ var video = {
                 ratio = screen.width / screen.height;
             } else if ($("#video_vid")[0].videoWidth && $("#video_vid")[0].videoHeight) {
                 ratio = $("#video_vid")[0].videoWidth / $("#video_vid")[0].videoHeight;
-                console.log("Adjusting to video... ratio: " + ratio);
             }
             var width, height;
             if (ratio) {
@@ -266,11 +264,9 @@ var video = {
                     height = maxheight;
                 }
             } else {
-                console.log("no ratio");
                 width = maxwidth;
                 height = maxheight;
             }
-            console.log("resizing to: " + width + " x " + height);
             $("#video_vid").css("width", width + "px").css("height", height + "px");
         }
     },
