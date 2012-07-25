@@ -19,14 +19,18 @@ function resizer(use_animate) {
     $("section.top").not(".minimized").each(function () {
         $(this).find(".topbtn, .attop").css("top", $(this).css("padding-top"));
         
-        var diff = $(this).outerHeight(true) - $(this).height();
-        var newheight = Math.floor(height - diff) + "px";
-        if (use_animate) {
-            $(this).animate({height: newheight}, function () {
-                if (typeof video != "undefined") video.adjust();
-            });
-        } else {
-            $(this).css("height", newheight);
+        var loading = $(this).data("loading");
+        if (!loading || use_animate) {
+            var diff = $(this).outerHeight(true) - $(this).height();
+            var newheight = Math.floor(height - diff) + "px";
+            if (use_animate) {
+                $(this).animate({height: newheight}, function () {
+                    $(this).data("loading", false);
+                    resizer();
+                });
+            } else {
+                $(this).css("height", newheight);
+            }
         }
     });
     
@@ -114,6 +118,7 @@ $(function () {
         if (minimized_items[section_id]) {
             var $section = $(minimized_items[section_id]);
             minimized_items[section_id] = null;
+            $section.data("loading", true);
             
             $(this).animate({width: 0}, function () {
                 $(this).remove();
