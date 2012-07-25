@@ -121,7 +121,7 @@ var settings = {
         </table>
         <p style="text-align: center; font-size: 10pt;">NOTE: All keyboard shortcuts are automatically kept in sync with every other control page on other computers.</p>
         
-        <div id="effects_keyboard_editor" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 10px; background-color: black; color: white; opacity: .9; border-radius: 9px; z-index: 999; overflow: auto; text-align: center;">
+        <div id="effects_keyboard_editor" class="blackoverlay" style="display: none;">
             <p><u>Edit Keyboard Shortcut</u></p>
             <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white; text-align: left;">
                 <p>Key: <select id="effects_keyboard_editor_key"></select></p>
@@ -168,6 +168,10 @@ var settings = {
 <section class="bottom flatfooter" style="display: none;">
     <header><h1><span id="client_title">Server Connection</span></h1></header>
     <div id="client_list" style="text-align: center;">Loading...</div>
+    <div id="client_details" class="blackoverlay" style="display: none;">
+        <p><span id="client_details_name" style="text-decoration: underline;">Client Name</span><br>Location: <span id="client_details_location"></span><br>Intercom: <span id="client_details_intercom"></p>
+        <table class="layouter"><tbody id="client_details_layouter"></tbody></table>
+    </div>
     <footer class="buttonbox"><div id="minimized_tray"><span>&nbsp;Minimized Sections: </span></div></footer>
 </section>
 

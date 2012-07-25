@@ -107,6 +107,22 @@ section > div > table {
     /* height: 100%; */
 }
 
+div.blackoverlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+    background-color: black;
+    color: white;
+    opacity: .9;
+    border-radius: 9px;
+    z-index: 990;
+    overflow: auto;
+    text-align: center;
+}
+
 tr.top {
     height: 60%;
 }
@@ -243,6 +259,17 @@ table.pretty td, table.pretty th {
     padding: 5px;
     font-size: 10pt;
     border: 1px solid #344A55;
+}
+
+table.layouter {
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+}
+
+table.layouter td {
+    border: 1px solid black;
+    background-color: white;
 }
 
 table.topped > tbody > tr > td, table.topped > tr > td {
