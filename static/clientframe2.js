@@ -12,6 +12,9 @@ var is_on = false,
 
 function escHTML(html) {
     // NOTE: Also in myutil.js and control.js
+    if (typeof html != "string") {
+        html = html + "";
+    }
     return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
 }
 

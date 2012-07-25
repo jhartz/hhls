@@ -21,6 +21,9 @@ if (process.env.NODE_ENV == "DEVELOPMENT") {
 
 exports.escHTML = function (html) {
     // NOTE: Also in control.js and clientframe2.js
+    if (typeof html != "string") {
+        html = html + "";
+    }
     return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
 };
 
