@@ -71,19 +71,19 @@ var conn = {
                 conn.showmsg("Disconnected from server");
                 effects.toggle("waiting");
             });
-            conn.socket.on("error", function () {
+            this.socket.on("error", function () {
                 conn.showmsg("Error connecting to server");
                 effects.toggle("waiting");
             });
-            conn.socket.on("reconnect", function () {
+            this.socket.on("reconnect", function () {
                 conn.showmsg("Reconnected to server");
                 effects.toggle("controls");
             });
-            conn.socket.on("reconnecting", function () {
+            this.socket.on("reconnecting", function () {
                 conn.showmsg("Reconnecting to server...");
                 effects.toggle("waiting");
             });
-            conn.socket.on("reconnect_failed", function () {
+            this.socket.on("reconnect_failed", function () {
                 conn.showmsg("Failed to reconnect to server");
                 effects.toggle("waiting");
             });
