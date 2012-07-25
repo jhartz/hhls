@@ -168,9 +168,12 @@ var settings = {
 <section class="bottom flatfooter" style="display: none;">
     <header><h1><span id="client_title">Server Connection</span></h1></header>
     <div id="client_list" style="text-align: center;">Loading...</div>
-    <div id="client_details" class="blackoverlay" style="display: none;">
-        <p><span id="client_details_name" style="text-decoration: underline;">Client Name</span><br>Location: <span id="client_details_location"></span><br>Intercom: <span id="client_details_intercom"></p>
-        <table class="layouter"><tbody id="client_details_layouter"></tbody></table>
+    <div id="client_details" class="blackoverlay" style="display: none; cursor: pointer; padding: 0;">
+        <table style="height: 100%; width: auto; min-width: 300px; margin: auto;"><tbody><tr>
+            <td style="text-align: left;">Name: <span id="client_details_name"></span><br>Location: <span id="client_details_location"></span><br>IP: <span id="client_details_ip"></span><br>Intercom: <span id="client_details_intercom"></td>
+            <td>&nbsp;&nbsp;&nbsp;</td>
+            <td><table class="layouter" style="width: auto; margin: auto;"><tbody id="client_details_layouter"></tbody></table></td>
+        </tr></tbody></table>
     </div>
     <footer class="buttonbox"><div id="minimized_tray"><span>&nbsp;Minimized Sections: </span></div></footer>
 </section>

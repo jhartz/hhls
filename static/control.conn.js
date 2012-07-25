@@ -24,8 +24,37 @@ var conn = {
             });
             */
             
+            $("#client_details").click(function () {
+                $(this).attr("data-cid", "");
+                $(this).fadeOut();
+            });
+            
             $(document).on("click", "span.clientitem", function () {
-                alert("More info on: " + $(this).text());
+                try {
+                    var data = $.parseJSON($(this).attr("data-json"));
+                    if (data) {
+                        $("#client_details").attr("data-cid", data.cid);
+                        $("#client_details_name").text(data.name);
+                        $("#client_details_location").text(data.location);
+                        $("#client_details_ip").text(data.ip);
+                        $("#client_details_intercom").text(data.intercom ? "on" : "off");
+                        $("#client_details_layouter").empty();
+                        for (var y = 1; y <= data.y; y++) {
+                            var html = '<tr>';
+                            for (var x = 1; x <= data.x; x++) {
+                                var channel = "&nbsp;"
+                                if (data.frames[x] && data.frames[x][y] && data.frames[x][y].channel) {
+                                    channel = escHTML(data.frames[x][y].channel);
+                                    if (channel == "0") channel = "Default";
+                                }
+                                html += '<td>' + channel + '</td>';
+                            }
+                            html += '</tr>';
+                            $("#client_details_layouter").append(html);
+                        }
+                        $("#client_details").fadeIn();
+                    }
+                } catch (err) {}
             });
             
             this.socket = io.connect();
@@ -110,6 +139,9 @@ var conn = {
     showmsg: function (msg) {
         $("#client_title").text("Server Connection");
         $("#client_list").html(escHTML(msg).replace(/\n/g, "<br>"));
+        if ($("#client_details").attr("data-cid")) {
+            $("#client_details").click();
+        }
         
         resizer();
     },
@@ -120,12 +152,26 @@ var conn = {
             var html = '';
             for (var i = 0; i < list.length; i++) {
                 if (html) html += ', ';
-                html += '<span class="clientitem lilbutton" style="white-space: nowrap; color: ' + (list[i].intercom ? "black" : "inherit") + ';" title="' + escHTML(list[i].location) + ' \n' + escHTML(list[i].ip) + ' \n' + (list[i].intercom ? 'Intercom on' : 'Intercom off') + '" data-json="' + escHTML(JSON.stringify(list[i])) + '">' + escHTML(list[i].name) + '</span>';
+                html += '<span class="clientitem lilbutton" style="white-space: nowrap; color: ' + (list[i].intercom ? "black" : "inherit") + ';" title="' + escHTML(list[i].location) + ' \n' + escHTML(list[i].ip) + ' \nIntercom ' + (list[i].intercom ? 'on' : 'off') + '" data-cid="' + escHTML(list[i].cid) + '" data-json="' + escHTML(JSON.stringify(list[i])) + '">' + escHTML(list[i].name) + '</span>';
             }
             $("#client_list").html(html);
+            if ($("#client_details").attr("data-cid")) {
+                var cid = $("#client_details").attr("data-cid");
+                var done = false;
+                $(".clientitem").each(function () {
+                    if (!done && $(this).attr("data-cid") == cid) {
+                        $(this).click();
+                        done = true;
+                    }
+                });
+                if (!done) {
+                    $("#client_details").click();
+                }
+            }
         } else {
             var addr = window.location.protocol + "//" + window.location.hostname;
             if (window.location.port) addr += ":" + window.location.port;
+            addr += "/";
             $("#client_list").html('No clients connected!<br><br>Direct your clients to ' + escHTML(addr) + '<br>and click "client"');
         }
         
