@@ -1,3 +1,33 @@
+var KEY_CODE_MAP = {
+      109: "-"
+    , 107: "="
+    , 219: "["
+    , 221: "]"
+    , 220: "\\"
+    , 59: ";"
+    , 222: "'"
+    , 188: ","
+    , 190: "."
+    , 110: "."
+    , 191: "/"
+    , 111: "/"
+    , 32: " "
+    /*
+    , 112: "F1"
+    , 113: "F2"
+    , 114: "F3"
+    , 115: "F4"
+    , 116: "F5"
+    , 117: "F6"
+    , 118: "F7"
+    , 119: "F8"
+    , 120: "F9"
+    , 121: "F10"
+    , 122: "F11"
+    , 123: "F12"
+    */
+};
+
 var effects = {
     oncustom: {timed: false, dimmed: false},
     transitioning: false,
@@ -78,7 +108,19 @@ var effects = {
         
         $(document).on("keydown keyup", function (event) {
             if (!effects.keyboard_onformelem && !event.ctrlKey && !event.altKey && !event.metaKey) {
-                var key = String.fromCharCode(event.which).toLowerCase();
+                var key;
+                if (event.which in KEY_CODE_MAP) {
+                    key = KEY_CODE_MAP[event.which];
+                } else if (event.which >= 65 && event.which <= 90) {
+                    // a-z
+                    key = String.fromCharCode(event.which).toLowerCase();
+                } else if (event.which >= 48 && event.which <= 57) {
+                    // 0-9
+                    key = String.fromCharCode(event.which);
+                } else if (event.which >= 96 && event.which <= 105) {
+                    // 0-9 (numeric keypad)
+                    key = String.fromCharCode(event.which - 48);
+                }
                 var valid = false;
                 for (var i = 0; i < effects.keyboard_valid.length; i++) {
                     if (effects.keyboard_valid[i] == key) {
@@ -403,13 +445,19 @@ var effects = {
         for (i = 97; i <= 122; i++) {
             checkkey(String.fromCharCode(i));
         }
-        // 1-9
-        for (i = 49; i <= 57; i++) {
-            checkkey(String.fromCharCode(i));
+        for (i = 1; i <= 9; i++) {
+            checkkey(i + "");
         }
-        $(["0", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/", " "]).each(function () {
-            checkkey(this);
-        });
+        checkkey("0");
+        var donekeys = {};
+        for (var keycode in KEY_CODE_MAP) {
+            if (KEY_CODE_MAP.hasOwnProperty(keycode)) {
+                if (!donekeys.hasOwnProperty(KEY_CODE_MAP[keycode])) {
+                    donekeys[KEY_CODE_MAP[keycode]] = true;
+                    checkkey(KEY_CODE_MAP[keycode]);
+                }
+            }
+        }
         
         $("#effects_keyboard_editor_key").val(prevselected);
         $("#effects_keyboard_tbody").html(html);
