@@ -228,12 +228,6 @@ var video = {
                         effects.sendpattern(control.data.channel || "0", control.data.light, control.data.sound);
                     }
                     break;
-                case "next":
-                    effects.next();
-                    break;
-                case "stop":
-                    effects.stop();
-                    break;
             }
         });
     },
