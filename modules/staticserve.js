@@ -45,9 +45,9 @@ exports.static = function (url, req, res, include_readme) {
     }
 };
 
-exports.partial = function (url, req, res, use_readme) {
+exports.partial = function (url, req, res, include_readme) {
     var bname = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
-    if (bname == "README" && !use_readme) {
+    if (bname == "README" && !include_readme) {
         myutil.writeError(res, 404);
     } else {
         var path = url.pathname.substring(1);
