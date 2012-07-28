@@ -82,13 +82,13 @@ function serveResources(req, res) {
 
 var settings = {
     channels: new jsonsettings.SettingsFile({filename: "channels.json", onupdate: function () {
-        send_setting("channels");
+        sendSetting("channels");
     }}),
     keyboard: new jsonsettings.SettingsFile({filename: "keyboard.json", onupdate: function () {
-        send_setting("keyboard");
+        sendSetting("keyboard");
     }}),
     presets: new jsonsettings.SettingsFile({filename: "presets.json", onupdate: function () {
-        send_setting("presets");
+        sendSetting("presets");
     }})
 };
 
@@ -346,7 +346,7 @@ function serveStream(url, req, res) {
             
             res.write(":\n\n");
             
-            send_client_list();
+            sendClientList();
         } else {
             myutil.writeError(res, 404);
         }
@@ -382,10 +382,10 @@ function disconnect(cid, x, y) {
         clients[cid].active = false;
     }
     
-    send_client_list();
+    sendClientList();
 }
 
-function send_msg(jsonmsg, channel) {
+function sendMsg(jsonmsg, channel) {
     var msg = jsonmsg ? JSON.stringify(jsonmsg) : null;
     
     for (var i = 0; i < clients.length; i++) {
@@ -416,17 +416,17 @@ function send_msg(jsonmsg, channel) {
 
 setInterval(function () {
     // Keep the connections alive
-    send_msg();
+    sendMsg();
 }, 30000);
 
-function send_forward(about, data) {
+function sendForward(about, data) {
     io.sockets.send(JSON.stringify({
         about: about,
         data: data
     }));
 }
 
-function send_client_list() {
+function sendClientList() {
     var clientlist = [];
     for (var i = 0; i < clients.length; i++) {
         if (clients[i] && clients[i].active) {
@@ -453,11 +453,11 @@ function send_client_list() {
             clientlist.push(client);
         }
     }
-    send_forward("clientlist", clientlist);
+    sendForward("clientlist", clientlist);
 }
 
-function send_setting(setting) {
-    send_forward("settings", {
+function sendSetting(setting) {
+    sendForward("settings", {
         setting: setting,
         settings: settings[setting].data
     });
@@ -471,7 +471,7 @@ io.sockets.on("connection", function (socket) {
             if (msg.about) {
                 switch (msg.about) {
                     case "effects_cmd":
-                        send_msg(msg.data, msg.data.channel);
+                        sendMsg(msg.data, msg.data.channel);
                         if (msg.data.command == "play") {
                             if (typeof msg.data.prop.dimness != "undefined") {
                                 settings.channels.data[msg.data.channel].dimness = msg.data.prop.dimness;
@@ -493,7 +493,7 @@ io.sockets.on("connection", function (socket) {
                         settings[msg.data.setting].update();
                         break;
                     default:
-                        send_forward(msg.about, msg.data);
+                        sendForward(msg.about, msg.data);
                 }
             } else {
                 console.log("no 'about'");
@@ -502,5 +502,5 @@ io.sockets.on("connection", function (socket) {
             console.log("invalid JSON");
         }
     });
-    send_client_list();
+    sendClientList();
 });
