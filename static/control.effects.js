@@ -96,8 +96,8 @@ var effects = {
         });
         
         $(document).on("keypress", "button", function (event) {
-            if (event.which != 13) {
-                // It's not an "enter" keypress, so ignore it (it might be a keyboard shortcut)
+            if (event.which == 32) {
+                // It's a spacebar, so ignore it (it might be a keyboard shortcut)
                 event.preventDefault();
             }
         }).on("blur", "input, select, textarea", function (event) {
@@ -265,6 +265,97 @@ var effects = {
             if (this.value == selected_channel) this.checked = true;
         });
         this.update_channel_details();
+        
+        this.update_channelman();
+    },
+    
+    update_channelman: function () {
+        var usedin_default = this.channel_used_in("0", "Y", "&nbsp;");
+        var html = '<tr><td class="disabled">Default Channel</td><td class="disabled">timed</td><td style="text-align: center;">' + usedin_default.keyboard + '</td><td style="text-align: center;">' + usedin_default.video + '</td><td style="text-align: center;">' + usedin_default.clients + '</td></tr>';
+        for (var channel in settings.channels) {
+            if (settings.channels.hasOwnProperty(channel)) {
+                var details = settings.channels[channel];
+                var css = "", type = "timed";
+                if (details.type && details.type == "toggled") {
+                    type = "toggled";
+                    css = "color: red;";
+                } else if (details.type && details.type == "dimmed") {
+                    type = "dimmed";
+                    css = "color: blue;";
+                }
+                var usedin = this.channel_used_in(channel, "Y", "&nbsp;");
+                html += '<tr><td title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel) + '</td><td>' + type + '</td><td style="text-align: center;">' + usedin.keyboard + '</td><td style="text-align: center;">' + usedin.video + '</td><td style="text-align: center;">' + usedin.clients + '</td>';
+                if (usedin.nothing) {
+                    html += '<td><span class="lilbutton effects_channelman_editor" data-channel="' + escHTML(channel) + '">Edit</span>&nbsp;<span class="lilbutton effects_channelman_deleter" data-channel="' + escHTML(channel) + '">Delete</span></td>';
+                }
+            }
+        }
+        
+        $("#effects_channelman_tbody").html(html);
+    },
+    
+    channel_used_in: function (channel, yesvalue, novalue) {
+        var usedin = {nothing: true};
+        
+        if (conn.used_channels.hasOwnProperty(channel)) {
+            usedin.clients = conn.used_channels[channel];
+            usedin.nothing = false;
+        } else {
+            usedin.clients = 0;
+        }
+        
+        for (var key in settings.keyboard) {
+            if (settings.keyboard.hasOwnProperty(key)) {
+                if (settings.keyboard[key].channel == channel) {
+                    usedin._keyboard = true;
+                    break;
+                } else if (channel == "0" && !settings.keyboard[key].channel) {
+                    usedin._keyboard = true;
+                    break;
+                }
+            }
+        }
+        
+        $("button.vidbtn").each(function () {
+            if ($(this).attr("data-control")) {
+                var control;
+                try {
+                    control = $.parseJSON($(this).attr("data-control"));
+                } catch (err) {}
+                if (control && control.length) {
+                    for (var i = 0; i < control.length; i++) {
+                        if (control[i].command && control[i].command == "effect" && control[i].data) {
+                            if (control[i].data.channel == channel) {
+                                usedin._video = true;
+                                break;
+                            } else if (channel == "0" && !control[i].data.channel) {
+                                usedin._video = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        $(["keyboard", "video"]).each(function () {
+            if (usedin["_" + this]) {
+                if (typeof yesvalue != "undefined" && (typeof yesvalue != "object" || yesvalue)) {
+                    usedin[this] = yesvalue;
+                } else {
+                    usedin[this] = true;
+                }
+                usedin.nothing = false;
+            } else {
+                if (typeof novalue != "undefined" && (typeof novalue != "object" || novalue)) {
+                    usedin[this] = novalue;
+                } else {
+                    usedin[this] = false;
+                }
+            }
+        });
+        
+        return usedin;
     },
     
     update_keyboard: function () {
@@ -322,6 +413,8 @@ var effects = {
         
         $("#effects_keyboard_editor_key").val(prevselected);
         $("#effects_keyboard_tbody").html(html);
+        
+        this.update_channelman();
     },
     
     keyboard_action_formatter: function (data) {

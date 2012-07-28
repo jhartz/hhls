@@ -227,6 +227,11 @@ span.lilbutton > a, div.button > a {
     text-decoration: inherit;
 }
 
+.disabled {
+    color: grey;
+    font-style: italic;
+}
+
 #video_selection {
     overflow: auto;
 }

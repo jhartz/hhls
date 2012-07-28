@@ -1,5 +1,6 @@
 var conn = {
     socket: null,
+    used_channels: {},
     
     init: function () {
         if (typeof JSON == "undefined" || typeof JSON.stringify != "function") {
@@ -92,7 +93,7 @@ var conn = {
                         conn.showmsg("ERROR: Invalid data received from server:\n" + message);
                     }
                 } catch (err) {
-                    conn.showmsg("ERROR: Invalid JSON received from server:\n" + message);
+                    conn.showmsg("ERROR: Invalid JSON received from server:\n" + message + "\n\n" + err);
                 }
             });
             
@@ -148,9 +149,22 @@ var conn = {
     
     showlist: function (list) {
         $("#client_title > span").text("Connected Clients");
+        this.used_channels = {};
         if (list.length > 0) {
             var html = '';
             for (var i = 0; i < list.length; i++) {
+                for (var y = 1; y <= list[i].y; y++) {
+                    for (var x = 1; x <= list[i].x; x++) {
+                        if (list[i].frames[x] && list[i].frames[x][y] && list[i].frames[x][y].channel) {
+                            channel = list[i].frames[x][y].channel;
+                            if (!this.used_channels.hasOwnProperty(channel)) {
+                                this.used_channels[channel] = 1;
+                            } else {
+                                this.used_channels[channel] += 1;
+                            }
+                        }
+                    }
+                }
                 if (html) html += ', ';
                 html += '<span class="clientitem lilbutton" style="white-space: nowrap; color: ' + (list[i].intercom ? "black" : "inherit") + ';" title="' + escHTML(list[i].location) + ' \n' + escHTML(list[i].ip) + ' \nIntercom ' + (list[i].intercom ? 'on' : 'off') + '" data-cid="' + escHTML(list[i].cid) + '" data-json="' + escHTML(JSON.stringify(list[i])) + '">' + escHTML(list[i].name) + '</span>';
             }
@@ -175,6 +189,7 @@ var conn = {
             $("#client_list").html('No clients connected!<br><br>Direct your clients to ' + escHTML(addr) + '<br>and click "client"');
         }
         
+        effects.update_channelman();
         resizer();
     }
 };
