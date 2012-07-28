@@ -13,7 +13,7 @@ var config = require("../config");
 
 mu.root = path.join(__dirname, "..", config.TEMPLATES_DIR || "templates");
 
-if (process.env.NODE_ENV == "DEVELOPMENT") {
+if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development") {
     mu.clearCache();
 } else {
     console.log("Using mu cache");
@@ -56,7 +56,7 @@ exports.write = function (res, templ_name, vars, status, headers) {
     if (!headers["Cache-Control"]) headers["Cache-Control"] = "no-cache";
     res.writeHead(status || 200, headers);
     
-    if (process.env.NODE_ENV == "DEVELOPMENT") {
+    if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development") {
         mu.clearCache();
     }
     var stream = mu.compileAndRender(templ_name, vars || {});

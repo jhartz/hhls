@@ -17,6 +17,14 @@ var config = require("./config"),
 
 jsonsettings.default_settings_dir = config.SETTINGS_DIR;
 
+io.configure(function () {
+    io.enable("browser client minification");
+    io.enable("browser client gzip");
+    io.enable("browser client etag");
+    io.set("log level", 1);
+    io.set("transports", ["websocket", "flashsocket", "htmlfile", "xhr-polling", "jsonp-polling"]);
+});
+
 app.listen(config.PORT);
 
 function handler(req, res) {
