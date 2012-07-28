@@ -24,9 +24,7 @@ TIME is a time in the video in the form of "00:00" or "00:00:00" or "00:00:00.00
 COMMAND is one of:
     cue       (shows text in the cue area; temporary (until we get better subtitle files))
     pause*    (pauses the video)
-    effects   (plays an effect)
-    next*     (tells all clients to move on to next effect in cue)
-    stop*     (tells all clients to stop playing any effects and empty their queues)
+    effect    (plays an effect)
 
 * no DATA with command
 
