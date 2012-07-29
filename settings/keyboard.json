@@ -94,5 +94,12 @@
             "light": "auto",
             "sound": "thunder1"
         }
+    },
+    "\\": {
+        "channel": "stairwell_blacklights",
+        "command": "play",
+        "prop": {
+            "state": 1
+        }
     }
 }
