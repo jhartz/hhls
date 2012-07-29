@@ -44,7 +44,7 @@ function status(text, in_loading) {
             var A = h + ":" + m + ":" + s;
             var B = escHTML(text).replace(/\n/g, "<br>");
             
-            document.getElementById("status").innerHTML = A + "&nbsp;&nbsp;&nbsp;&nbsp;" + B;
+            document.getElementById("status").innerHTML = A + "&nbsp;&nbsp;&nbsp; " + B;
             
             var elem = document.createElement("tr");
             elem.innerHTML = "<td>" + A + "</td><td>" + B + "</td>";
