@@ -72,7 +72,7 @@
             "time": 4
         }
     },
-    " ": {
+    "[space]": {
         "channel": "movietheatre_lighting",
         "command": "play",
         "prop": {
