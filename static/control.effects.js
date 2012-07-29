@@ -1,17 +1,19 @@
 var KEY_CODE_MAP = {
       109: "-"
+    , 189: "-"
     , 107: "="
     , 219: "["
     , 221: "]"
     , 220: "\\"
     , 59: ";"
+    , 186: ";"
     , 222: "'"
     , 188: ","
-    , 190: "."
     , 110: "."
-    , 191: "/"
+    , 190: "."
     , 111: "/"
-    , 32: " "
+    , 191: "/"
+    , 32: "[space]"
     /*
     , 112: "F1"
     , 113: "F2"
@@ -25,6 +27,17 @@ var KEY_CODE_MAP = {
     , 121: "F10"
     , 122: "F11"
     , 123: "F12"
+    , 8: "[backspace]"
+    , 46: "[delete]",
+    , 9: "[tab]"
+    , 33: "[page up]"
+    , 34: "[page down]"
+    , 35: "[end]"
+    , 36: "[home]"
+    , 37: "[left arrow]"
+    , 38: "[up arrow]"
+    , 39: "[right arrow]"
+    , 40: "[down arrow]"
     */
 };
 
@@ -108,31 +121,41 @@ var effects = {
         
         $(document).on("keydown keyup", function (event) {
             if (!effects.keyboard_onformelem && !event.ctrlKey && !event.altKey && !event.metaKey) {
-                var key;
-                if (event.which in KEY_CODE_MAP) {
-                    key = KEY_CODE_MAP[event.which];
-                } else if (event.which >= 65 && event.which <= 90) {
-                    // a-z
-                    key = String.fromCharCode(event.which).toLowerCase();
-                } else if (event.which >= 48 && event.which <= 57) {
-                    // 0-9
-                    key = String.fromCharCode(event.which);
-                } else if (event.which >= 96 && event.which <= 105) {
-                    // 0-9 (numeric keypad)
-                    key = String.fromCharCode(event.which - 48);
-                }
-                var valid = false;
-                for (var i = 0; i < effects.keyboard_valid.length; i++) {
-                    if (effects.keyboard_valid[i] == key) {
-                        valid = true;
-                        break;
+                var key, valid = false;
+                if (typeof video != "undefined" && MEDIA_KEY_CODE_MAP.hasOwnProperty(event.which)) {
+                    key = "MEDIA_KEY";
+                    valid = true;
+                } else {
+                    if (KEY_CODE_MAP.hasOwnProperty(event.which)) {
+                        key = KEY_CODE_MAP[event.which];
+                    } else if (event.which >= 65 && event.which <= 90) {
+                        // a-z
+                        key = String.fromCharCode(event.which).toLowerCase();
+                    } else if (event.which >= 48 && event.which <= 57) {
+                        // 0-9
+                        key = String.fromCharCode(event.which);
+                    } else if (event.which >= 96 && event.which <= 105) {
+                        // 0-9 (numeric keypad)
+                        key = String.fromCharCode(event.which - 48);
+                    }
+                    for (var i = 0; i < effects.keyboard_valid.length; i++) {
+                        if (effects.keyboard_valid[i] == key) {
+                            valid = true;
+                            break;
+                        }
                     }
                 }
                 if (valid) {
                     event.preventDefault();
                     // Only run the shortcut on keyup
                     // (the keydown handler is so preventDefault is called)
-                    if (event.type == "keyup") effects.keyboard_action(key);
+                    if (event.type == "keyup") {
+                        if (key == "MEDIA_KEY") {
+                            video.runcmd(MEDIA_KEY_CODE_MAP[event.which]);
+                        } else {
+                            effects.keyboard_action(key);
+                        }
+                    }
                 }
             }
         });
@@ -404,7 +427,7 @@ var effects = {
         var keys = {};
         for (var key in settings.keyboard) {
             if (settings.keyboard.hasOwnProperty(key)) {
-                if (!(key.toLowerCase() in keys)) {
+                if (!keys.hasOwnProperty(key.toLowerCase())) {
                     keys[key.toLowerCase()] = settings.keyboard[key];
                 }
             }
@@ -416,12 +439,11 @@ var effects = {
         
         var html = "", i;
         var checkkey = function (key) {
-            var prettykey = key == " " ? "[space]" : key;
             var option = document.createElement("option");
             option.value = key;
-            option.appendChild(document.createTextNode(prettykey));
+            option.appendChild(document.createTextNode(key));
             
-            html += '<tr><td style="cursor: default; text-align: center;">' + escHTML(prettykey) + '</td>';
+            html += '<tr><td style="cursor: default; text-align: center;">' + escHTML(key) + '</td>';
             if (keys.hasOwnProperty(key)) {
                 if (keys[key].command) {
                     option.style.color = "grey";
@@ -565,7 +587,7 @@ var effects = {
     },
     
     keyboard_editor_delete: function (key) {
-        if (key in settings.keyboard) {
+        if (settings.keyboard.hasOwnProperty(key)) {
             delete settings.keyboard[key];
         }
         conn.send_setting("keyboard");

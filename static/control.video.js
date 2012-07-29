@@ -1,3 +1,13 @@
+var MEDIA_KEY_CODE_MAP = {
+    173: "mute",
+    174: "vol down",
+    175: "vol up",
+    176: "next",
+    177: "prev",
+    178: "stop",
+    179: "play/pause"
+};
+
 var video = {
     winref: null,
     nowinref: false,
@@ -6,7 +16,7 @@ var video = {
     
     init: function () {
         var testelem = document.createElement("video");
-        if (typeof testelem.canPlayType != "function" || !testelem.dataset) {
+        if (typeof testelem.canPlayType != "function") {
             $("#video_openwin").html("<div>ERROR: Your browser does not support some of the HTML5 and JavaScript features required by the video player.</div><div>Please upgrade to a more modern browser to use the video player.</div>");
         } else {
             $(window).on("unload beforeunload", function () {
@@ -21,7 +31,7 @@ var video = {
             });
             
             $("button.vidbtn").click(function () {
-                video.playvid(this.dataset.vidbtn, $.parseJSON(this.dataset.formats), this.dataset.control ? $.parseJSON(this.dataset.control) : null);
+                video.playvid($(this).attr("data-vidbtn"), $.parseJSON($(this).attr("data-formats")), $(this).attr("data-control") ? $.parseJSON($(this).attr("data-control")) : null);
             });
             
             $("#video_selection_back > button").click(function () {
@@ -166,7 +176,7 @@ var video = {
                 if (maybe.length > 0) {
                     ext = maybe[0];
                 } else {
-                    alert("ERROR: This video is in a format not supported by your browser.");
+                    alert("ERROR: This video is not available in a format supported by your browser.");
                     this.stopallvid();
                     return;
                 }
@@ -230,6 +240,39 @@ var video = {
                     break;
             }
         });
+    },
+    
+    runcmd: function (cmd) {
+        var vid = $("#video_vid")[0];
+        switch ((cmd + "").toLowerCase()) {
+            case "play":
+            case "pause":
+            case "play/pause":
+                vid[vid.paused ? "play" : "pause"]();
+                break;
+            case "stop":
+                this.stopallvid();
+                break;
+            case "vol up":
+            case "volume up":
+                vid.volume += 0.1;
+                break;
+            case "vol down":
+            case "volume down":
+                vid.volume -= 0.1;
+                break;
+            case "mute":
+            case "unmute":
+            case "mute/unmute":
+                vid.muted = !vid.muted;
+                break;
+            case "next":
+                alert("TODO");
+                break;
+            case "prev":
+                alert("TODO");
+                break;
+        }
     },
     
     adjust: function () {
