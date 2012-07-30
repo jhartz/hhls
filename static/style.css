@@ -273,7 +273,8 @@ table.pretty {
     padding: 0;
 }
 
-table.pretty td, table.pretty th {
+table.pretty > thead > tr > td, table.pretty > tbody > tr > td, table.pretty > tr > td,
+table.pretty > thead > tr > th, table.pretty > tbody > tr > th, table.pretty > tr > th {
     margin: 0;
     padding: 5px;
     font-size: 10pt;
@@ -287,7 +288,7 @@ table.layouter {
     opacity: 1;
 }
 
-table.layouter td {
+table.layouter > tbody > tr > td, table.layouter > tr > td {
     border: 1px solid black;
     background-color: white;
     color: black;
