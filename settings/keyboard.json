@@ -42,13 +42,6 @@
             "sound": "thunder1"
         }
     },
-    "a": {
-        "channel": "corrin",
-        "command": "play",
-        "prop": {
-            "preset": "thunder2"
-        }
-    },
     "b": {
         "channel": "stairwell_blacklights",
         "command": "play",
