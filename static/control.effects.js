@@ -136,13 +136,15 @@ var effects = {
             } else if (newname.toLowerCase() == "default channel" || settings.channels.hasOwnProperty(newname)) {
                 alert("ERROR: Name already in use");
                 $("#effects_channelman_newname").select();
-            } else {
+            } else if (/^[a-zA-Z]/.test(newname)) {
                 var prop = {type: newtype};
                 if (newdesc) prop.description = newdesc;
                 settings.channels[newname] = prop;
                 conn.send_setting("channels");
                 $("#effects_channelman_newname").val("");
                 $("#effects_channelman_newdesc").val("");
+            } else {
+                alert("ERROR: Name must start with a letter");
             }
         });
         
