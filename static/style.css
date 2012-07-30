@@ -19,6 +19,14 @@ h3 {
     font-size: 13pt;
 }
 
+::-webkit-input-placeholder {
+    color: #ACA899 !important;
+}
+
+:-moz-placeholder {
+    color: #ACA899 !important;
+}
+
 section {
     position: absolute;
     top: 0;
