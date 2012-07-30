@@ -77,6 +77,10 @@ var conn = {
             this.socket.on("message", function (message) {
                 try {
                     var msg = $.parseJSON(message);
+                } catch (err) {
+                    conn.showmsg("ERROR: Invalid JSON received from server:\n" + message + "\n\n" + err);
+                }
+                try {
                     if (msg && msg.about) {
                         switch (msg.about) {
                             case "clientlist":
@@ -84,7 +88,9 @@ var conn = {
                                 break;
                             case "settings":
                                 settings[msg.data.setting] = msg.data.settings;
-                                if (effects["update_" + msg.data.setting]) effects["update_" + msg.data.setting]();
+                                if (typeof effects["update_" + msg.data.setting] == "function") {
+                                    effects["update_" + msg.data.setting]();
+                                }
                                 break;
                             default:
                                 conn.showmsg("ERROR: Invalid message received from server:\n" + message);
@@ -93,7 +99,7 @@ var conn = {
                         conn.showmsg("ERROR: Invalid data received from server:\n" + message);
                     }
                 } catch (err) {
-                    conn.showmsg("ERROR: Invalid JSON received from server:\n" + message + "\n\n" + err);
+                    conn.showmsg("Error processing message from server:\n" + message + "\n\n" + err);
                 }
             });
             
