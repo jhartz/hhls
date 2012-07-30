@@ -107,6 +107,45 @@ var effects = {
             $("#effects_custom_light").css("visibility", $("#effects_custom_lighttype_list")[0].checked ? "visible" : "hidden");
         });
         
+        $(document).on("click", ".effects_channelman_editor", function (event) {
+            alert("EDITING: " + $(this).attr("data-channel"));
+        });
+        
+        $(document).on("click", ".effects_channelman_deleter", function (event) {
+            var channel = $(this).attr("data-channel");
+            if (settings.channels.hasOwnProperty(channel)) {
+                delete settings.channels[channel];
+            }
+            conn.send_setting("channels");
+        });
+        
+        $("#effects_channelman_newtype").change(function () {
+            var color = "";
+            if ($(this).val() == "toggled") color = "red";
+            if ($(this).val() == "dimmed") color = "blue";
+            $("#effects_channelman_newname").css("color", color);
+        });
+        
+        $("#effects_channelman_newbtn").click(function () {
+            var newname = $.trim($("#effects_channelman_newname").val());
+            var newtype = $("#effects_channelman_newtype").val();
+            var newdesc = $.trim($("#effects_channelman_newdesc").val());
+            if (newname.replace(/ /g, "").length < 2) {
+                alert("Please specify a name");
+                $("#effects_channelman_newname").select();
+            } else if (newname.toLowerCase() == "default channel" || settings.channels.hasOwnProperty(newname)) {
+                alert("ERROR: Name already in use");
+                $("#effects_channelman_newname").select();
+            } else {
+                var prop = {type: newtype};
+                if (newdesc) prop.description = newdesc;
+                settings.channels[newname] = prop;
+                conn.send_setting("channels");
+                $("#effects_channelman_newname").val("");
+                $("#effects_channelman_newdesc").val("");
+            }
+        });
+        
         $(document).on("click", ".effects_keyboard_deleter", function (event) {
             effects.keyboard_editor_delete($(this).attr("data-key"));
         });
@@ -335,7 +374,7 @@ var effects = {
     },
     
     update_channelman: function () {
-        var usedin_default = this.channel_used_in("0", "Y", "&nbsp;");
+        var usedin_default = this.channel_used_in("0", "Yes", "&nbsp;");
         var html = '<tr><td class="disabled">Default Channel</td><td class="disabled">timed</td><td style="text-align: center;">' + usedin_default.keyboard + '</td><td style="text-align: center;">' + usedin_default.video + '</td><td style="text-align: center;">' + usedin_default.clients + '</td></tr>';
         for (var channel in settings.channels) {
             if (settings.channels.hasOwnProperty(channel)) {
@@ -348,7 +387,7 @@ var effects = {
                     type = "dimmed";
                     css = "color: blue;";
                 }
-                var usedin = this.channel_used_in(channel, "Y", "&nbsp;");
+                var usedin = this.channel_used_in(channel, "Yes", "&nbsp;");
                 html += '<tr><td title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel) + '</td><td>' + type + '</td><td style="text-align: center;">' + usedin.keyboard + '</td><td style="text-align: center;">' + usedin.video + '</td><td style="text-align: center;">' + usedin.clients + '</td>';
                 if (usedin.nothing) {
                     html += '<td><span class="lilbutton effects_channelman_editor" data-channel="' + escHTML(channel) + '">Edit</span>&nbsp;<span class="lilbutton effects_channelman_deleter" data-channel="' + escHTML(channel) + '">Delete</span></td>';
