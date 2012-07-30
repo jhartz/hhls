@@ -46,6 +46,7 @@ var effects = {
     transitioning: false,
     channel: "0",
     details: {type: "timed"},
+    channels_currentlyediting: null,
     keyboard_currentlyediting: null,
     keyboard_onformelem: false,
     keyboard_valid: [],
@@ -99,7 +100,7 @@ var effects = {
             effects.sendtoggle(effects.channel, -1);
         });
         
-        $(document).on("change", "input[name=effects_channel]", function (event) {
+        $(document).on("change", "input[name=effects_channellist]", function (event) {
             effects.update_channel_details();
         });
         
@@ -107,11 +108,19 @@ var effects = {
             $("#effects_custom_light").css("visibility", $("#effects_custom_lighttype_list")[0].checked ? "visible" : "hidden");
         });
         
-        $(document).on("click", ".effects_channelman_editor", function (event) {
-            alert("EDITING: " + $(this).attr("data-channel"));
+        $(document).on("click", ".effects_channels_editor", function (event) {
+            effects.channels_editor($(this).attr("data-channel"));
         });
         
-        $(document).on("click", ".effects_channelman_deleter", function (event) {
+        $("#effects_channels_editor_submitter").click(function () {
+            effects.channels_editor_save();
+        });
+        
+        $("#effects_channels_editor_canceller").click(function () {
+            effects.channels_editor_cancel();
+        });
+        
+        $(document).on("click", ".effects_channels_deleter", function (event) {
             var channel = $(this).attr("data-channel");
             if (settings.channels.hasOwnProperty(channel)) {
                 delete settings.channels[channel];
@@ -119,32 +128,27 @@ var effects = {
             conn.send_setting("channels");
         });
         
-        $("#effects_channelman_newtype").change(function () {
+        $("#effects_channels_newtype, #effects_channels_editor_type").change(function () {
             var color = "";
             if ($(this).val() == "toggled") color = "red";
             if ($(this).val() == "dimmed") color = "blue";
-            $("#effects_channelman_newname").css("color", color);
+            var newid = $(this).is("#effects_channels_newtype") ? "newname" : "editor_name";
+            $("#effects_channels_" + newid).css("color", color);
         });
         
-        $("#effects_channelman_newbtn").click(function () {
-            var newname = $.trim($("#effects_channelman_newname").val());
-            var newtype = $("#effects_channelman_newtype").val();
-            var newdesc = $.trim($("#effects_channelman_newdesc").val());
-            if (newname.replace(/ /g, "").length < 2) {
-                alert("Please specify a name");
-                $("#effects_channelman_newname").select();
-            } else if (newname.toLowerCase() == "default channel" || settings.channels.hasOwnProperty(newname)) {
-                alert("ERROR: Name already in use");
-                $("#effects_channelman_newname").select();
-            } else if (/^[a-zA-Z]/.test(newname)) {
+        $("#effects_channels_newbtn").click(function () {
+            var newname = $.trim($("#effects_channels_newname").val());
+            var newtype = $("#effects_channels_newtype").val();
+            var newdesc = $.trim($("#effects_channels_newdesc").val());
+            if (effects.check_channel_inputs(newname, newtype, newdesc)) {
                 var prop = {type: newtype};
                 if (newdesc) prop.description = newdesc;
                 settings.channels[newname] = prop;
                 conn.send_setting("channels");
-                $("#effects_channelman_newname").val("");
-                $("#effects_channelman_newdesc").val("");
+                $("#effects_channels_newname").val("");
+                $("#effects_channels_newdesc").val("");
             } else {
-                alert("ERROR: Name must start with a letter");
+                $("#effects_channels_newname").select();
             }
         });
         
@@ -332,8 +336,21 @@ var effects = {
         }
     },
     
+    check_channel_inputs: function (name, type, desc, old_name) {
+        if (name.replace(/ /g, "").length < 2) {
+            alert("Please specify a name");
+        } else if (name.toLowerCase() == "default channel" || (settings.channels.hasOwnProperty(name) && name != old_name)) {
+            alert("ERROR: Name already in use");
+        } else if (/^[a-zA-Z]/.test(name)) {
+            return true;
+        } else {
+            alert("ERROR: Name must start with a letter");
+        }
+        return false;
+    },
+    
     update_channel_details: function () {
-        var $selected = $("input[name=effects_channel]:checked", "#effects_form");
+        var $selected = $("input[name=effects_channellist]:checked", "#effects_form");
         this.channel = $selected.val();
         this.details = settings.channels[this.channel] || {type: "timed"};
         if (!this.details.type) this.details.type = "timed";
@@ -343,9 +360,9 @@ var effects = {
     },
     
     update_channels: function () {
-        var selected_channel = $("input[name=effects_channel]:checked", "#effects_form").val() || "0";
+        var selected_channel = $("input[name=effects_channellist]:checked", "#effects_form").val() || "0";
         
-        var html = '<table><tbody><tr><td><input type="radio" id="effects_channels_radio0" name="effects_channel" value="0" checked></td><td><label for="effects_channels_radio0">Default Channel</label></td></tr>';
+        var html = '<table><tbody><tr><td><input type="radio" id="effects_channellist_radio0" name="effects_channellist" value="0" checked></td><td><label for="effects_channellist_radio0">Default Channel</label></td></tr>';
         var counter = 1;
         for (var channel in settings.channels) {
             if (settings.channels.hasOwnProperty(channel)) {
@@ -359,15 +376,15 @@ var effects = {
                     type = "dimmed";
                     css = "color: blue;";
                 }
-                html += '<tr><td valign="top"><input type="radio" id="effects_channels_radio' + counter + '" name="effects_channel" value="' + escHTML(channel) + '"></td><td><label for="effects_channels_radio' + counter + '" title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel).replace(/_/g, "_<wbr>") + '</label></td></tr>';
+                html += '<tr><td valign="top"><input type="radio" id="effects_channellist_radio' + counter + '" name="effects_channellist" value="' + escHTML(channel) + '"></td><td><label for="effects_channellist_radio' + counter + '" title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel).replace(/_/g, "_<wbr>") + '</label></td></tr>';
             }
         }
         
         html += '</tbody></table>';
-        $("#effects_channels").html(html);
+        $("#effects_channellist").html(html);
         
         // Re-select previously selected channel
-        $("input[name=effects_channel]", "#effects_form").each(function () {
+        $("input[name=effects_channellist]", "#effects_form").each(function () {
             if (this.value == selected_channel) this.checked = true;
         });
         this.update_channel_details();
@@ -392,12 +409,12 @@ var effects = {
                 var usedin = this.channel_used_in(channel, "Yes", "&nbsp;");
                 html += '<tr><td title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel) + '</td><td>' + type + '</td><td style="text-align: center;">' + usedin.keyboard + '</td><td style="text-align: center;">' + usedin.video + '</td><td style="text-align: center;">' + usedin.clients + '</td>';
                 if (usedin.nothing) {
-                    html += '<td><span class="lilbutton effects_channelman_editor" data-channel="' + escHTML(channel) + '">Edit</span>&nbsp;<span class="lilbutton effects_channelman_deleter" data-channel="' + escHTML(channel) + '">Delete</span></td>';
+                    html += '<td><span class="lilbutton effects_channels_editor" data-channel="' + escHTML(channel) + '">Edit</span>&nbsp;<span class="lilbutton effects_channels_deleter" data-channel="' + escHTML(channel) + '">Delete</span></td>';
                 }
             }
         }
         
-        $("#effects_channelman_tbody").html(html);
+        $("#effects_channels_tbody").html(html);
     },
     
     channel_used_in: function (channel, yesvalue, novalue) {
@@ -464,6 +481,48 @@ var effects = {
         return usedin;
     },
     
+    channels_editor: function (channel) {
+        var data = settings.channels[channel];
+        if (data) {
+            blockers.effects_channels_editor = "Please finish editing the channel before exiting.";
+            this.channels_currentlyediting = channel;
+            
+            $("#effects_channels_editor_name").val(channel);
+            $("#effects_channels_editor_type").val(data.type).change();
+            $("#effects_channels_editor_desc").val(data.description || "");
+            
+            this.toggle("channels", function () {
+                $("#effects_channels_editor").fadeIn();
+            });
+        }
+    },
+    
+    channels_editor_save: function () {
+        var name = $.trim($("#effects_channels_editor_name").val());
+        var type = $("#effects_channels_editor_type").val();
+        var desc = $.trim($("#effects_channels_editor_desc").val());
+        if (this.check_channel_inputs(name, type, desc, this.channels_currentlyediting)) {
+            if (name != this.channels_currentlyediting && settings.channels.hasOwnProperty(this.channels_currentlyediting)) {
+                delete settings.channels[this.channels_currentlyediting];
+            }
+            this.channels_currentlyediting = null;
+            var prop = {type: type};
+            if (desc) prop.description = desc;
+            settings.channels[name] = prop;
+            conn.send_setting("channels");
+            $("#effects_channels_editor").fadeOut();
+            blockers.effects_channels_editor = null;
+        } else {
+            $("#effects_channels_editor_name").select();
+        }
+    },
+    
+    channels_editor_cancel: function () {
+        this.channels_currentlyediting = null;
+        $("#effects_channels_editor").fadeOut();
+        blockers.effects_channels_editor = null;
+    },
+    
     update_keyboard: function () {
         var keys = {};
         for (var key in settings.keyboard) {
@@ -476,7 +535,7 @@ var effects = {
         
         var prevselected = $("#effects_keyboard_editor_key").val();
         $("#effects_keyboard_editor_key").empty();
-        effects.keyboard_valid = [];
+        this.keyboard_valid = [];
         
         var html = "", i;
         var checkkey = function (key) {
@@ -573,20 +632,20 @@ var effects = {
             switch (data.command) {
                 case "play":
                     if (data.prop.preset) {
-                        effects.sendpreset(data.channel || "0", data.prop.preset);
+                        this.sendpreset(data.channel || "0", data.prop.preset);
                     } else if (data.prop.light) {
-                        effects.sendpattern(data.channel || "0", data.prop.light, data.prop.sound || null);
+                        this.sendpattern(data.channel || "0", data.prop.light, data.prop.sound || null);
                     } else if (typeof data.prop.dimness != "undefined") {
-                        effects.sendpattern(data.channel || "0", data.prop.dimness, data.prop.time || 0);
+                        this.sendpattern(data.channel || "0", data.prop.dimness, data.prop.time || 0);
                     } else if (typeof data.prop.state != "undefined") {
-                        effects.sendtoggle(data.channel || "0", data.prop.state);
+                        this.sendtoggle(data.channel || "0", data.prop.state);
                     }
                     break;
                 case "next":
-                    effects.next(data.channel || "0");
+                    this.next(data.channel || "0");
                     break;
                 case "stop":
-                    effects.stop(data.channel || "0");
+                    this.stop(data.channel || "0");
                     break;
             }
         }

@@ -33,7 +33,7 @@ var settings = {
         <form id="effects_form">
             <table id="effects_table" class="topped" style="width: 100%; border-collapse: collapse;"><tbody>
                 <tr>
-                    <td style="width: 50%;"><div id="effects_channels" class="panelbox">Loading...</div></td>
+                    <td style="width: 50%;"><div id="effects_channellist" class="panelbox">Loading...</div></td>
                     <td style="width: 50%;">
                         <div id="effects_timedpanel" class="panel effects_panel">
                             <div class="front">
@@ -102,7 +102,7 @@ var settings = {
     </div>
     
     
-    <div id="effects_channelman" data-level="2" style="display: none;">
+    <div id="effects_channels" data-level="2" style="display: none;">
         <h2>Channel Manager</h2>
         <table class="pretty" style="width: auto; margin: auto;">
             <thead>
@@ -114,19 +114,31 @@ var settings = {
                     <th>Connected Clients</th>
                 </tr>
             </thead>
-            <tbody id="effects_channelman_tbody"></tbody>
+            <tbody id="effects_channels_tbody"></tbody>
             <tfoot>
-                <tr><td style="border-left: none; border-right: none; border-bottom: none; padding: 0;">&nbsp;</td></tr>
+                <tr><td style="padding: 0;">&nbsp;</td></tr>
                 <tr>
-                    <td style="border: none;"><input id="effects_channelman_newname" placeholder="Name"></td>
-                    <td style="border: none;"><select id="effects_channelman_newtype"><option value="timed" selected>timed</option><option value="toggled">toggled</option><option value="dimmed">dimmed</option></select></td>
-                    <td style="border: none; width: 10px;"><span id="effects_channelman_newbtn" class="lilbutton">Add</span></td>
+                    <td><input id="effects_channels_newname" placeholder="Name"></td>
+                    <td><select id="effects_channels_newtype"><option value="timed" selected>timed</option><option value="toggled">toggled</option><option value="dimmed">dimmed</option></select></td>
+                    <td style="width: 10px;">&nbsp;&nbsp;<span id="effects_channels_newbtn" class="lilbutton">Add</span></td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="border: none;"><textarea id="effects_channelman_newdesc" placeholder="Description" rows="2" style="width: 100%;"></textarea></td>
+                    <td colspan="2"><textarea id="effects_channels_newdesc" placeholder="Description" rows="2" style="width: 100%;"></textarea></td>
                 </tr>
             </tfoot>
         </table>
+        
+        <div id="effects_channels_editor" class="blackoverlay" style="display: none;">
+            <p><u>Edit Channel</u></p>
+            <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white; text-align: left;">
+                <table>
+                    <tr><td>Name:</td><td><input id="effects_channels_editor_name"></td></tr>
+                    <tr><td>Type:</td><td><select id="effects_channels_editor_type"><option value="timed" selected>timed</option><option value="toggled">toggled</option><option value="dimmed">dimmed</option></select></td></tr>
+                    <tr><td valign="top">Description:</td><td><textarea id="effects_channels_editor_desc" rows="2"></textarea></td></tr>
+                </table>
+            </td></tr></tbody></table>
+            <p><span id="effects_channels_editor_submitter" class="lilbutton">Save</span>&nbsp;&nbsp;<span id="effects_channels_editor_canceller" class="lilbutton">Cancel</span></p>
+        </div>
     </div>
     
     
@@ -157,7 +169,7 @@ var settings = {
     </div>
     
     <footer class="buttonbox">
-        <div><button type="button" data-btn="intercom" style="width: 33%;" disabled>Intercom</button><button type="button" data-btn="channelman" style="width: 33%;" disabled>Channels</button><button type="button" data-btn="keyboard" style="width: 34%;" disabled>Keyboard Shortcuts</button></div>
+        <div><button type="button" data-btn="intercom" style="width: 33%;" disabled>Intercom</button><button type="button" data-btn="channels" style="width: 33%;" disabled>Channels</button><button type="button" data-btn="keyboard" style="width: 34%;" disabled>Keyboard Shortcuts</button></div>
     </footer>
 </section>
 {{#videos}}
