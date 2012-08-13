@@ -13,11 +13,12 @@ var myutil = require("./myutil");
 
 
 mime.define({"text/vtt": ["vtt"]});  // for WebVTT support (waiting on https://github.com/broofa/node-mime/pull/37)
+
 var staticfiles = new static.Server();
 
-exports.static = function (url, req, res, include_readme) {
+exports.static = function (url, req, res, includeReadme) {
     var bname = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
-    if (bname == "README" && !include_readme) {
+    if (bname == "README" && !includeReadme) {
         myutil.writeError(res, 404);
     } else if (bname.indexOf(".") == -1) {
         // No extension... assume plain text
@@ -46,9 +47,9 @@ exports.static = function (url, req, res, include_readme) {
     }
 };
 
-exports.partial = function (url, req, res, include_readme) {
+exports.partial = function (url, req, res, includeReadme) {
     var bname = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
-    if (bname == "README" && !include_readme) {
+    if (bname == "README" && !includeReadme) {
         myutil.writeError(res, 404);
     } else {
         var path = url.pathname.substring(1);

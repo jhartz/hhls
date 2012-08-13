@@ -28,27 +28,27 @@ exports.escHTML = function (html) {
 };
 
 exports.makeFileList = function (files, separateMetadata, includeReadme) {
-    var filelist = {};
+    var fileList = {};
     for (var i = 0; i < files.length; i++) {
         if (includeReadme || files[i] != "README") {
             var bname = files[i].indexOf(".") != -1 ? files[i].substring(0, files[i].lastIndexOf(".")) : files[i];
             var ext = files[i].indexOf(".") != -1 ? files[i].substring(files[i].lastIndexOf(".") + 1) : "";
-            if (!filelist[bname]) filelist[bname] = {};
-            if (!filelist[bname].files) filelist[bname].files = [];
+            if (!fileList[bname]) fileList[bname] = {};
+            if (!fileList[bname].files) fileList[bname].files = [];
             if (separateMetadata && ext.toLowerCase() == "json") {
-                filelist[bname].json = true;
+                fileList[bname].json = true;
             } else if (separateMetadata && ext.toLowerCase() == "vtt") {
-                filelist[bname].track = "vtt";
+                fileList[bname].track = "vtt";
             } else {
-                filelist[bname].files.push([ext, mime.lookup(ext)]);
+                fileList[bname].files.push([ext, mime.lookup(ext)]);
             }
         }
     }
-    return filelist;
+    return fileList;
 };
 
 // myutil.write(res, template name, [template vars, [status], [headers]])
-exports.write = function (res, templ_name, vars, status, headers) {
+exports.write = function (res, template, vars, status, headers) {
     if (status && typeof status == "object") {
         headers = status;
         status = null;
@@ -62,7 +62,7 @@ exports.write = function (res, templ_name, vars, status, headers) {
     if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development") {
         mu.clearCache();
     }
-    var stream = mu.compileAndRender(templ_name, vars || {});
+    var stream = mu.compileAndRender(template, vars || {});
     util.pump(stream, res);
 };
 
@@ -86,10 +86,10 @@ exports.writeError = function (res, num, details) {
 };
 
 // "Format query" - to test/format a member of require("url").parse(..., true).query
-exports.fquery = function (querystring, helperfunc) {
+exports.fquery = function (query, helper) {
     var formatter = function (endstring) {
-        if (typeof helperfunc == "string") {
-            switch (helperfunc.toLowerCase()) {
+        if (typeof helper == "string") {
+            switch (helper.toLowerCase()) {
                 case "int":
                     return parseInt(endstring, 10);
                     break;
@@ -100,22 +100,22 @@ exports.fquery = function (querystring, helperfunc) {
                 default:
                     return endstring;
             }
-        } else if (typeof helperfunc == "function") {
-            return helperfunc(endstring);
+        } else if (typeof helper == "function") {
+            return helper(endstring);
         } else {
             return endstring;
         }
     };
     
-    if (Array.isArray(querystring)) {
+    if (Array.isArray(query)) {
         var real = "";
-        querystring.forEach(function (item) {
+        query.forEach(function (item) {
             if (!real && item) real = item;
         });
-        if (!real) real = querystring[0];
+        if (!real) real = query[0];
         return formatter(real);
-    } else if (typeof querystring == "string") {
-        return formatter(querystring);
+    } else if (typeof query == "string") {
+        return formatter(query);
     } else {
         return formatter("");
     }

@@ -20,11 +20,11 @@ exports.SettingsFile = function (options) {
     if (!this.options.onload) this.options.onload = function () {};
     if (!this.options.onupdate) this.options.onupdate = function () {};
     
-    var add_watchers = function (obj, bigman) {
+    var addWatchers = function (obj, bigman) {
         var newobj = {};
         for (var prop in obj) {
             if (obj.hasOwnProperty(prop) && typeof obj[prop] != "function") {
-                add_watcher(obj, prop, newobj, bigman);
+                addWatcher(obj, prop, newobj, bigman);
             }
         }
         Object.defineProperty(newobj, "setProp", {
@@ -32,7 +32,7 @@ exports.SettingsFile = function (options) {
                 // Add/modify a property and make sure we have watchers on it
                 var old = {};
                 old[propname] = propvalue;
-                add_watcher(old, propname, newobj, bigman);
+                addWatcher(old, propname, newobj, bigman);
                 bigman.update();
             }
         });
@@ -46,8 +46,8 @@ exports.SettingsFile = function (options) {
         return newobj;
     };
     
-    var add_watcher = function (obj, prop, newobj, bigman) {
-        var val = (obj[prop] && typeof obj[prop] == "object") ? add_watchers(obj[prop], bigman) : obj[prop];
+    var addWatcher = function (obj, prop, newobj, bigman) {
+        var val = (obj[prop] && typeof obj[prop] == "object") ? addWatchers(obj[prop], bigman) : obj[prop];
         Object.defineProperty(newobj, prop, {
             enumerable: true,
             configurable: true,
@@ -55,7 +55,7 @@ exports.SettingsFile = function (options) {
                 return val;
             },
             set: function (newval) {
-                val = (newval && typeof newval == "object") ? add_watchers(newval, bigman) : newval;
+                val = (newval && typeof newval == "object") ? addWatchers(newval, bigman) : newval;
                 bigman.update();
             }
         });
@@ -78,7 +78,7 @@ exports.SettingsFile = function (options) {
                 }
                 if (JSONdata) {
                     if (that.options.use_watchers) {
-                        var val = add_watchers(JSONdata, that);
+                        var val = addWatchers(JSONdata, that);
                         Object.defineProperty(that, "data", {
                             enumerable: true,
                             configurable: true,
@@ -86,7 +86,7 @@ exports.SettingsFile = function (options) {
                                 return val;
                             },
                             set: function (newval) {
-                                val = add_watchers(newval, that);
+                                val = addWatchers(newval, that);
                                 that.update();
                             }
                         });
