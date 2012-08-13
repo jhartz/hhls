@@ -31,10 +31,10 @@ var video = {
             });
             
             $("button.vidbtn").click(function () {
-                video.playvid($(this).attr("data-vidbtn"),
-                              $.parseJSON($(this).attr("data-formats")),
-                              $(this).attr("data-control") ? $.parseJSON($(this).attr("data-control")) : null,
-                              $(this).attr("data-track") || null);
+                video.playVideo($(this).attr("data-vidbtn"),
+                                $.parseJSON($(this).attr("data-formats")),
+                                $(this).attr("data-control") ? $.parseJSON($(this).attr("data-control")) : null,
+                                $(this).attr("data-track") || null);
             });
             
             $("#video_selection_back > button").click(function () {
@@ -143,12 +143,12 @@ var video = {
             if (this.winref) this.winref.close();
         } catch (err) {}
         this.winref = null;
-        this.stopallvid();
+        this.stopVideo();
         this.nowinref = false;
         this.toggle("openwin");
     },
     
-    stopallvid: function () {
+    stopVideo: function () {
         if (this.pop) Popcorn.destroy(this.pop);
         this.cue();
         $("#video_vid")[0].pause();
@@ -174,8 +174,8 @@ var video = {
         }
     },
     
-    playvid: function (vid, formats, control, track) {
-        //this.stopallvid();
+    playVideo: function (vid, formats, control, track) {
+        //this.stopVideo();
         if (vid && formats && formats.length > 0) {
             var ext = "";
             var maybe = [];
@@ -193,7 +193,7 @@ var video = {
                     ext = maybe[0];
                 } else {
                     alert("ERROR: This video is not available in a format supported by your browser.");
-                    this.stopallvid();
+                    this.stopVideo();
                     return;
                 }
             }
@@ -309,7 +309,7 @@ var video = {
                 vid[vid.paused ? "play" : "pause"]();
                 break;
             case "stop":
-                this.stopallvid();
+                this.stopVideo();
                 break;
             case "vol up":
             case "volume up":

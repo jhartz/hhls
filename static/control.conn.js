@@ -133,7 +133,7 @@ var conn = {
         }
     },
     
-    send_setting: function (setting) {
+    sendsetting: function (setting) {
         this.sendmsg({
             about: "settings",
             data: {

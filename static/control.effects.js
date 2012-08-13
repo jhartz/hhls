@@ -125,7 +125,7 @@ var effects = {
             if (settings.channels.hasOwnProperty(channel)) {
                 delete settings.channels[channel];
             }
-            conn.send_setting("channels");
+            conn.sendsetting("channels");
         });
         
         $("#effects_channels_newtype, #effects_channels_editor_type").change(function () {
@@ -144,7 +144,7 @@ var effects = {
                 var prop = {type: newtype};
                 if (newdesc) prop.description = newdesc;
                 settings.channels[newname] = prop;
-                conn.send_setting("channels");
+                conn.sendsetting("channels");
                 $("#effects_channels_newname").val("");
                 $("#effects_channels_newdesc").val("");
             } else {
@@ -509,7 +509,7 @@ var effects = {
             var prop = {type: type};
             if (desc) prop.description = desc;
             settings.channels[name] = prop;
-            conn.send_setting("channels");
+            conn.sendsetting("channels");
             $("#effects_channels_editor").fadeOut();
             blockers.effects_channels_editor = null;
         } else {
@@ -676,7 +676,7 @@ var effects = {
             if (!settings.keyboard[key].prop) settings.keyboard[key].prop = {};
             settings.keyboard[key].prop.state = Number($("#effects_keyboard_editor_state").val());
         }
-        conn.send_setting("keyboard");
+        conn.sendsetting("keyboard");
         $("#effects_keyboard_editor").fadeOut();
         blockers.effects_keyboard_editor = null;
     },
@@ -690,7 +690,7 @@ var effects = {
         if (settings.keyboard.hasOwnProperty(key)) {
             delete settings.keyboard[key];
         }
-        conn.send_setting("keyboard");
+        conn.sendsetting("keyboard");
     },
     
     update_presets: function () {
@@ -710,7 +710,7 @@ var effects = {
         var presetname = prompt("Preset name:");
         if (presetname) {
             settings.presets[presetname] = preset;
-            conn.send_setting("presets");
+            conn.sendsetting("presets");
         }
     },
     
