@@ -12,6 +12,7 @@ var fs = require("fs"),
 var myutil = require("./myutil");
 
 
+mime.define({"text/vtt": ["vtt"]});  // for WebVTT support (waiting on https://github.com/broofa/node-mime/pull/37)
 var staticfiles = new static.Server();
 
 exports.static = function (url, req, res, include_readme) {

@@ -1,13 +1,13 @@
 This directory contains video files that can be played in the video player.
 The directory name can be changed in config.js
 
-If you include one video (same basename) in multiple formats (different extensions), the client will automatically figure out which one to use based on the client computer's compatibility.
+If you include one video (same basename) in multiple formats (different extensions), the video player will automatically figure out which one to use based on the computer's compatibility.
 Example: movie.webm, movie.mp4, movie.ogv
-(They're all the same video, but just in different formats; the client now has a choice in case it is not compatible with one of the formats.)
+(They're all the same video, but just in different formats; the video player now has a choice in case it is not compatible with one of the formats.)
+
+You can include cues in the video (almost like subtitles only visible to the control, not to the full-screen video playing to the audience) by writing them in a WebVTT file called basename.vtt where basename is the name of the video (without the extension).
 
 You can run effects at specific times in the video by including details in a JSON file called basename.json where basename is the name of the video (without the extension).
-Example: movie.webm, movie.mp4, movie.json
-(The json file applies to all videos with the same basename.)
 
 Format for the JSON file:
 
@@ -19,19 +19,15 @@ Format for the JSON file:
         }, ...
     ]
 
-TIME is a time in the video in the form of "00:00" or "00:00:00" or "00:00:00.000" or 00 (seconds)
+TIME is a JavaScript number (float) representing a point in the video (in seconds)
 
 COMMAND is one of:
-    cue       (shows text in the cue area; temporary (until we get better subtitle files))
     pause*    (pauses the video)
     effect    (plays an effect)
 
 * no DATA with command
 
 DATA depends on the COMMAND...
-    "command": "cue",
-    "data": "TEXT TO SHOW IN CUE AREA (empty string or null to clear)"
-
     "command": "effect",
     "data": {
         "preset": "...",

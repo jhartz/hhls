@@ -31,7 +31,10 @@ var video = {
             });
             
             $("button.vidbtn").click(function () {
-                video.playvid($(this).attr("data-vidbtn"), $.parseJSON($(this).attr("data-formats")), $(this).attr("data-control") ? $.parseJSON($(this).attr("data-control")) : null);
+                video.playvid($(this).attr("data-vidbtn"),
+                              $.parseJSON($(this).attr("data-formats")),
+                              $(this).attr("data-control") ? $.parseJSON($(this).attr("data-control")) : null,
+                              $(this).attr("data-track") || null);
             });
             
             $("#video_selection_back > button").click(function () {
@@ -150,6 +153,7 @@ var video = {
         this.cue();
         $("#video_vid")[0].pause();
         $("#video_vid")[0].src = "";
+        this.clearTracks();
         if (this.winref) {
             this.winref.document.getElementById("main_vid").pause();
             this.winref.document.getElementById("main_vid").src = "";
@@ -158,7 +162,19 @@ var video = {
         this.toggle("selection");
     },
     
-    playvid: function (vid, formats, control) {
+    clearTracks: function () {
+        $("#video_vid track").remove();
+        var tracks = $("#video_vid")[0].textTracks;
+        if (tracks) {
+            for (var i = 0; i < tracks.length; i++) {
+                for (var j = 0; k < tracks[i].cues.length; j++) {
+                    tracks[i].removeCue(tracks[i].cues[j]);
+                }
+            }
+        }
+    },
+    
+    playvid: function (vid, formats, control, track) {
         //this.stopallvid();
         if (vid && formats && formats.length > 0) {
             var ext = "";
@@ -183,6 +199,7 @@ var video = {
             }
             
             var url = vid + "." + ext;
+            this.clearTracks();
             if ($("#video_vid")[0].currentTime) $("#video_vid")[0].currentTime = 0;
             $("#video_vid")[0].src = url;
             $("#video_vid")[0].load();
@@ -201,7 +218,25 @@ var video = {
                 }, 200);
             }
             
+            // <track> stuff: http://www.html5rocks.com/en/tutorials/track/basics/
+            
+            if (track) {
+                var trackElem = document.createElement("track");
+                trackElem.kind = "subtitles";
+                trackElem.default = true;
+                trackElem.src = vid + "." + track;
+                $("#video_vid").append(trackElem);
+            }
+            
             if (control && control.length) {
+                // TODO: Instead of Popcorn, just use TextTracks
+                // (supported in Chrome dev)
+                /*
+                var controlTrack = $("#video_vid")[0].addTextTrack("metadata");
+                for (var j = 0; j < control.length; j++) {
+                    controlTrack.addCue(this.addControl(control[j]));
+                }
+                */
                 this.pop = Popcorn("#video_vid");
                 for (var j = 0; j < control.length; j++) {
                     this.addControl(control[j]);
@@ -214,6 +249,30 @@ var video = {
     },
     
     addControl: function (control) {
+        /*
+        var cue = new TextTrackCue(control.time - 0.1, control.time, "");
+        if (control.command == "pause") {
+            cue.pauseOnExit = true;
+        } else {
+            cue.onexit = function () {
+                // This will only be fired if playback goes thru control.time
+                // (not if we're seeking and we pass over it)
+                if (control.command == "effect") {
+                    if (control.data.preset) {
+                        effects.sendpreset(control.data.channel || "0", control.data.preset);
+                    } else if (control.data.channel && control.data.state) {
+                        effects.sendtoggle(control.data.channel, control.data.state);
+                    } else if (control.data.channel && control.data.dimness) {
+                        effects.sendpattern(control.data.channel, control.data.dimness, control.data.time);
+                    } else if (control.data.light || control.data.sound) {
+                        effects.sendpattern(control.data.channel || "0", control.data.light, control.data.sound);
+                    }
+                }
+            };
+        }
+        return cue;
+        */
+        
         var time = control.time;
         if (time) time = Popcorn.util.toSeconds(time);
         
@@ -224,7 +283,6 @@ var video = {
                     break;
                 case "cue":
                     // TODO: Move to subtitle file (separate from this system)
-                    // http://www.html5rocks.com/en/tutorials/track/basics/ (not yet implemented by most browsers)
                     video.cue(control.data);
                     break;
                 case "effect":
