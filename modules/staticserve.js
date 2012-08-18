@@ -1,12 +1,11 @@
 // Haunted House Logistics Server - static file handler
-// Provides different functions to handle serving static files
+// Serves static files, with support for partial content
 
 
 // node modules
 var fs = require("fs"),
     path = require("path"),
-    mime = require("mime"),
-    static = require("node-static");
+    mime = require("mime");
 
 // my modules
 var myutil = require("./myutil");
@@ -14,85 +13,64 @@ var myutil = require("./myutil");
 
 mime.define({"text/vtt": ["vtt"]});  // for WebVTT support (waiting on https://github.com/broofa/node-mime/pull/37)
 
-var staticfiles = new static.Server();
-
-exports.static = function (url, req, res, includeReadme) {
-    var bname = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
-    if (bname == "README" && !includeReadme) {
+exports.serve = function (url, req, res, contentDir, includeReadme) {
+    var filename = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
+    var pathname = path.join(contentDir, filename);
+    if (filename == "README" && !includeReadme) {
         myutil.writeError(res, 404);
-    } else if (bname.indexOf(".") == -1) {
-        // No extension... assume plain text
-        var pathname = url.pathname.substring(1).replace(/\//g, path.sep);
-        fs.lstat(pathname, function (err, stats) {
+    } else {
+        fs.stat(pathname, function (err, stats) {
             if (!err && stats.isFile()) {
-                res.writeHead(200, {"Content-Type": "text/plain"});
-                fs.createReadStream(pathname).pipe(res);
-            } else {
-                myutil.writeError(res, 404);
-            }
-        });
-    } else {
-        req.addListener("end", function () {
-            staticfiles.serve(req, res, function (err, resp) {
-                if (err) {
-                    if (err.status == 404) {
-                        myutil.writeError(res, 404);
-                    } else {
-                        res.writeHead(err.status, err.headers);
-                        res.end();
-                    }
-                }
-            });
-        });
-    }
-};
-
-exports.partial = function (url, req, res, includeReadme) {
-    var bname = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
-    if (bname == "README" && !includeReadme) {
-        myutil.writeError(res, 404);
-    } else {
-        var path = url.pathname.substring(1);
-        fs.stat(path, function (err, stats) {
-            if (err) {
-                myutil.writeError(res, 500);
-            } else {
-                var total = stats.size;
                 var headers = {
-                    // For the 2 following headers... see small info here:
-                    // http://delog.wordpress.com/2011/04/25/stream-webm-file-to-chrome-using-node-js/
-                    // (below big code block)
-                    //"Connection": "close",
-                    //"Transfer-Encoding": "chunked",
+                    "Date": (new Date()).toUTCString(),
                     "Cache-Control": "max-age=21600",
                     "Accept-Ranges": "bytes",
-                    "Content-Length": total,
-                    "Content-Type": mime.lookup(path)
+                    "Last-Modified": stats.mtime.toUTCString()
                 };
-                var range = req.headers.range;
-                if (range) {
-                    var parts = range.substring(range.indexOf("bytes=") + 6).split("-");
-                    var start = parseInt(parts[0], 10);
-                    var end = parts[1] ? parseInt(parts[1], 10) : total - 1;
-                    var chunksize = (end + 1) - start;
-                    
-                    headers["Content-Range"] = "bytes " + start + "-" + end + "/" + total;
-                    headers["Content-Length"] = chunksize;
-                    
-                    res.writeHead(206, headers);
-                    if (req.method == "HEAD") {
-                        res.end();
-                    } else {
-                        fs.createReadStream(path, {start: start, end: end}).pipe(res);
-                    }
+                if (Date.parse(req.headers["if-modofied-since"]) >= Date.parse(stats.mtime)) {
+                    res.writeHead(304, headers);
+                    res.end();
                 } else {
-                    res.writeHead(200, headers);
-                    if (req.method == "HEAD") {
-                        res.end();
+                    headers["Content-Type"] = "text/plain";
+                    if (filename.indexOf(".") != -1) {
+                        headers["Content-Type"] = mime.lookup(pathname);
+                    }
+                    
+                    var total = stats.size;
+                    var range = req.headers.range;
+                    if (range) {
+                        // For the 2 following headers... see small info here:
+                        // http://delog.wordpress.com/2011/04/25/stream-webm-file-to-chrome-using-node-js/
+                        // (below big code block)
+                        //headers["Connection"] = "close";
+                        //headers["Transfer-Encoding"] = "chunked";
+                        
+                        var parts = range.substring(range.indexOf("bytes=") + 6).split("-");
+                        var start = parseInt(parts[0], 10);
+                        var end = parts[1] ? parseInt(parts[1], 10) : total - 1;
+                        var chunksize = (end + 1) - start;
+                        
+                        headers["Content-Range"] = "bytes " + start + "-" + end + "/" + total;
+                        headers["Content-Length"] = chunksize;
+                        
+                        res.writeHead(206, headers);
+                        if (req.method == "HEAD") {
+                            res.end();
+                        } else {
+                            fs.createReadStream(path, {start: start, end: end}).pipe(res);
+                        }
                     } else {
-                        fs.createReadStream(path).pipe(res);
+                        headers["Content-Length"] = total;
+                        res.writeHead(200, headers);
+                        if (req.method == "HEAD") {
+                            res.end();
+                        } else {
+                            fs.createReadStream(path).pipe(res);
+                        }
                     }
                 }
+            } else {
+                myutil.writeError(res, 404);
             }
         });
     }

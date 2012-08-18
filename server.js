@@ -15,7 +15,7 @@ var config = require("./config"),
     jsonsettings = require("./modules/jsonsettings");
 
 
-jsonsettings.default_settings_dir = config.SETTINGS_DIR;
+jsonsettings.default_settings_dir = config.SETTINGS_DIR || "settings";
 
 io.configure(function () {
     io.enable("browser client minification");
@@ -35,10 +35,16 @@ function handler(req, res) {
         } else {
             myutil.writeError(res, 404);
         }
-    } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, config.RESOURCES_DIR.length + 2) == "/" + config.RESOURCES_DIR + "/") {
-        staticserve.static(url, req, res);
-    } else if (url.pathname.substring(0, config.VIDEO_DIR.length + 2) == "/" + config.VIDEO_DIR + "/" || url.pathname.substring(0, config.SOUND_DIR.length + 2) == "/" + config.SOUND_DIR + "/") {
-        staticserve.partial(url, req, res);
+    } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, 11) == "/resources/" || url.pathname.substring(0, 8) == "/videos/" || url.pathname.substring(0, 8) == "/sounds/") {
+        var contentDir = url.pathname.substring(1).substring(0, url.pathname.indexOf("/"));
+        if (contentDir == "resources" && config.RESOURCES_DIR) {
+            contentDir = config.RESOURCES_DIR;
+        } else if (contentDir == "videos" && config.VIDEO_DIR) {
+            contentDir = config.VIDEO_DIR;
+        } else if (contentDir == "sounds" && config.SOUND_DIR) {
+            contentDir = config.SOUND_DIR;
+        }
+        staticserve.serve(url, req, res, contentDir);
     } else if (url.pathname == "/") {
         serveResources(req, res);
     } else if (url.pathname == "/control") {
