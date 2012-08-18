@@ -8,7 +8,7 @@ Multiple computers throughout the building can connect to the server through a w
 
 Additionally, the *control* has built-in support for video presentations (and for syncing effects with the video), and any *control* that has a microphone can be used as an intercom system to broadcast an audio message to each computer connected as a *client*.
 
-Another interesting feature of HHLS is a basic live security camera system (entirely separate from the rest of the system). This allows a computer connected to the server to remotely monitor any computer with a webcam attached that is connected to the security camera system.
+Another interesting feature of HHLS is a basic live camera monitoring system (entirely separate from the rest of the system). This allows a computer connected to the server to remotely monitor any computer with a webcam attached that is connected to the camera monitoring system.
 
 ## License
 
