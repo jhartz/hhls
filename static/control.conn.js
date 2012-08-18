@@ -58,7 +58,7 @@ var conn = {
                 } catch (err) {}
             });
             
-            this.socket = io.connect();
+            this.socket = io.connect("/control");
             
             this.socket.on("connecting", function () {
                 conn.showmsg("Connecting to server...");
