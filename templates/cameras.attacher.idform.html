@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Camera Attacher - Haunted House</title>
+<link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+
+<body>
+<section>
+    <header><h1>Attach a Camera</h1></header>
+    <form action="/cameras/attacher">
+        <table style="margin: auto;">
+            <tr>
+                <td><label for="input_name">Computer Name: </label></td>
+                <td><input name="name" id="input_name"{{#hostname}} placeholder="{{hostname}}"{{/hostname}}{{#name}} value="{{name}}"{{/name}}></td>
+            </tr>
+            <tr>
+                <td><label for="input_location">Computer Location: </label></td>
+                <td><input name="location" id="input_location"{{#location}} value="{{location}}"{{/location}}></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;"><input type="submit" value="Go"></td>
+            </tr>
+        </table>
+    </form>
+</section>
+</body>
+</html>

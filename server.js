@@ -43,6 +43,15 @@ function handler(req, res) {
         serveResources(req, res);
     } else if (url.pathname == "/control") {
         serveControl(url, req, res);
+    } else if (url.pathname.substring(0, 8) == "/cameras") {
+        var urlpart = url.pathname.substring(9);
+        if (urlpart == "attacher") {
+            serveCamerasAttacher(url, req, res);
+        } else if (urlpart == "viewer") {
+            serveCamerasViewer(url, req, res);
+        } else {
+            myutil.writeError(res, 404);
+        }
     } else if (url.pathname.substring(0, 7) == "/client") {
         var urlpart = url.pathname.substring(8);
         if (urlpart == "") {
@@ -54,22 +63,38 @@ function handler(req, res) {
         } else {
             myutil.writeError(res, 404);
         }
-    } else if (url.pathname.substring(0, 8) == "/cameras") {
-        var urlpart = url.pathname.substring(9);
-        if (urlpart == "viewer") {
-            // TODO: make this
-            myutil.write(res, "cameras.viewer.html");
-        } else if (urlpart == "attacher") {
-            // TODO: make this
-            myutil.write(res, "cameras.attacher.html");
-        } else {
-            myutil.writeError(res, 404);
-        }
     } else if (url.pathname == "/test") {
         myutil.write(res, "test.html");
     } else {
         myutil.writeError(res, 404);
     }
+}
+
+function testLocationData(url, req, res, successCallback, failCallback) {
+    dns.reverse(req.connection.remoteAddress, function (err, domains) {
+        var hostname = "";
+        if (!err && domains && domains.length > 0) {
+            for (var i = 0; i < domains.length; i++) {
+                if (domains[i]) {
+                    hostname = domains[i];
+                    break;
+                }
+            }
+        }
+        
+        if (url.query && myutil.fquery(url.query.location)) {
+            var name = (myutil.fquery(url.query.name) || hostname).trim();
+            var location = myutil.fquery(url.query.location).trim();
+            
+            var d = new Date(), expires = new Date(d.getFullYear() + 1, 0, 1);
+            var cookieoptions = "; Path=/; Expires=" + expires.toUTCString();
+            
+            successCallback(name, location, ["name=" + name + cookieoptions, "location=" + location + cookieoptions]);
+        } else {
+            var cookies = req.headers.cookie ? myutil.parseCookies(req.headers.cookie) : {};
+            failCallback(cookies.name || "", cookies.location || "", hostname);
+        }
+    });
 }
 
 function serveResources(req, res) {
@@ -83,7 +108,10 @@ function serveResources(req, res) {
                     filelist.push({file: files[i]});
                 }
             }
-            myutil.write(res, "resources.html", {dir: config.RESOURCES_DIR, files: filelist});
+            myutil.write(res, "resources.html", {
+                dir: config.RESOURCES_DIR,
+                files: filelist
+            });
         }
     });
 }
@@ -114,7 +142,14 @@ function serveControl(url, req, res) {
                     }
                 }
                 
-                myutil.write(res, "control.html", {videos: videolist || false, sounds: soundlist, miniclient: !!(!url.query || typeof url.query.nominiclient == "undefined"), channels: JSON.stringify(settings.channels.data), keyboard: JSON.stringify(settings.keyboard.data), presets: JSON.stringify(settings.presets.data)});
+                myutil.write(res, "control.html", {
+                    videos: videolist || false,
+                    sounds: soundlist,
+                    miniclient: !!(!url.query || typeof url.query.nominiclient == "undefined"),
+                    channels: JSON.stringify(settings.channels.data),
+                    keyboard: JSON.stringify(settings.keyboard.data),
+                    presets: JSON.stringify(settings.presets.data)
+                });
             }
         });
     };
@@ -162,87 +197,94 @@ function serveControl(url, req, res) {
     }
 }
 
+function serveCamerasAttacher(url, req, res) {
+    testLocationData(url, req, res, function (name, location, cookies) {
+        myutil.write(res, "cameras.attacher.html", {
+            name: name,
+            location: location
+        }, {"Set-Cookie": cookies});
+    }, function (name, location, hostname) {
+        myutil.write(res, "cameras.attacher.idform.html", {
+            name: name,
+            location: location,
+            hostname: hostname
+        });
+    });
+}
+
+function serveCamerasViewer(url, req, res) {
+
+}
+
 // client stuff
 
 var clients = [];
 
 function serveClient(url, req, res) {
-    dns.reverse(req.connection.remoteAddress, function (err, domains) {
-        var hostname = "";
-        if (!err && domains && domains.length > 0) {
-            for (var i = 0; i < domains.length; i++) {
-                if (domains[i]) {
-                    hostname = domains[i];
-                    break;
-                }
-            }
+    testLocationData(url, req, res, function (name, location, cookies) {
+        var xval, yval;
+        if (myutil.fquery(url.query.layout) == "custom") {
+            xval = myutil.fquery(url.query.layout_x, "int");
+            yval = myutil.fquery(url.query.layout_y, "int");
+        } else {
+            var split = myutil.fquery(url.query.layout).split("x");
+            xval = parseInt(split[0], 10);
+            yval = parseInt(split[1], 10);
+        }
+        if (!xval || xval < 1 || xval > 9) {
+            xval = 1;
+        }
+        if (!yval || yval < 1 || yval > 9) {
+            yval = 1;
         }
         
-        if (url.query && myutil.fquery(url.query.location) && myutil.fquery(url.query.layout)) {
-            var name = (myutil.fquery(url.query.name) || hostname).trim();
-            var location = myutil.fquery(url.query.location).trim();
-            
-            var xval, yval;
-            if (myutil.fquery(url.query.layout) == "custom") {
-                xval = myutil.fquery(url.query.layout_x, "int");
-                yval = myutil.fquery(url.query.layout_y, "int");
-            } else {
-                var split = myutil.fquery(url.query.layout).split("x");
-                xval = parseInt(split[0], 10);
-                yval = parseInt(split[1], 10);
+        var cid = clients.length;
+        console.log("SERVING CLIENT: " + cid);
+        clients.push({
+            active: false,
+            name: name,
+            location: location,
+            ip: req.connection.remoteAddress,
+            x: xval,
+            y: yval,
+            frames: {}
+        });
+        
+        var iframes = "", x, y;
+        for (y = 1; y <= yval; y++) {
+            iframes += "            <tr>\n";
+            for (x = 1; x <= xval; x++) {
+                var extra = "";
+                if (myutil.fquery(url.query["channel_" + x + "x" + y])) extra += "&channel=" + encodeURIComponent(myutil.fquery(url.query["channel_" + x + "x" + y]));
+                iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + myutil.escHTML(extra) + '" scrolling="no">Loading...</iframe></td>\n';
             }
-            if (!xval || xval < 1 || xval > 9) {
-                xval = 1;
-            }
-            if (!yval || yval < 1 || yval > 9) {
-                yval = 1;
-            }
-            
-            var cid = clients.length;
-            console.log("SERVING CLIENT: " + cid);
-            clients.push({
-                active: false,
-                name: name,
-                location: location,
-                ip: req.connection.remoteAddress,
-                x: xval,
-                y: yval,
-                frames: {}
-            });
-            
-            var iframes = "", x, y;
-            for (y = 1; y <= yval; y++) {
-                iframes += "            <tr>\n";
-                for (x = 1; x <= xval; x++) {
-                    var extra = "";
-                    if (myutil.fquery(url.query["channel_" + x + "x" + y])) extra += "&channel=" + encodeURIComponent(myutil.fquery(url.query["channel_" + x + "x" + y]));
-                    iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + myutil.escHTML(extra) + '" scrolling="no">Loading...</iframe></td>\n';
-                }
-                iframes += "            </tr>\n";
-            }
-            
-            var d = new Date(), expires = new Date(d.getFullYear() + 1, 0, 1);
-            var cookieoptions = "; Path=/; Expires=" + expires.toUTCString();
-            
-            var td_height = Math.round(100 / yval);
-            
-            myutil.write(res, "client2.html", {name: name, location: location, closebtn: (xval == 1 && yval == 1 ? false : true), td_height: td_height, iframes: iframes}, {"Set-Cookie": ["name=" + name + cookieoptions, "location=" + location + cookieoptions]});
-        } else {
-            var cookies = req.headers.cookie ? myutil.parseCookies(req.headers.cookie) : {};
-            
-            var vars = {hostname: hostname};
-            vars.name = cookies.name || "";
-            vars.location = cookies.location || "";
-            vars.styling = !!(url.query && typeof url.query.nostyle == "undefined");
-            if (url.query && myutil.fquery(url.query.layout) && myutil.fquery(url.query.layout).trim().search(/^[1-9]x[1-9]$/) != -1) {
-                vars.show_layout = false;
-                vars.layout = myutil.fquery(url.query.layout).trim();
-            } else {
-                vars.show_layout = true;
-            }
-            
-            myutil.write(res, "client.html", vars);
+            iframes += "            </tr>\n";
         }
+        
+        var td_height = Math.round(100 / yval);
+        
+        myutil.write(res, "client2.html", {
+            name: name,
+            location: location,
+            closebtn: (xval == 1 && yval == 1 ? false : true),
+            td_height: td_height,
+            iframes: iframes
+        }, {"Set-Cookie": cookies});
+    }, function (name, location, hostname) {
+        var vars = {
+            name: name,
+            location: location,
+            hostname: hostname
+        };
+        vars.styling = !!(url.query && typeof url.query.nostyle == "undefined");
+        if (url.query && myutil.fquery(url.query.layout) && myutil.fquery(url.query.layout).trim().search(/^[1-9]x[1-9]$/) != -1) {
+            vars.show_layout = false;
+            vars.layout = myutil.fquery(url.query.layout).trim();
+        } else {
+            vars.show_layout = true;
+        }
+        
+        myutil.write(res, "client.html", vars);
     });
 }
 
@@ -313,7 +355,12 @@ function serveClientFrame(url, req, res) {
                     }
                 }
                 
-                myutil.write(res, "clientframe.html", {cid: cid, x: x, y: y, channellist: channellist});
+                myutil.write(res, "clientframe.html", {
+                    cid: cid,
+                    x: x,
+                    y: y,
+                    channellist: channellist
+                });
             }
         } else {
             myutil.writeError(res, 404);
@@ -431,7 +478,7 @@ setInterval(function () {
 }, 30000);
 
 function sendForward(about, data) {
-    io.sockets.send(JSON.stringify({
+    io.of("/control").send(JSON.stringify({
         about: about,
         data: data
     }));
@@ -474,9 +521,8 @@ function sendSetting(setting) {
     });
 }
 
-io.sockets.on("connection", function (socket) {
+io.of("/control").on("connection", function (socket) {
     socket.on("message", function (message) {
-        console.log("msg received: " + message);
         try {
             var msg = JSON.parse(message);
             if (msg.about) {
@@ -507,11 +553,32 @@ io.sockets.on("connection", function (socket) {
                         sendForward(msg.about, msg.data);
                 }
             } else {
-                console.log("no 'about'");
+                console.log("io (/control): no 'about'");
             }
         } catch (err) {
-            console.log("invalid JSON");
+            console.log("io (/control): invalid JSON");
         }
     });
     sendClientList();
+});
+
+io.of("/cameras").on("connection", function (socket) {
+    socket.on("connection", function (message) {
+        try {
+            var msg = JSON.parse(message);
+            if (msg.about) {
+                switch (msg.about) {
+                    case "stuff":
+                        console.log("blah");
+                        break;
+                    default:
+                        console.log("invalid 'about'");
+                }
+            } else {
+                console.log("io (/cameras): no 'about'");
+            }
+        } catch (err) {
+            console.log("io (/cameras): invalid JSON");
+        }
+    });
 });
