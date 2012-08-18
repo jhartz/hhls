@@ -1,0 +1,26 @@
+TODO
+
+ - client2: intercom stuff (turn checkbox label blue when active (when someone is talking into it), and grey when disabled ... and just the default color otherwise)
+ - clientframe:
+    - client FF add-on (detection and device list)
+ - clientframe2:
+    - client FF add-on (forwarding of "ext_device" from URL into JavaScript on server; client prompting for custom command line execs for "on" and "off" commands if selected (and prefs in "options") ... and change the "Change Channel" button to "Change Channel or Device" if we're using a device)
+    - automatic lighting based on sound for timed channels
+    - show in "loaded sounds" only when audio is loaded
+ - /client/addon (zipfile generation) and link to it in /client or on home page (probably not /client/frame, cause then it would almost be a per-frame thing)
+
+ - control:
+    - intercom (talk into intercom or see who (IP) is currently using it)
+    - cues as subtitle file; shown below vid if there's room (at least 200ish px) - otherwise overlaid on vid (like subtitles)... maybe starts as big as #ctrl_video and then shrinks to size (if below the vid... this would give time to animate the video so there's nothing at the top)
+    - NEXT/PREV FOR VIDEOS
+
+
+ - Camera Viewer:
+    - Title bar at top (like client2), with options btn at right to select which cameras we're viewing (this is also shown onload); flash title bar & options button when new camera is attached
+    - Cameras are laid out below in a grid; maybe just make them all the same height (as big as we can without making the container scroll), and then keep the aspect ratio on each one and put them all as inline elements in one auto-wrapping div (maybe floated elements), so it almost looks like a grid
+    - Add option (in "options") for a time delay for the camera (like "20 seconds" or something) to delay the video (so we can have a camera on the people as they enter somewhere, and show it later)
+    - Add option (in "options") to auto-hide the top bar and any other metadata shown (in case we want to make the camera feed visible to the audience)
+    - Onclick on the actual video should be play/pause, and if we do this also have a "back to live feed" button - maybe a "play" arrow with a vertical line on the right... >|
+ - Camera Attacher:
+    - Then for each camera we attach we have a "camera location"
+    - Or maybe just, instead of all this jazz... http://goalbit.sourceforge.net/ (Windows-only) or VLC streaming
