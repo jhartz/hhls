@@ -1,0 +1,23 @@
+{
+  "name": "HHLS",
+  "version": "1.0",
+  "description": "Haunted House Logistics Server",
+  "license": "GPL",
+  "author": {
+    "name": "Jake Hartz",
+    "email": "jake33@rocketmail.com",
+    "url": "http://jhartz.github.com/"
+  },
+  "dependencies": {
+    "socket.io": "0.9.x",
+    "mu2": "0.5.x",
+    "mime": "1.2.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhartz/hhls.git"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
