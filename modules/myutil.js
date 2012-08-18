@@ -7,11 +7,8 @@ var util = require("util"),
     mu = require("mu2"),
     mime = require("mime");
 
-// my modules
-var config = require("../config");
 
-
-mu.root = path.join(__dirname, "..", config.TEMPLATES_DIR || "templates");
+mu.root = path.join(__dirname, "..", "templates");
 
 if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development") {
     mu.clearCache();
