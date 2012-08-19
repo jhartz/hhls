@@ -2,6 +2,7 @@ body {
     background-color: #1D353F;
     color: #344A55;
     font-family: 'Lucida Grande', sans-serif;
+    font-size: 12pt;
 }
 
 h1 {
@@ -45,7 +46,7 @@ section {
     transition: background-color .2s linear;
 }
 
-section h1, section h2, section h3 {
+section h1, section h2 {
     text-align: center;
 }
 
@@ -110,9 +111,8 @@ section > div {
     padding: 10px;
 }
 
-section > div > table {
-    width: 100%;
-    /* height: 100%; */
+section.textcentered {
+    text-align: center;
 }
 
 div.blackoverlay {
@@ -181,6 +181,11 @@ button:active, button.active {
     margin: 5px 3px 3px 5px;
 }
 
+button a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
 section > footer.buttonbox {
     padding: 0;
 }
@@ -230,7 +235,7 @@ span.lilbutton:hover {
     text-decoration: underline;
 }
 
-span.lilbutton > a, div.button > a {
+span.lilbutton a {
     color: inherit;
     text-decoration: inherit;
 }
@@ -301,13 +306,13 @@ table.topped > tbody > tr > td, table.topped > tr > td {
     white-space: nowrap;
 }
 
-div.topbtn {
+div.topcorner {
     position: absolute;
     top: 0;
     left: 0;
 }
 
-div.bottombtn {
+div.bottomcorner {
     position: absolute;
     right: 0;
     bottom: 0;

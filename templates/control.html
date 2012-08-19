@@ -22,12 +22,17 @@ var settings = {
 </head>
 
 <body>
-<noscript><section style="text-align: center;">ERROR: JavaScript is required to view this page.</section></noscript>
+<noscript>
+<section class="textcentered">
+    <header><h1>ERROR</h1>
+    <div>JavaScript is required to view this page.</div>
+</section>
+</noscript>
 
 <section id="ctrl_effects" class="top" style="display: none;">
     <header><h1>Effects Controller</h1></header>
     
-    <div id="effects_waiting"><table><tr><td id="effects_statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
+    <div id="effects_waiting"><table style="width: 100%;"><tr><td id="effects_statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
     
     <div id="effects_controls" data-level="1" style="display: none; min-height: 100%;">
         <form id="effects_form">
@@ -181,17 +186,17 @@ var settings = {
     </div>
     
     <div id="video_selection" style="display: none;">
-        <table>
+        <table style="width: 100%;">
 
 {{{videos}}}
         </table>
-        <div id="video_selection_back" class="bottombtn" style="display: none;"><button type="button">Back to video</button></div>
+        <div id="video_selection_back" class="bottomcorner" style="display: none;"><button type="button">Back to video</button></div>
     </div>
     
     <div id="video_playing" style="display: none; height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;">
         <table style="width: 100%; height: 100%; border-style: none; border-collapse: collapse;"><tr><td style="text-align: center;"><video id="video_vid" preload="auto" controls title="While seeking the videos (or if the videos become out of sync), click and hold on the seek bar for a few seconds and then release." style="background-color: black;"></video></td></tr></table>
         <div id="visual_cue_container" style="display: none;"><div id="visual_cue">[visual cue area]</div></div>
-        <div id="video_playing_back" class="topbtn"><button type="button">Back to video list</button></div>
+        <div id="video_playing_back" class="topcorner"><button type="button">Back to video list</button></div>
     </div>
 </section>
 {{/videos}}{{#miniclient}}
