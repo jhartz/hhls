@@ -36,15 +36,21 @@ function handler(req, res) {
             myutil.writeError(res, 404);
         }
     } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, 11) == "/resources/" || url.pathname.substring(0, 8) == "/videos/" || url.pathname.substring(0, 8) == "/sounds/") {
-        var contentDir = url.pathname.substring(1).substring(0, url.pathname.indexOf("/"));
-        if (contentDir == "resources" && config.RESOURCES_DIR) {
-            contentDir = config.RESOURCES_DIR;
-        } else if (contentDir == "videos" && config.VIDEO_DIR) {
-            contentDir = config.VIDEO_DIR;
-        } else if (contentDir == "sounds" && config.SOUND_DIR) {
-            contentDir = config.SOUND_DIR;
+        var filename = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
+        if (filename.toLowerCase() == "readme") {
+            myutil.writeError(res, 404);
+        } else {
+            var contentDir = url.pathname.substring(1);
+            contentDir = contentDir.substring(0, contentDir.indexOf("/"));
+            if (contentDir == "resources" && config.RESOURCES_DIR) {
+                contentDir = config.RESOURCES_DIR;
+            } else if (contentDir == "videos" && config.VIDEO_DIR) {
+                contentDir = config.VIDEO_DIR;
+            } else if (contentDir == "sounds" && config.SOUND_DIR) {
+                contentDir = config.SOUND_DIR;
+            }
+            staticserve.serve(req, res, filename, contentDir);
         }
-        staticserve.serve(url, req, res, contentDir);
     } else if (url.pathname == "/") {
         serveResources(req, res);
     } else if (url.pathname == "/control") {
