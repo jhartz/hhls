@@ -17,7 +17,7 @@ if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development")
 }
 
 exports.escHTML = function (html) {
-    // NOTE: Also in control.js and clientframe2.js
+    // NOTE: Also in control.js, clientframe2.js, cameras.attacher.js, cameras.viewer.js
     if (typeof html != "string") {
         html = html + "";
     }
