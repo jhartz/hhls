@@ -1,5 +1,4 @@
 function escHTML(html) {
-    // NOTE: Also in myutil.js and clientframe2.js
     if (typeof html != "string") {
         html = html + "";
     }

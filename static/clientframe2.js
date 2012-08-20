@@ -11,7 +11,6 @@ var is_on = false,
     oneffectstop = function () {};
 
 function escHTML(html) {
-    // NOTE: Also in myutil.js and control.js
     if (typeof html != "string") {
         html = html + "";
     }
