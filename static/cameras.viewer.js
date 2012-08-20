@@ -16,6 +16,37 @@ var initialized = false,
 
 window.URL = window.URL || window.webkitURL;
 
+function openOptions() {
+    for (var attacherIndex in pcs) {
+        if (pcs.hasOwnProperty(attacherIndex) && pcs[attacherIndex]) {
+            for (var pcIndex in pcs[attacherIndex]) {
+                if (pcs[attacherIndex].hasOwnProperty(pcIndex) && pcs[attacherIndex][pcIndex]) {
+                    pcs[attacherIndex][pcIndex].close();
+                }
+            }
+        }
+    }
+    cameras = [];
+    pcs = {};
+    layoutCameras();
+    document.getElementById("options").style.display = "block";
+}
+
+function closeOptions() {
+    document.getElementById("options").style.display = "none";
+    var inputs = document.getElementById("options_cameras").getElementsByTagName("input");
+    for (var i = 0; i < inputs.length; i++) {
+        var attacherIndex = parseInt(inputs[i].getAttribute("data-attacherIndex"), 10);
+        var streamIndex = parseInt(inputs[i].getAttribute("data-streamIndex"), 10);
+        if (inputs[i].checked && !isNaN(attacherIndex) && !isNaN(streamIndex) && attachers[attacherIndex].streams[streamIndex]) {
+            socket.emit("request signal", {
+                attacherIndex: attacherIndex,
+                streamIndex: streamIndex
+            });
+        }
+    }
+}
+
 function layoutCameras() {
     var div = document.createElement("div");
     for (var i = 0; i < cameras.length; i++) {
@@ -28,7 +59,7 @@ function layoutCameras() {
 }
 
 window.onload = function () {
-    if (typeof document.addEventListener != "function" || typeof JSON == "undefined") {
+    if (typeof document.addEventListener != "function" || typeof JSON == "undefined" || typeof document.getElementsByTagName != "function") {
         document.body.innerHTML = "<p>ERROR: Your browser does not support some of the JavaScript features required by this page.<br>Please upgrade to a more modern browser.</p>";
     } else if (typeof webkitPeerConnection00 == "undefined") {
         document.body.innerHTML = "<p>ERROR: Your browser does not support PeerConnection (webkitPeerConnection00).<br>Please upgrade to a more modern browser.</p>";
@@ -60,15 +91,7 @@ window.onload = function () {
         });
         
         document.getElementById("options_go").addEventListener("click", function () {
-            cameras = [];  // TODO: better "destroy" system (when we first open "Options")
-            document.getElementById("options").style.display = "none";
-            // testing...
-            var attacherIndex = 0;
-            var streamIndex = 0;
-            socket.emit("request signal", {
-                attacherIndex: attacherIndex,
-                streamIndex: streamIndex
-            });
+            closeOptions();
         }, false);
         
         socket.on("attachers", function (data) {
@@ -77,10 +100,10 @@ window.onload = function () {
                 attachers = data;
                 for (var i = 0; i < data.length; i++) {
                     if (data[i] && data[i].streams && data[i].streams.length) {
-                        html += '<p>' + escHTML(data[i].name) + ' - ' + escHTML(data[i].location) + '</p>';
+                        html += '<p>' + escHTML(data[i].name) + ' (' + escHTML(data[i].location) + ')</p>';
                         html += '<ul>';
                         for (var j = 0; j < data[i].streams.length; j++) {
-                            html += '<li><input type="checkbox" id="attacher' + i + 'stream' + j + '">&nbsp;<label for="attacher' + i + 'stream' + j + '">' + escHTML(data[i].streams[j].name) + '</li>';
+                            html += '<li><input type="checkbox" data-attacherIndex="' + i + '" data-streamIndex="' + j + '" id="attacher' + i + 'stream' + j + '">&nbsp;<label for="attacher' + i + 'stream' + j + '">' + escHTML(data[i].streams[j].name) + '</li>';
                         }
                         html += '</ul>';
                     }
@@ -141,7 +164,7 @@ window.onload = function () {
         
         socket.on("ready", function () {
             initialized = true;
-            document.getElementById("options").style.display = "block";
+            openOptions();
         });
     }
 };
