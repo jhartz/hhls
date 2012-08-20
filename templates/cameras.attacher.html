@@ -4,29 +4,48 @@
 <meta charset="utf-8">
 <title>Camera Attacher - Haunted House</title>
 <link rel="stylesheet" type="text/css" href="/static/style.css">
-<script type="text/javascript" src="/static/jquery.js"></script>
+<style type="text/css">
+#main {
+    max-height: -moz-calc(100% - 20px);
+    max-height: -webkit-calc(100% - 20px);
+    max-height: calc(100% - 20px);
+}
+
+video {
+    max-height: 40%;
+}
+
+.container {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 7px;
+}
+
+.container h2 {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.container h2:hover {
+    text-decoration: none;
+}
+</style>
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+var config = {{{config}}};
+</script>
 <script type="text/javascript" src="/static/cameras.attacher.js"></script>
 </head>
 
 <body>
-<section>
+<section class="textcentered">
     <header><h1>Attach a Camera</h1></header>
-    <div>
-        <table class="pretty" style="width: auto; margin: auto;">
-            <tr>
-                <td style="text-align: right;">Server Connection:</td>
-                <td><span id="status_socket">Loading...</span></td>
-            </tr>
-            <tr>
-                <td style="text-align: right;">Video Stream:</td>
-                <td><span id="status_video">Loading...</span></td>
-            </tr>
-        </table>
-        <p>&nbsp;</p>
-        <div id="content" style="text-align: center;">
-        
-        </div>
+    <div id="main">
+        <table class="pretty" style="width: auto; margin: auto;"><tr><td><span id="status">Loading...</span></td></tr></table>
+        <div id="content"></div>
+        <p style="display: none;"><button id="addCamera" type="button">Add another camera</button></p>
     </div>
 </section>
 </body>

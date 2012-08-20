@@ -212,8 +212,10 @@ function serveControl(url, req, res) {
 function serveCamerasAttacher(url, req, res) {
     testLocationData(url, req, res, function (name, location, cookies) {
         myutil.write(res, "cameras.attacher.html", {
-            name: name,
-            location: location
+            config: JSON.stringify({
+                name: name,
+                location: location
+            })
         }, {"Set-Cookie": cookies});
     }, function (name, location, hostname) {
         myutil.write(res, "cameras.attacher.idform.html", {
@@ -225,7 +227,7 @@ function serveCamerasAttacher(url, req, res) {
 }
 
 function serveCamerasViewer(url, req, res) {
-
+    myutil.write(res, "cameras.viewer.html");
 }
 
 // client stuff
@@ -537,60 +539,193 @@ io.of("/control").on("connection", function (socket) {
     socket.on("message", function (message) {
         try {
             var msg = JSON.parse(message);
-            if (msg.about) {
-                switch (msg.about) {
-                    case "effects_cmd":
-                        sendMsg(msg.data, msg.data.channel);
-                        if (msg.data.command == "play") {
-                            if (typeof msg.data.prop.dimness != "undefined") {
-                                settings.channels.data[msg.data.channel].dimness = msg.data.prop.dimness;
-                                settings.channels.update();
-                            } else if (typeof msg.data.prop.state != "undefined") {
-                                var state = settings.channels.data[msg.data.channel].state || 0;
-                                if (msg.data.prop.state == -1) {
-                                    state = Number(!state);
-                                } else {
-                                    state = msg.data.prop.state;
-                                }
-                                settings.channels.data[msg.data.channel].state = state;
-                                settings.channels.update();
-                            }
-                        }
-                        break;
-                    case "settings":
-                        settings[msg.data.setting].data = msg.data.settings;
-                        settings[msg.data.setting].update();
-                        break;
-                    default:
-                        sendForward(msg.about, msg.data);
-                }
-            } else {
-                console.log("io (/control): no 'about'");
-            }
         } catch (err) {
             console.log("io (/control): invalid JSON");
+        }
+        if (typeof msg == "object" && msg.about) {
+            switch (msg.about) {
+                case "effects_cmd":
+                    sendMsg(msg.data, msg.data.channel);
+                    if (msg.data.command == "play") {
+                        if (typeof msg.data.prop.dimness != "undefined") {
+                            settings.channels.data[msg.data.channel].dimness = msg.data.prop.dimness;
+                            settings.channels.update();
+                        } else if (typeof msg.data.prop.state != "undefined") {
+                            var state = settings.channels.data[msg.data.channel].state || 0;
+                            if (msg.data.prop.state == -1) {
+                                state = Number(!state);
+                            } else {
+                                state = msg.data.prop.state;
+                            }
+                            settings.channels.data[msg.data.channel].state = state;
+                            settings.channels.update();
+                        }
+                    }
+                    break;
+                case "settings":
+                    settings[msg.data.setting].data = msg.data.settings;
+                    settings[msg.data.setting].update();
+                    break;
+                default:
+                    sendForward(msg.about, msg.data);
+            }
+        } else {
+            console.log("io (/control): no 'msg' or 'msg.about'");
         }
     });
     sendClientList();
 });
 
+var attachers = [];
+var viewers = [];
 io.of("/cameras").on("connection", function (socket) {
-    socket.on("connection", function (message) {
-        try {
-            var msg = JSON.parse(message);
-            if (msg.about) {
-                switch (msg.about) {
-                    case "stuff":
-                        console.log("blah");
-                        break;
-                    default:
-                        console.log("invalid 'about'");
-                }
-            } else {
-                console.log("io (/cameras): no 'about'");
-            }
-        } catch (err) {
-            console.log("io (/cameras): invalid JSON");
-        }
+    // from attacher
+    socket.on("attacher init", function (data) {
+        var attacherIndex = attachers.length;
+        attachers.push({
+            name: data.name,
+            location: data.location,
+            streams: [],
+            socket: socket
+        });
+        socket.set("attacherIndex", attacherIndex, function () {
+            socket.emit("ready");
+        });
     });
+    
+    // from viewer
+    socket.on("viewer init", function () {
+        var viewerIndex = viewers.length;
+        viewers.push({
+            socket: socket
+        });
+        sendAttachers();
+        socket.set("viewerIndex", viewerIndex, function () {
+            socket.emit("ready");
+        });
+    });
+    
+    // from attacher
+    socket.on("streams", function (data) {
+        socket.get("attacherIndex", function (err, attacherIndex) {
+            if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && Array.isArray(data)) {
+                attachers[attacherIndex].streams = data;
+                sendAttachers();
+            } else {
+                socket.emit("init");
+            }
+        });
+    });
+    
+    // from viewer
+    socket.on("request signal", function (data, callback) {
+        socket.get("viewerIndex", function (err, viewerIndex) {
+            if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.streamIndex == "number" && attachers[data.attacherIndex].streams[data.streamIndex]) {
+                console.log("viewer " + viewerIndex + " is requesting stream " + data.streamIndex + " from " _ data.attacherIndex);
+                attachers[data.attacherIndex].socket.emit("request signal", {
+                    viewerIndex: viewerIndex,
+                    streamIndex: data.streamIndex
+                });
+            } else {
+                socket.emit("init");
+            }
+        });
+    });
+    
+    // from attacher
+    socket.on("offer", function (data) {
+        socket.get("attacherIndex", function (err, attacherIndex) {
+            if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && typeof data.viewerIndex == "number" && viewers[data.viewerIndex] && typeof data.pcIndex == "number" && data.sdp) {
+                viewers[data.viewerIndex].socket.emit("offer", {
+                    attacherIndex: attacherIndex,
+                    pcIndex: data.pcIndex,
+                    sdp: data.sdp
+                });
+            } else {
+                socket.emit("init");
+            }
+        });
+    });
+    
+    // from viewer
+    socket.on("answer", function (data) {
+        socket.get("viewerIndex", function (err, viewerIndex) {
+            if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.pcIndex == "number" && data.sdp) {
+                attachers[data.attacherIndex].socket.emit("answer", {
+                    viewerIndex: viewerIndex,
+                    pcIndex: data.pcIndex,
+                    sdp: data.sdp
+                });
+            } else {
+                socket.emit("init");
+            }
+        });
+    });
+    
+    // from attacher
+    socket.on("cantidate from attacher", function (data) {
+        socket.get("attacherIndex", function (err, attacherIndex) {
+            if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && typeof data.viewerIndex == "number" && viewers[data.viewerIndex] && typeof data.pcIndex == "number" && data.label && data.cantidate) {
+                viewers[data.viewerIndex].socket.emit("cantidate", {
+                    attacherIndex: attacherIndex,
+                    pcIndex: data.pcIndex,
+                    label: data.label,
+                    cantidate: data.cantidate
+                });
+            } else {
+                socket.emit("init");
+            }
+        });
+    });
+    
+    // from viewer
+    socket.on("cantidate from viewer", function (data) {
+        socket.get("viewerIndex", function (err, viewerIndex) {
+            if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.pcIndex == "number" && data.label && data.cantidate) {
+                attachers[data.attacherIndex].socket.emit("cantidate", {
+                    viewerIndex: viewerIndex,
+                    pcIndex: data.pcIndex,
+                    label: data.label,
+                    cantidate: data.cantidate
+                });
+            } else {
+                socket.emit("init");
+            }
+        });
+    });
+    
+    try {
+        var attacherIndex, viewerIndex;
+        socket.get("attacherIndex", function (err, index) {
+            attacherIndex = index;
+        });
+        socket.get("viewerIndex", function (err, index) {
+            viewerIndex = index;
+        });
+        if (typeof attacherIndex != "number" && typeof viewerIndex != "number") throw true;
+    } catch (err) {
+        // This socket has not yet been initialized (or we ran into an error with the initialization)
+        socket.emit("init");
+    }
 });
+
+function sendAttachers() {
+    var attacherList = [];
+    for (var i = 0; i < attachers.length; i++) {
+        if (attachers[i] && attachers[i].streams) {
+            attacherList[i] = {
+                name: attachers[i].name,
+                location: attachers[i].location,
+                streams: attachers[i].streams
+            };
+        } else {
+            attacherList[i] = null;
+        }
+    }
+    
+    for (var j = 0; j < viewers.length; j++) {
+        if (viewers[j] && viewers[j].socket) {
+            viewers[j].socket.emit("attachers", attacherList);
+        }
+    }
+}

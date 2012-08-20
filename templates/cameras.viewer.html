@@ -3,10 +3,61 @@
 <head>
 <meta charset="utf-8">
 <title>Camera Viewer - Haunted House</title>
+<style type="text/css">
+body {
+    background-color: black;
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+
+#options {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.heading {
+    font-size: 15pt;
+    text-decoration: underline;
+}
+
+p.heading {
+    font-size: 20pt;
+}
+
+#options_cameras {
+    display: inline-block;
+    border: 1px solid white;
+    border-radius: 5px;
+    text-align: left;
+    margin: auto;
+    padding: 0 15px;
+}
+
+#options_cameras p {
+    margin-bottom: 0;
+}
+
+#options_cameras ul {
+    margin-top: 0;
+    padding-left: 15px;
+    list-style-type: none;
+}
+</style>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/static/cameras.viewer.js"></script>
 </head>
 
 <body>
-<div style="text-align: center;">CAMERA CONTROL</div>
+<div id="options" style="display: none;">
+    <p><span class="heading">Status:</span><br><span id="status"></span></p>
+    <p class="heading">Cameras</p>
+    <div id="options_cameras"></div>
+    <p><button id="options_go" type="button">Go</button></p>
+</div>
+<div id="cameras"></div>
 </body>
 </html>
