@@ -621,7 +621,7 @@ io.of("/cameras").on("connection", function (socket) {
     socket.on("request signal", function (data, callback) {
         socket.get("viewerIndex", function (err, viewerIndex) {
             if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.streamIndex == "number" && attachers[data.attacherIndex].streams[data.streamIndex]) {
-                console.log("viewer " + viewerIndex + " is requesting stream " + data.streamIndex + " from " _ data.attacherIndex);
+                console.log("viewer " + viewerIndex + " is requesting stream " + data.streamIndex + " from attacher " + data.attacherIndex);
                 attachers[data.attacherIndex].socket.emit("request signal", {
                     viewerIndex: viewerIndex,
                     streamIndex: data.streamIndex
@@ -636,6 +636,7 @@ io.of("/cameras").on("connection", function (socket) {
     socket.on("offer", function (data) {
         socket.get("attacherIndex", function (err, attacherIndex) {
             if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && typeof data.viewerIndex == "number" && viewers[data.viewerIndex] && typeof data.pcIndex == "number" && data.sdp) {
+                console.log("attacher " + attacherIndex + " is sending an offer to viewer " + data.viewerIndex + " with pc " + pcIndex);
                 viewers[data.viewerIndex].socket.emit("offer", {
                     attacherIndex: attacherIndex,
                     pcIndex: data.pcIndex,
@@ -651,6 +652,7 @@ io.of("/cameras").on("connection", function (socket) {
     socket.on("answer", function (data) {
         socket.get("viewerIndex", function (err, viewerIndex) {
             if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.pcIndex == "number" && data.sdp) {
+                console.log("viewer " + viewerIndex + " is sending an answer to attacher " + data.attacherIndex + " with pc " + pcIndex);
                 attachers[data.attacherIndex].socket.emit("answer", {
                     viewerIndex: viewerIndex,
                     pcIndex: data.pcIndex,
@@ -666,6 +668,7 @@ io.of("/cameras").on("connection", function (socket) {
     socket.on("cantidate from attacher", function (data) {
         socket.get("attacherIndex", function (err, attacherIndex) {
             if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && typeof data.viewerIndex == "number" && viewers[data.viewerIndex] && typeof data.pcIndex == "number" && data.label && data.cantidate) {
+                console.log("attacher " + attacherIndex + " is sending a cantidate to viewer " + data.viewerIndex + " with pc " + data.pcIndex);
                 viewers[data.viewerIndex].socket.emit("cantidate", {
                     attacherIndex: attacherIndex,
                     pcIndex: data.pcIndex,
@@ -682,6 +685,7 @@ io.of("/cameras").on("connection", function (socket) {
     socket.on("cantidate from viewer", function (data) {
         socket.get("viewerIndex", function (err, viewerIndex) {
             if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.pcIndex == "number" && data.label && data.cantidate) {
+                console.log("viewer " + viewerIndex + " is sending a cantidate to attacher " + data.attacherIndex + " with pc " + data.pcIndex);
                 attachers[data.attacherIndex].socket.emit("cantidate", {
                     viewerIndex: viewerIndex,
                     pcIndex: data.pcIndex,
@@ -695,16 +699,22 @@ io.of("/cameras").on("connection", function (socket) {
     });
     
     try {
-        var attacherIndex, viewerIndex;
-        socket.get("attacherIndex", function (err, index) {
-            attacherIndex = index;
+        var attacher = false,
+            viewer = false;
+        socket.get("attacherIndex", function (err, attacherIndex) {
+            if (typeof attacherIndex == "number" && attachers[attacherIndex]) {
+                attacher = true;
+            }
         });
-        socket.get("viewerIndex", function (err, index) {
-            viewerIndex = index;
+        socket.get("viewerIndex", function (err, viewerIndex) {
+            if (typeof viewerIndex == "number" && viewers[viewerIndex]) {
+                viewer = true;
+            }
         });
-        if (typeof attacherIndex != "number" && typeof viewerIndex != "number") throw true;
+        if (!attacher && !viewer) throw "no valid attacher or viewer";
     } catch (err) {
         // This socket has not yet been initialized (or we ran into an error with the initialization)
+        console.log("Initializing socket (reason: " + err + ")");
         socket.emit("init");
     }
 });
