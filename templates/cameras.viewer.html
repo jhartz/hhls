@@ -9,14 +9,16 @@ body {
     color: white;
     text-align: center;
     margin: 0;
+    padding: 0;
 }
 
-#options {
+#options, #cameras {
     position: absolute;
     left: 0;
     top: 0;
     right: 0;
     bottom: 0;
+    overflow: auto;
 }
 
 .heading {
@@ -52,12 +54,12 @@ p.heading {
 </head>
 
 <body>
+<div id="cameras"></div>
 <div id="options" style="display: none;">
     <p><span class="heading">Status:</span><br><span id="status"></span></p>
     <p class="heading">Cameras</p>
     <div id="options_cameras"></div>
     <p><button id="options_go" type="button">Go</button></p>
 </div>
-<div id="cameras"></div>
 </body>
 </html>

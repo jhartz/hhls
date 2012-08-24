@@ -48,14 +48,37 @@ function closeOptions() {
 }
 
 function layoutCameras() {
-    var div = document.createElement("div");
+    var cam_container = document.getElementById("cameras");
+    var container = document.createElement("div");
     for (var i = 0; i < cameras.length; i++) {
-        div.appendChild(cameras[i]);
+        container.appendChild(cameras[i]);
     }
-    document.getElementById("cameras").appendChild(div);
-    while (document.getElementById("cameras").childNodes.length > 1) {
-        document.getElementById("cameras").removeChild(document.getElementById("cameras").firstChild);
+    cam_container.appendChild(container);
+    while (cam_container.childNodes.length > 1) {
+        cam_container.removeChild(cam_container.firstChild);
     }
+    
+    // Make all videos as tall as possible without scrolling
+    var height = 300, videos = cam_container.getElementsByTagName("video"), j;
+    var u = function () {
+        for (j = 0; j < videos.length; j++) {
+            videos[j].style.height = height + "px";
+        }
+    };
+    while (cam_container.scrollHeight <= cam_container.clientHeight) {
+        height += 4;
+        u();
+    }
+    height -= 8;
+    u();
+    while (cam_container.scrollHeight <= cam_container.clientHeight) {
+        height += 1;
+        u();
+    }
+    height -= 10;
+    u();
+    height += 9;
+    u();
 }
 
 window.onload = function () {
