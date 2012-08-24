@@ -49,12 +49,19 @@ span.btn:hover {
 }
 
 #status table td {
-    width: 25%;
+    width: 50%;
     padding-top: 2px;
     vertical-align: top;
     text-overflow: ellipsis;
 }
-
+{{#closebtn}}
+#status table td {
+    width: 33%;
+}
+#status table td:last-child {
+    width: 34%;
+}
+{{/closebtn}}
 
 #iframeholder {
     position: absolute;
@@ -84,7 +91,6 @@ span.btn:hover {
                 <td>{{location}}</td>
                 <td>{{name}}</td>{{#closebtn}}
                 <td><span id="status_closeall" class="btn">Close All Connections</span></td>{{/closebtn}}
-                <td><input id="intercom_checkbox" type="checkbox" checked><label for="intercom_checkbox"> Intercom</label></td>
             </tr>
         </table>
     </div>

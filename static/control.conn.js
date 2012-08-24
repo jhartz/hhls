@@ -38,7 +38,6 @@ var conn = {
                         $("#client_details_name").text(data.name);
                         $("#client_details_location").text(data.location);
                         $("#client_details_ip").text(data.ip);
-                        $("#client_details_intercom").text(data.intercom ? "on" : "off");
                         $("#client_details_layouter").empty();
                         for (var y = 1; y <= data.y; y++) {
                             var html = '<tr>';
@@ -172,7 +171,7 @@ var conn = {
                     }
                 }
                 if (html) html += ', ';
-                html += '<span class="clientitem lilbutton" style="white-space: nowrap; color: ' + (list[i].intercom ? "black" : "inherit") + ';" title="' + escHTML(list[i].location) + ' \n' + escHTML(list[i].ip) + ' \nIntercom ' + (list[i].intercom ? 'on' : 'off') + '" data-cid="' + escHTML(list[i].cid) + '" data-json="' + escHTML(JSON.stringify(list[i])) + '">' + escHTML(list[i].name) + '</span>';
+                html += '<span class="clientitem lilbutton" style="white-space: nowrap;" title="' + escHTML(list[i].location) + ' \n' + escHTML(list[i].ip) + '" data-cid="' + escHTML(list[i].cid) + '" data-json="' + escHTML(JSON.stringify(list[i])) + '">' + escHTML(list[i].name) + '</span>';
             }
             $("#client_list").html(html);
             if ($("#client_details").attr("data-cid")) {
