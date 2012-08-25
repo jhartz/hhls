@@ -19,13 +19,15 @@ exports.serve = function (req, res, filename, contentDir) {
         if (err || !(stats && stats.isFile())) {
             myutil.writeError(res, 404);
         } else {
+            var nocache = (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development");
             var headers = {
                 "Date": (new Date()).toUTCString(),
                 "Cache-Control": "max-age=21600",
                 "Accept-Ranges": "bytes",
                 "Last-Modified": stats.mtime.toUTCString()
             };
-            if (Date.parse(req.headers["if-modified-since"]) >= Date.parse(stats.mtime)) {
+            if (nocache) headers["Cache-Control"] = "no-cache";
+            if (!nocache && Date.parse(req.headers["if-modified-since"]) >= Date.parse(stats.mtime)) {
                 res.writeHead(304, headers);
                 res.end();
             } else {
