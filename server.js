@@ -636,7 +636,7 @@ io.of("/cameras").on("connection", function (socket) {
     socket.on("offer", function (data) {
         socket.get("attacherIndex", function (err, attacherIndex) {
             if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && typeof data.viewerIndex == "number" && viewers[data.viewerIndex] && typeof data.pcIndex == "number" && data.sdp) {
-                console.log("attacher " + attacherIndex + " is sending an offer to viewer " + data.viewerIndex + " with pc " + pcIndex);
+                console.log("attacher " + attacherIndex + " is sending an offer to viewer " + data.viewerIndex + " with pc " + data.pcIndex);
                 viewers[data.viewerIndex].socket.emit("offer", {
                     attacherIndex: attacherIndex,
                     pcIndex: data.pcIndex,
