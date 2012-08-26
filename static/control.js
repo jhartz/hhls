@@ -1,10 +1,3 @@
-function escHTML(html) {
-    if (typeof html != "string") {
-        html = html + "";
-    }
-    return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
-}
-
 function resizer(use_animate) {
     $("section").not("minimized").children("header").each(function () {
         $(this).parent().css("padding-top", Math.round($(this).outerHeight()) + "px");

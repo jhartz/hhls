@@ -8,7 +8,7 @@ var fs = require("fs"),
     mime = require("mime");
 
 // my modules
-var myutil = require("./myutil");
+var writer = require("./writer");
 
 
 mime.define({"text/vtt": ["vtt"]});  // for WebVTT support (waiting on https://github.com/broofa/node-mime/pull/37)
@@ -17,7 +17,7 @@ exports.serve = function (req, res, filename, contentDir) {
     var pathname = path.join(contentDir, filename);
     fs.stat(pathname, function (err, stats) {
         if (err || !(stats && stats.isFile())) {
-            myutil.writeError(res, 404);
+            writer.writeError(res, 404);
         } else {
             var nocache = (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development");
             var headers = {

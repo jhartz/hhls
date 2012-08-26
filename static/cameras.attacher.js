@@ -1,18 +1,5 @@
-function escHTML(html) {
-    if (typeof html != "string") {
-        html = html + "";
-    }
-    return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
-}
-
 function status(msg) {
-    document.getElementById("status").innerHTML = escHTML(msg).replace(/\n/g, "<br>");
-}
-
-if (typeof console == "undefined") {
-    console = {
-        log: function () {}
-    };
+    document.getElementById("status").innerHTML = shared.escHTML(msg, true);
 }
 
 var socket,
@@ -52,7 +39,7 @@ function addCamera() {
         div.appendChild(button);
         
         var h2 = document.createElement("h2");
-        h2.innerHTML = escHTML(streams[streamIndex].name);
+        h2.innerHTML = shared.escHTML(streams[streamIndex].name);
         div.appendChild(h2);
         
         var video = document.createElement("video");
@@ -68,7 +55,7 @@ function addCamera() {
             var newname = prompt("Name:", streams[streamIndex].name);
             if (newname) {
                 streams[streamIndex].name = newname;
-                h2.innerHTML = escHTML(streams[streamIndex].name);
+                h2.innerHTML = shared.escHTML(streams[streamIndex].name);
                 sendStreams();
             }
         }, false);
@@ -83,15 +70,15 @@ function addCamera() {
         
         document.getElementById("content").appendChild(outer);
     }, function (err) {
-        console.log("getUserMedia ERROR:", err);
         status("ERROR: getUserMedia failed!\nMake sure your camera is connected.");
+        typeof console != "undefined" && console.log("getUserMedia ERROR:", err);
     });
 }
 
 function addPeer(streamIndex, viewerIndex) {
     var peerIndex = streams[streamIndex].peers.length;
     var pc = new webkitPeerConnection00(null, function onIceCandidate(candidate, moreToFollow) {
-        console.log("onIceCandidate:", candidate);
+        typeof console != "undefined" && console.log("Found Ice Candidate:", candidate);
         if (candidate) {
             socket.emit("to viewer", {
                 destination: viewerIndex,

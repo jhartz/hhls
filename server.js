@@ -10,7 +10,8 @@ var app = require("http").createServer(handler),
 
 // my modules
 var config = require("./config"),
-    myutil = require("./modules/myutil"),
+    shared = require("./static/shared"),
+    writer = require("./modules/writer"),
     staticserve = require("./modules/staticserve"),
     jsonsettings = require("./modules/jsonsettings");
 
@@ -33,12 +34,12 @@ function handler(req, res) {
         if (url.pathname == "/client/stream") {
             serveStream(url, req, res);
         } else {
-            myutil.writeError(res, 404);
+            writer.writeError(res, 404);
         }
     } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, 11) == "/resources/" || url.pathname.substring(0, 8) == "/videos/" || url.pathname.substring(0, 8) == "/sounds/") {
         var filename = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
         if (filename.toLowerCase() == "readme") {
-            myutil.writeError(res, 404);
+            writer.writeError(res, 404);
         } else {
             var contentDir = url.pathname.substring(1);
             contentDir = contentDir.substring(0, contentDir.indexOf("/"));
@@ -62,7 +63,7 @@ function handler(req, res) {
         } else if (urlpart == "viewer") {
             serveCamerasViewer(url, req, res);
         } else {
-            myutil.writeError(res, 404);
+            writer.writeError(res, 404);
         }
     } else if (url.pathname.substring(0, 7) == "/client") {
         var urlpart = url.pathname.substring(8);
@@ -73,12 +74,52 @@ function handler(req, res) {
         } else if (urlpart == "addon") {
             staticserve.zipfile(path.join("components", "addon"), req, res);
         } else {
-            myutil.writeError(res, 404);
+            writer.writeError(res, 404);
         }
     } else if (url.pathname == "/test") {
-        myutil.write(res, "test.html");
+        writer.write(res, "test.html");
     } else {
-        myutil.writeError(res, 404);
+        writer.writeError(res, 404);
+    }
+}
+
+/*
+    UTIL FUNCTIONS
+*/
+
+// "Format query" - to test/format a member of require("url").parse(..., true).query
+function fquery(query, helper) {
+    var formatter = function (endstring) {
+        if (typeof helper == "string") {
+            switch (helper.toLowerCase()) {
+                case "int":
+                    return parseInt(endstring, 10);
+                    break;
+                case "num":
+                case "number":
+                    return Number(endstring);
+                    break;
+                default:
+                    return endstring;
+            }
+        } else if (typeof helper == "function") {
+            return helper(endstring);
+        } else {
+            return endstring;
+        }
+    };
+    
+    if (Array.isArray(query)) {
+        var real = "";
+        query.forEach(function (item) {
+            if (!real && item) real = item;
+        });
+        if (!real) real = query[0];
+        return formatter(real);
+    } else if (typeof query == "string") {
+        return formatter(query);
+    } else {
+        return formatter("");
     }
 }
 
@@ -94,25 +135,49 @@ function testLocationData(url, req, res, successCallback, failCallback) {
             }
         }
         
-        if (url.query && myutil.fquery(url.query.location)) {
-            var name = (myutil.fquery(url.query.name) || hostname).trim();
-            var location = myutil.fquery(url.query.location).trim();
+        if (url.query && fquery(url.query.location)) {
+            var name = (fquery(url.query.name) || hostname).trim();
+            var location = fquery(url.query.location).trim();
             
             var d = new Date(), expires = new Date(d.getFullYear() + 1, 0, 1);
             var cookieoptions = "; Path=/; Expires=" + expires.toUTCString();
             
             successCallback(name, location, ["name=" + name + cookieoptions, "location=" + location + cookieoptions]);
         } else {
-            var cookies = req.headers.cookie ? myutil.parseCookies(req.headers.cookie) : {};
+            var cookies = req.headers.cookie ? shared.parseCookies(req.headers.cookie) : {};
             failCallback(cookies.name || "", cookies.location || "", hostname);
         }
     });
 }
 
+function makeFileList(files, separateMetadata, includeReadme) {
+    var fileList = {};
+    for (var i = 0; i < files.length; i++) {
+        if (includeReadme || files[i] != "README") {
+            var bname = files[i].indexOf(".") != -1 ? files[i].substring(0, files[i].lastIndexOf(".")) : files[i];
+            var ext = files[i].indexOf(".") != -1 ? files[i].substring(files[i].lastIndexOf(".") + 1) : "";
+            if (!fileList[bname]) fileList[bname] = {};
+            if (!fileList[bname].files) fileList[bname].files = [];
+            if (separateMetadata && ext.toLowerCase() == "json") {
+                fileList[bname].json = true;
+            } else if (separateMetadata && ext.toLowerCase() == "vtt") {
+                fileList[bname].track = "vtt";
+            } else {
+                fileList[bname].files.push([ext, mime.lookup(ext)]);
+            }
+        }
+    }
+    return fileList;
+}
+
+/*
+    SERVE FUNCTIONS
+*/
+
 function serveResources(req, res) {
     fs.readdir(config.RESOURCES_DIR, function (err, files) {
         if (err) {
-            myutil.writeError(res, 500);
+            writer.writeError(res, 500);
         } else {
             var filelist = [];
             for (var i = 0; i < files.length; i++) {
@@ -120,7 +185,7 @@ function serveResources(req, res) {
                     filelist.push({file: files[i]});
                 }
             }
-            myutil.write(res, "resources.html", {
+            writer.write(res, "resources.html", {
                 dir: config.RESOURCES_DIR,
                 files: filelist
             });
@@ -144,17 +209,17 @@ function serveControl(url, req, res) {
     var writeme = function (videolist) {
         fs.readdir(config.SOUND_DIR, function (err, files) {
             if (err) {
-                myutil.writeError(res, 500);
+                writer.writeError(res, 500);
             } else {
                 var soundlist = "";
-                var sounds = myutil.makeFileList(files);
+                var sounds = makeFileList(files);
                 for (var sound in sounds) {
                     if (sounds.hasOwnProperty(sound)) {
-                        soundlist += '<option value="' + myutil.escHTML(sound) + '">' + myutil.escHTML(sound) + '</option>';
+                        soundlist += '<option value="' + shared.escHTML(sound) + '">' + shared.escHTML(sound) + '</option>';
                     }
                 }
                 
-                myutil.write(res, "control.html", {
+                writer.write(res, "control.html", {
                     videos: videolist || false,
                     sounds: soundlist,
                     miniclient: !!(!url.query || typeof url.query.nominiclient == "undefined"),
@@ -171,16 +236,16 @@ function serveControl(url, req, res) {
     } else {
         fs.readdir(config.VIDEO_DIR, function (err, files) {
             if (err) {
-                myutil.writeError(res, 500);
+                writer.writeError(res, 500);
             } else {
-                var videos = myutil.makeFileList(files, true);
+                var videos = makeFileList(files, true);
                 var videolist = "";
                 var counter = 0;
                 for (var video in videos) {
                     if (videos.hasOwnProperty(video)) {
                         var extra = "";
                         if (videos[video].track) {
-                            extra += ' data-track="' + myutil.escHTML(videos[video].track) + '"';
+                            extra += ' data-track="' + shared.escHTML(videos[video].track) + '"';
                         }
                         if (videos[video].json) {
                             try {
@@ -189,12 +254,12 @@ function serveControl(url, req, res) {
                                 console.log("ERROR in serveControl, in parsing json for data-control...", err);
                             }
                             if (control) {
-                                extra += ' data-control="' + myutil.escHTML(JSON.stringify(control)) + '"';
+                                extra += ' data-control="' + shared.escHTML(JSON.stringify(control)) + '"';
                             }
                         }
                         counter++;
                         if (counter == 1) videolist += "<tr>\n";
-                        videolist += '<td><button type="button" class="vidbtn" data-vidbtn="/' + myutil.escHTML(config.VIDEO_DIR) + '/' + myutil.escHTML(video) + '" data-formats="' + myutil.escHTML(JSON.stringify(videos[video].files)) + '"' + extra + ' style="min-width: 50%;">' + myutil.escHTML(video) + '</button></td>\n';
+                        videolist += '<td><button type="button" class="vidbtn" data-vidbtn="/' + shared.escHTML(config.VIDEO_DIR) + '/' + shared.escHTML(video) + '" data-formats="' + shared.escHTML(JSON.stringify(videos[video].files)) + '"' + extra + ' style="min-width: 50%;">' + shared.escHTML(video) + '</button></td>\n';
                         if (counter == 3) {
                             videolist += "</tr>\n";
                             counter = 0;
@@ -211,14 +276,14 @@ function serveControl(url, req, res) {
 
 function serveCamerasAttacher(url, req, res) {
     testLocationData(url, req, res, function (name, location, cookies) {
-        myutil.write(res, "cameras.attacher.html", {
+        writer.write(res, "cameras.attacher.html", {
             config: JSON.stringify({
                 name: name,
                 location: location
             })
         }, {"Set-Cookie": cookies});
     }, function (name, location, hostname) {
-        myutil.write(res, "cameras.attacher.idform.html", {
+        writer.write(res, "cameras.attacher.idform.html", {
             name: name,
             location: location,
             hostname: hostname
@@ -227,7 +292,7 @@ function serveCamerasAttacher(url, req, res) {
 }
 
 function serveCamerasViewer(url, req, res) {
-    myutil.write(res, "cameras.viewer.html");
+    writer.write(res, "cameras.viewer.html");
 }
 
 // client stuff
@@ -237,11 +302,11 @@ var clients = [];
 function serveClient(url, req, res) {
     testLocationData(url, req, res, function (name, location, cookies) {
         var xval, yval;
-        if (myutil.fquery(url.query.layout) == "custom") {
-            xval = myutil.fquery(url.query.layout_x, "int");
-            yval = myutil.fquery(url.query.layout_y, "int");
+        if (fquery(url.query.layout) == "custom") {
+            xval = fquery(url.query.layout_x, "int");
+            yval = fquery(url.query.layout_y, "int");
         } else {
-            var split = myutil.fquery(url.query.layout).split("x");
+            var split = fquery(url.query.layout).split("x");
             xval = parseInt(split[0], 10);
             yval = parseInt(split[1], 10);
         }
@@ -269,15 +334,15 @@ function serveClient(url, req, res) {
             iframes += "            <tr>\n";
             for (x = 1; x <= xval; x++) {
                 var extra = "";
-                if (myutil.fquery(url.query["channel_" + x + "x" + y])) extra += "&channel=" + encodeURIComponent(myutil.fquery(url.query["channel_" + x + "x" + y]));
-                iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + myutil.escHTML(extra) + '" scrolling="no">Loading...</iframe></td>\n';
+                if (fquery(url.query["channel_" + x + "x" + y])) extra += "&channel=" + encodeURIComponent(fquery(url.query["channel_" + x + "x" + y]));
+                iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + shared.escHTML(extra) + '" scrolling="no">Loading...</iframe></td>\n';
             }
             iframes += "            </tr>\n";
         }
         
         var td_height = Math.round(100 / yval);
         
-        myutil.write(res, "client2.html", {
+        writer.write(res, "client2.html", {
             name: name,
             location: location,
             closebtn: (xval == 1 && yval == 1 ? false : true),
@@ -291,25 +356,25 @@ function serveClient(url, req, res) {
             hostname: hostname
         };
         vars.styling = !!(url.query && typeof url.query.nostyle == "undefined");
-        if (url.query && myutil.fquery(url.query.layout) && myutil.fquery(url.query.layout).trim().search(/^[1-9]x[1-9]$/) != -1) {
+        if (url.query && fquery(url.query.layout) && fquery(url.query.layout).trim().search(/^[1-9]x[1-9]$/) != -1) {
             vars.show_layout = false;
-            vars.layout = myutil.fquery(url.query.layout).trim();
+            vars.layout = fquery(url.query.layout).trim();
         } else {
             vars.show_layout = true;
         }
         
-        myutil.write(res, "client.html", vars);
+        writer.write(res, "client.html", vars);
     });
 }
 
 function serveClientFrame(url, req, res) {
-    if (url.query && !isNaN(myutil.fquery(url.query.cid, "int")) && myutil.fquery(url.query.x, "int") && myutil.fquery(url.query.y, "int")) {
-        var cid = myutil.fquery(url.query.cid, "int"),
-            x = myutil.fquery(url.query.x, "int"),
-            y = myutil.fquery(url.query.y, "int");
+    if (url.query && !isNaN(fquery(url.query.cid, "int")) && fquery(url.query.x, "int") && fquery(url.query.y, "int")) {
+        var cid = fquery(url.query.cid, "int"),
+            x = fquery(url.query.x, "int"),
+            y = fquery(url.query.y, "int");
         if (clients[cid] && x > 0 && x <= clients[cid].x && y > 0 && y <= clients[cid].y) {
-            if (myutil.fquery(url.query.channel) && (myutil.fquery(url.query.channel) == "0" || myutil.fquery(url.query.channel) in settings.channels.data)) {
-                var channel = myutil.fquery(url.query.channel);
+            if (fquery(url.query.channel) && (fquery(url.query.channel) == "0" || fquery(url.query.channel) in settings.channels.data)) {
+                var channel = fquery(url.query.channel);
                 var details = settings.channels.data[channel] || {type: "timed"};
                 
                 var writeme = function (soundlist) {
@@ -319,7 +384,7 @@ function serveClientFrame(url, req, res) {
                     } else if (typeof details.state != "undefined") {
                         old_prop = '{state: ' + details.state + '}';
                     }
-                    myutil.write(res, "clientframe2.html", {
+                    writer.write(res, "clientframe2.html", {
                         cid: cid, x: x, y: y,
                         channel: channel.replace(/"/g, '\\"'), channeltype: details.type,
                         sounds: soundlist || false,
@@ -330,17 +395,17 @@ function serveClientFrame(url, req, res) {
                 if (details.type == "timed") {
                     fs.readdir(config.SOUND_DIR, function (err, files) {
                         if (err) {
-                            myutil.writeError(res, 500);
+                            writer.writeError(res, 500);
                         } else {
-                            var sounds = myutil.makeFileList(files);
+                            var sounds = makeFileList(files);
                             var soundlist = "";
                             for (var sound in sounds) {
                                 if (sounds.hasOwnProperty(sound)) {
-                                    soundlist += '<audio preload="auto" data-sound="' + myutil.escHTML(sound) + '">';
+                                    soundlist += '<audio preload="auto" data-sound="' + shared.escHTML(sound) + '">';
                                     for (var i = 0; i < sounds[sound].files.length; i++) {
                                         var ext = sounds[sound].files[i][0];
                                         var type = sounds[sound].files[i][1];
-                                        soundlist += '<source src="/' + myutil.escHTML(config.SOUND_DIR) + '/' + myutil.escHTML(sound) + '.' + myutil.escHTML(ext) + '" type="' + myutil.escHTML(type) + '">';
+                                        soundlist += '<source src="/' + shared.escHTML(config.SOUND_DIR) + '/' + shared.escHTML(sound) + '.' + shared.escHTML(ext) + '" type="' + shared.escHTML(type) + '">';
                                     }
                                     soundlist += '</audio>\n';
                                 }
@@ -365,11 +430,11 @@ function serveClientFrame(url, req, res) {
                         } else if (details.type && details.type == "dimmed") {
                             css = "color: blue;";
                         }
-                        channellist += '<br><input type="radio" name="channel" value="' + myutil.escHTML(channel) + '" id="channel_radio' + counter + '"><label for="channel_radio' + counter + '" style="' + css + '"' + (details.description ? ' title="' + myutil.escHTML(details.description) + '"' : '') + '> ' + myutil.escHTML(channel) + '</label>';
+                        channellist += '<br><input type="radio" name="channel" value="' + shared.escHTML(channel) + '" id="channel_radio' + counter + '"><label for="channel_radio' + counter + '" style="' + css + '"' + (details.description ? ' title="' + shared.escHTML(details.description) + '"' : '') + '> ' + shared.escHTML(channel) + '</label>';
                     }
                 }
                 
-                myutil.write(res, "clientframe.html", {
+                writer.write(res, "clientframe.html", {
                     cid: cid,
                     x: x,
                     y: y,
@@ -377,18 +442,18 @@ function serveClientFrame(url, req, res) {
                 });
             }
         } else {
-            myutil.writeError(res, 404);
+            writer.writeError(res, 404);
         }
     } else {
-        myutil.writeError(res, 404);
+        writer.writeError(res, 404);
     }
 }
 
 function serveStream(url, req, res) {
-    if (url.query && !isNaN(myutil.fquery(url.query.cid, "int")) && myutil.fquery(url.query.x, "int") && myutil.fquery(url.query.y, "int") && myutil.fquery(url.query.channel)) {
-        var cid = myutil.fquery(url.query.cid, "int"),
-            x = myutil.fquery(url.query.x, "int"),
-            y = myutil.fquery(url.query.y, "int"),
+    if (url.query && !isNaN(fquery(url.query.cid, "int")) && fquery(url.query.x, "int") && fquery(url.query.y, "int") && fquery(url.query.channel)) {
+        var cid = fquery(url.query.cid, "int"),
+            x = fquery(url.query.x, "int"),
+            y = fquery(url.query.y, "int"),
             channel = url.query.channel;
         if (clients[cid] && x > 0 && x <= clients[cid].x && y > 0 && y <= clients[cid].y && (channel == "0" || channel in settings.channels.data)) {
             res.writeHead(200, {
@@ -420,10 +485,10 @@ function serveStream(url, req, res) {
             
             sendClientList();
         } else {
-            myutil.writeError(res, 404);
+            writer.writeError(res, 404);
         }
     } else {
-        myutil.writeError(res, 404);
+        writer.writeError(res, 404);
     }
 }
 
@@ -617,7 +682,6 @@ io.of("/cameras").on("connection", function (socket) {
     socket.on("to attacher", function (msg) {
         socket.get("viewerIndex", function (err, viewerIndex) {
             if (typeof viewerIndex == "number" && viewers[viewerIndex] && typeof msg.destination == "number" && attachers[msg.destination] && msg.event && msg.data) {
-                console.log("\nto attacher: " + JSON.stringify(msg));
                 attachers[msg.destination].socket.emit(msg.event, {
                     source: viewerIndex,
                     data: msg.data
@@ -631,7 +695,6 @@ io.of("/cameras").on("connection", function (socket) {
     socket.on("to viewer", function (msg) {
         socket.get("attacherIndex", function (err, attacherIndex) {
             if (typeof attacherIndex == "number" && attachers[attacherIndex] && typeof msg.destination == "number" && viewers[msg.destination] && msg.event && msg.data) {
-                console.log("\nto viewer " + JSON.stringify(msg));
                 viewers[msg.destination].socket.emit(msg.event, {
                     source: attacherIndex,
                     data: msg.data

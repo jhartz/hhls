@@ -10,20 +10,13 @@ var is_on = false,
     oneffectnext = function () {},
     oneffectstop = function () {};
 
-function escHTML(html) {
-    if (typeof html != "string") {
-        html = html + "";
-    }
-    return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
-}
-
 function status(text, in_loading) {
     if (in_loading) {
         document.getElementById("loading").style.display = "block";
         document.getElementById("leftpanel").style.display = "none";
         document.getElementById("rightpanel").style.display = "none";
         
-        document.getElementById("loading").innerHTML = escHTML(text || "").replace(/\n/g, "<br>");
+        document.getElementById("loading").innerHTML = shared.escHTML(text || "", true);
     } else {
         document.getElementById("loading").style.display = "none";
         document.getElementById("leftpanel").style.display = "block";
@@ -41,7 +34,7 @@ function status(text, in_loading) {
             if (s.length == 1) s = "0" + s;
             
             var A = h + ":" + m + ":" + s;
-            var B = escHTML(text).replace(/\n/g, "<br>");
+            var B = shared.escHTML(text, true);
             
             document.getElementById("status").innerHTML = A + "&nbsp;&nbsp;&nbsp; " + B;
             
@@ -169,7 +162,7 @@ window.onload = function () {
             for (var i = 0; i < soundlist.length; i++) {
                 sounds[soundlist[i].dataset.sound] = soundlist[i];
                 // TODO: run this below on the audio's onload (if it's not already loaded)
-                document.getElementById("options_soundlist").innerHTML += '<li>' + escHTML(soundlist[i].dataset.sound) + '</li>';
+                document.getElementById("options_soundlist").innerHTML += '<li>' + shared.escHTML(soundlist[i].dataset.sound) + '</li>';
             }
         }
         

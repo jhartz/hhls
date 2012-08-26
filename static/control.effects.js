@@ -376,7 +376,7 @@ var effects = {
                     type = "dimmed";
                     css = "color: blue;";
                 }
-                html += '<tr><td valign="top"><input type="radio" id="effects_channellist_radio' + counter + '" name="effects_channellist" value="' + escHTML(channel) + '"></td><td><label for="effects_channellist_radio' + counter + '" title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel).replace(/_/g, "_<wbr>") + '</label></td></tr>';
+                html += '<tr><td valign="top"><input type="radio" id="effects_channellist_radio' + counter + '" name="effects_channellist" value="' + shared.escHTML(channel) + '"></td><td><label for="effects_channellist_radio' + counter + '" title="' + shared.escHTML(details.description || channel) + '" style="' + shared.escHTML(css) + '">' + shared.escHTML(channel).replace(/_/g, "_<wbr>") + '</label></td></tr>';
             }
         }
         
@@ -407,9 +407,9 @@ var effects = {
                     css = "color: blue;";
                 }
                 var usedin = this.channel_used_in(channel, "Yes", "&nbsp;");
-                html += '<tr><td title="' + escHTML(details.description || channel) + '" style="' + escHTML(css) + '">' + escHTML(channel) + '</td><td>' + type + '</td><td style="text-align: center;">' + usedin.keyboard + '</td><td style="text-align: center;">' + usedin.video + '</td><td style="text-align: center;">' + usedin.clients + '</td>';
+                html += '<tr><td title="' + shared.escHTML(details.description || channel) + '" style="' + shared.escHTML(css) + '">' + shared.escHTML(channel) + '</td><td>' + type + '</td><td style="text-align: center;">' + usedin.keyboard + '</td><td style="text-align: center;">' + usedin.video + '</td><td style="text-align: center;">' + usedin.clients + '</td>';
                 if (usedin.nothing) {
-                    html += '<td><span class="lilbutton effects_channels_editor" data-channel="' + escHTML(channel) + '">Edit</span>&nbsp;<span class="lilbutton effects_channels_deleter" data-channel="' + escHTML(channel) + '">Delete</span></td>';
+                    html += '<td><span class="lilbutton effects_channels_editor" data-channel="' + shared.escHTML(channel) + '">Edit</span>&nbsp;<span class="lilbutton effects_channels_deleter" data-channel="' + shared.escHTML(channel) + '">Delete</span></td>';
                 }
             }
         }
@@ -543,20 +543,20 @@ var effects = {
             option.value = key;
             option.appendChild(document.createTextNode(key));
             
-            html += '<tr><td style="cursor: default; text-align: center;">' + escHTML(key) + '</td>';
+            html += '<tr><td style="cursor: default; text-align: center;">' + shared.escHTML(key) + '</td>';
             if (keys.hasOwnProperty(key)) {
                 if (keys[key].command) {
                     option.style.color = "grey";
                     effects.keyboard_valid.push(key);
                 }
                 if (keys[key].channel && keys[key].channel != "0") {
-                    html += '<td>' + escHTML(keys[key].channel) + '</td>';
+                    html += '<td>' + shared.escHTML(keys[key].channel) + '</td>';
                 } else {
                     html += '<td>Default Channel</td>';
                 }
                 html += '<td>';
                 html += effects.keyboard_action_formatter(keys[key]);
-                html += '</td><td><span class="lilbutton effects_keyboard_deleter" data-key="' + escHTML(key) + '">Delete</span></td>';
+                html += '</td><td><span class="lilbutton effects_keyboard_deleter" data-key="' + shared.escHTML(key) + '">Delete</span></td>';
             }
             html += '</tr>';
             
@@ -592,13 +592,13 @@ var effects = {
             if (data.command == "play" && data.prop) {
                 var html = "";
                 if (data.prop.preset) {
-                    html += "Preset: " + escHTML(data.prop.preset);
+                    html += "Preset: " + shared.escHTML(data.prop.preset);
                 } else if (data.prop.light) {
                     html += 'Light: ';
                     if (data.prop.light == "auto") {
                         html += 'auto';
                     } else {
-                        html += '<span title="' + escHTML(JSON.stringify(data.prop.light)) + '" style="cursor: default; font-style: italic;">(custom lighting sequence)</span>';
+                        html += '<span title="' + shared.escHTML(JSON.stringify(data.prop.light)) + '" style="cursor: default; font-style: italic;">(custom lighting sequence)</span>';
                     }
                     if (data.prop.sound) html += "<br>Sound: " + data.prop.sound;
                 } else if (typeof data.prop.dimness != "undefined") {
@@ -619,7 +619,7 @@ var effects = {
                 }
                 return html;
             } else {
-                return "<i>" + escHTML(data.command) + "</i>";
+                return "<i>" + shared.escHTML(data.command) + "</i>";
             }
         } else {
             return "&nbsp;";

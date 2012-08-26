@@ -44,7 +44,7 @@ var conn = {
                             for (var x = 1; x <= data.x; x++) {
                                 var channel = "&nbsp;"
                                 if (data.frames[x] && data.frames[x][y] && data.frames[x][y].channel) {
-                                    channel = escHTML(data.frames[x][y].channel);
+                                    channel = shared.escHTML(data.frames[x][y].channel);
                                     if (channel == "0") channel = "Default";
                                 }
                                 html += '<td>' + channel + '</td>';
@@ -171,7 +171,7 @@ var conn = {
                     }
                 }
                 if (html) html += ', ';
-                html += '<span class="clientitem lilbutton" style="white-space: nowrap;" title="' + escHTML(list[i].location) + ' \n' + escHTML(list[i].ip) + '" data-cid="' + escHTML(list[i].cid) + '" data-json="' + escHTML(JSON.stringify(list[i])) + '">' + escHTML(list[i].name) + '</span>';
+                html += '<span class="clientitem lilbutton" style="white-space: nowrap;" title="' + shared.escHTML(list[i].location) + ' \n' + shared.escHTML(list[i].ip) + '" data-cid="' + shared.escHTML(list[i].cid) + '" data-json="' + shared.escHTML(JSON.stringify(list[i])) + '">' + shared.escHTML(list[i].name) + '</span>';
             }
             $("#client_list").html(html);
             if ($("#client_details").attr("data-cid")) {
@@ -191,7 +191,7 @@ var conn = {
             var addr = window.location.protocol + "//" + window.location.hostname;
             if (window.location.port) addr += ":" + window.location.port;
             addr += "/";
-            $("#client_list").html('No clients connected!<br><br>Direct your clients to ' + escHTML(addr) + '<br>and click "client"');
+            $("#client_list").html('No clients connected!<br><br>Direct your clients to ' + shared.escHTML(addr) + '<br>and click "client"');
         }
         
         effects.update_channelman();

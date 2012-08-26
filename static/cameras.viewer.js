@@ -1,12 +1,5 @@
-function escHTML(html) {
-    if (typeof html != "string") {
-        html = html + "";
-    }
-    return html.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt");
-}
-
 function status(msg) {
-    document.getElementById("status").innerHTML = escHTML(msg).replace(/\n/g, "<br>");
+    document.getElementById("status").innerHTML = shared.escHTML(msg, true);
 }
 
 if (typeof console == "undefined") {
@@ -146,10 +139,10 @@ window.onload = function () {
                 attachers = msg;
                 for (var i = 0; i < msg.length; i++) {
                     if (msg[i] && msg[i].streams && msg[i].streams.length) {
-                        html += '<p>' + escHTML(msg[i].name) + ' (' + escHTML(msg[i].location) + ')</p>';
+                        html += '<p>' + shared.escHTML(msg[i].name) + ' (' + shared.escHTML(msg[i].location) + ')</p>';
                         html += '<ul>';
                         for (var j = 0; j < msg[i].streams.length; j++) {
-                            html += '<li><input type="checkbox" data-attacherIndex="' + i + '" data-streamIndex="' + j + '" id="attacher' + i + 'stream' + j + '">&nbsp;<label for="attacher' + i + 'stream' + j + '">' + escHTML(msg[i].streams[j].name) + '</li>';
+                            html += '<li><input type="checkbox" data-attacherIndex="' + i + '" data-streamIndex="' + j + '" id="attacher' + i + 'stream' + j + '">&nbsp;<label for="attacher' + i + 'stream' + j + '">' + shared.escHTML(msg[i].streams[j].name) + '</li>';
                         }
                         html += '</ul>';
                     }
