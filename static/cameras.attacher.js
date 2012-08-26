@@ -9,9 +9,14 @@ function status(msg) {
     document.getElementById("status").innerHTML = escHTML(msg).replace(/\n/g, "<br>");
 }
 
+if (typeof console == "undefined") {
+    console = {
+        log: function () {}
+    };
+}
+
 var socket,
-    streams = [],
-    pcs = [];
+    streams = [];
 
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 window.URL = window.URL || window.webkitURL;
@@ -23,8 +28,6 @@ function sendStreams() {
             streamsList[i] = {
                 name: streams[i].name
             };
-        } else {
-            streamsList[i] = null;
         }
     }
     socket.emit("streams", streamsList);
@@ -34,7 +37,7 @@ function addCamera() {
     navigator.getUserMedia({video: true}, function (stream) {
         var streamIndex = streams.length;
         streams[streamIndex] = {
-            name: "Camera #" + streamIndex,
+            name: "Camera #" + (streamIndex + 1),
             peers: []
         };
         streams[streamIndex].stream = stream;
@@ -43,9 +46,24 @@ function addCamera() {
         var div = document.createElement("div");
         div.id = "div" + streamIndex;
         div.className = "container";
+        
+        var button = document.createElement("button");
+        button.innerHTML = "X";
+        div.appendChild(button);
+        
         var h2 = document.createElement("h2");
         h2.innerHTML = escHTML(streams[streamIndex].name);
         div.appendChild(h2);
+        
+        var video = document.createElement("video");
+        video.id = "video" + streamIndex;
+        video.autoplay = true;
+        video.src = window.URL.createObjectURL(stream);
+        div.appendChild(video);
+        
+        var outer = document.createElement("div");
+        outer.appendChild(div);
+        
         h2.addEventListener("click", function () {
             var newname = prompt("Name:", streams[streamIndex].name);
             if (newname) {
@@ -54,46 +72,58 @@ function addCamera() {
                 sendStreams();
             }
         }, false);
-        var video = document.createElement("video");
-        video.id = "video" + streamIndex;
-        video.autoplay = true;
-        video.src = window.URL.createObjectURL(stream);
-        div.appendChild(video);
-        var outer = document.createElement("div");
-        outer.appendChild(div);
+        button.addEventListener("click", function () {
+            for (var i = 0; i < streams[streamIndex].peers.length; i++) {
+                streams[streamIndex].peers[i].close();
+            }
+            delete streams[streamIndex];
+            sendStreams();
+            document.getElementById("content").removeChild(outer);
+        }, false);
+        
         document.getElementById("content").appendChild(outer);
     }, function (err) {
-        typeof console != "undefined" && console.log("getUserMedia ERROR:", err);
+        console.log("getUserMedia ERROR:", err);
         status("ERROR: getUserMedia failed!\nMake sure your camera is connected.");
     });
 }
 
 function addPeer(streamIndex, viewerIndex) {
-    var pcIndex = pcs.length;
-    pcs[pcIndex] = new webkitPeerConnection00(null, function onIceCantidate(cantidate, moreToFollow) {
-        typeof console != "undefined" && console.log("onIceCantidate:", cantidate);
-        if (cantidate) {
-            socket.emit("cantidate from attacher", {
-                viewerIndex: viewerIndex,
-                pcIndex: pcIndex,
-                label: cantidate.label,
-                cantidate: cantidate.toSdp()
+    var peerIndex = streams[streamIndex].peers.length;
+    var pc = new webkitPeerConnection00(null, function onIceCandidate(candidate, moreToFollow) {
+        console.log("onIceCandidate:", candidate);
+        if (candidate) {
+            socket.emit("to viewer", {
+                destination: viewerIndex,
+                event: "candidate",
+                data: {
+                    streamIndex: streamIndex,
+                    peerIndex: peerIndex,
+                    label: candidate.label,
+                    candidate: candidate.toSdp()
+                }
             });
         }
-        typeof console != "undefined" && console.log(moreToFollow ? "more to follow" : "no more to follow");
+        console.log(moreToFollow ? "more to follow" : "no more to follow");
     });
-    pcs[pcIndex].addStream(streams[streamIndex].stream);
-    var offer = pcs[pcIndex].createOffer({video: true});
-    pcs[pcIndex].setLocalDescription(pcs[pcIndex].SDP_OFFER, offer);
-    socket.emit("offer", {
-        viewerIndex: viewerIndex,
-        pcIndex: pcIndex,
-        sdp: offer.toSdp()
+    pc.addStream(streams[streamIndex].stream);
+    var offer = pc.createOffer({video: true});
+    pc.setLocalDescription(pc.SDP_OFFER, offer);
+    socket.emit("to viewer", {
+        destination: viewerIndex,
+        event: "offer",
+        data: {
+            streamIndex: streamIndex,
+            peerIndex: peerIndex,
+            sdp: offer.toSdp()
+        }
     });
-    pcs[pcIndex].startIce();
+    pc.startIce();
+    streams[streamIndex].peers[peerIndex] = pc;
 }
 
 window.onload = function () {
+    status("Loading...");
     if (typeof document.addEventListener != "function" || typeof JSON == "undefined") {
         document.getElementById("main").innerHTML = "ERROR: Your browser does not support some of the JavaScript features required by this page.<br>Please upgrade to a more modern browser.";
     } else if (!navigator.getUserMedia) {
@@ -142,23 +172,34 @@ window.onload = function () {
             addCamera();
         });
         
-        socket.on("request signal", function (data) {
-            if (data && typeof data.viewerIndex == "number" && typeof data.streamIndex == "number" && streams[data.streamIndex]) {
-                addPeer(data.streamIndex, data.viewerIndex);
+        socket.on("request signal", function (msg) {
+            if (msg && typeof msg.source == "number" && msg.data &&
+                typeof msg.data.streamIndex == "number" && streams[msg.data.streamIndex]) {
+                
+                addPeer(msg.data.streamIndex, msg.source);
             } else {
-                status("Bad request for camera: " + JSON.stringify(data));
+                status("Bad request for camera: " + JSON.stringify(msg));
             }
         });
         
-        socket.on("answer", function (data) {
-            if (data && typeof data.viewerIndex == "number" && typeof data.pcIndex == "number" && pcs[data.pcIndex] && data.sdp) {
-                pcs[data.pcIndex].setRemoteDescription(pc.SDP_ANSWER, new SessionDescription(data.sdp));
+        socket.on("answer", function (msg) {
+            if (msg && typeof msg.source == "number" && msg.data &&
+                typeof msg.data.streamIndex == "number" && streams[msg.data.streamIndex] &&
+                typeof msg.data.peerIndex == "number" && streams[msg.data.streamIndex].peers[msg.data.peerIndex] &&
+                msg.data.sdp) {
+                
+                streams[msg.data.streamIndex].peers[msg.data.peerIndex].setRemoteDescription(streams[msg.data.streamIndex].peers[msg.data.peerIndex].SDP_ANSWER, new SessionDescription(msg.data.sdp));
             }
         });
         
-        socket.on("cantidate", function (data) {
-            if (data && typeof data.viewerIndex == "number" && typeof data.pcIndex == "number" && pcs[data.pcIndex] && data.label && data.cantidate) {
-                pcs[data.pcIndex].processIceMessage(new IceCantidate(data.label, data.cantidate));
+        socket.on("candidate", function (msg) {
+            if (msg && typeof msg.source == "number" && msg.data &&
+                typeof msg.data.streamIndex == "number" && streams[msg.data.streamIndex] &&
+                typeof msg.data.peerIndex == "number" && streams[msg.data.streamIndex].peers[msg.data.peerIndex] &&
+                msg.data.label && msg.data.candidate &&
+                streams[msg.data.streamIndex].peers[msg.data.peerIndex].remoteDescription) {
+                
+                streams[msg.data.streamIndex].peers[msg.data.peerIndex].processIceMessage(new IceCandidate(msg.data.label, msg.data.candidate));
             }
         });
     }

@@ -9,26 +9,38 @@ function status(msg) {
     document.getElementById("status").innerHTML = escHTML(msg).replace(/\n/g, "<br>");
 }
 
+if (typeof console == "undefined") {
+    console = {
+        log: function () {}
+    };
+}
+
 var initialized = false,
     attachers = [],
-    cameras = [],
-    pcs = {};  // pc = pcs[attacherIndex][pcIndex]
+    attachers_streams = [],  // pc = attachers_streams[attacherIndex][streamIndex][peerIndex]
+    cameras = [];
 
 window.URL = window.URL || window.webkitURL;
 
 function openOptions() {
-    for (var attacherIndex in pcs) {
-        if (pcs.hasOwnProperty(attacherIndex) && pcs[attacherIndex]) {
-            for (var pcIndex in pcs[attacherIndex]) {
-                if (pcs[attacherIndex].hasOwnProperty(pcIndex) && pcs[attacherIndex][pcIndex]) {
-                    pcs[attacherIndex][pcIndex].close();
+    for (var attacherIndex = 0; attacherIndex < attachers_streams.length; streamIndex++) {
+        if (attachers_streams[attacherIndex]) {
+            for (var streamIndex = 0; streamIndex < attachers_streams[attacherIndex].length; streamIndex++) {
+                if (attachers_streams[attacherIndex][streamIndex]) {
+                    for (var peerIndex = 0; peerIndex < attachers_streams[attacherIndex][streamIndex].length; peerIndex++) {
+                        if (attachers_streams[attacherIndex][streamIndex][peerIndex]) {
+                            attachers_streams[attacherIndex][streamIndex][peerIndex].close();
+                        }
+                    }
                 }
             }
         }
     }
+    
+    attachers_streams = [];
     cameras = [];
-    pcs = {};
     layoutCameras();
+    document.getElementById("options_btn_container").style.display = "none";
     document.getElementById("options").style.display = "block";
 }
 
@@ -39,12 +51,16 @@ function closeOptions() {
         var attacherIndex = parseInt(inputs[i].getAttribute("data-attacherIndex"), 10);
         var streamIndex = parseInt(inputs[i].getAttribute("data-streamIndex"), 10);
         if (inputs[i].checked && !isNaN(attacherIndex) && !isNaN(streamIndex) && attachers[attacherIndex].streams[streamIndex]) {
-            socket.emit("request signal", {
-                attacherIndex: attacherIndex,
-                streamIndex: streamIndex
+            socket.emit("to attacher", {
+                destination: attacherIndex,
+                event: "request signal",
+                data: {
+                    streamIndex: streamIndex
+                }
             });
         }
     }
+    document.getElementById("options_btn_container").style.display = "block";
 }
 
 function layoutCameras() {
@@ -60,20 +76,20 @@ function layoutCameras() {
     
     var videos = cam_container.getElementsByTagName("video");
     if (videos.length > 0) {
-        // Make all videos as tall as possible without scrolling
+        // Make all videos as tall as possible without making container scroll
         var height = 300, j;
         var u = function () {
             for (j = 0; j < videos.length; j++) {
                 videos[j].style.height = height + "px";
             }
         };
-        while (cam_container.scrollHeight <= cam_container.clientHeight && height < screen.height) {
+        while (cam_container.scrollHeight <= cam_container.clientHeight && cam_container.scrollWidth <= cam_container.clientWidth && height < screen.height) {
             height += 4;
             u();
         }
         height -= 8;
         u();
-        while (cam_container.scrollHeight <= cam_container.clientHeight && height < screen.height) {
+        while (cam_container.scrollHeight <= cam_container.clientHeight && cam_container.scrollWidth <= cam_container.clientWidth && height < screen.height) {
             height += 1;
             u();
         }
@@ -116,20 +132,24 @@ window.onload = function () {
             status("Failed to reconnect to server");
         });
         
+        document.getElementById("options_btn").addEventListener("click", function () {
+            openOptions();
+        }, false);
+        
         document.getElementById("options_go").addEventListener("click", function () {
             closeOptions();
         }, false);
         
-        socket.on("attachers", function (data) {
-            if (data && data.length) {
+        socket.on("attachers", function (msg) {
+            if (msg && msg.length) {
                 var html = '';
-                attachers = data;
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i] && data[i].streams && data[i].streams.length) {
-                        html += '<p>' + escHTML(data[i].name) + ' (' + escHTML(data[i].location) + ')</p>';
+                attachers = msg;
+                for (var i = 0; i < msg.length; i++) {
+                    if (msg[i] && msg[i].streams && msg[i].streams.length) {
+                        html += '<p>' + escHTML(msg[i].name) + ' (' + escHTML(msg[i].location) + ')</p>';
                         html += '<ul>';
-                        for (var j = 0; j < data[i].streams.length; j++) {
-                            html += '<li><input type="checkbox" data-attacherIndex="' + i + '" data-streamIndex="' + j + '" id="attacher' + i + 'stream' + j + '">&nbsp;<label for="attacher' + i + 'stream' + j + '">' + escHTML(data[i].streams[j].name) + '</li>';
+                        for (var j = 0; j < msg[i].streams.length; j++) {
+                            html += '<li><input type="checkbox" data-attacherIndex="' + i + '" data-streamIndex="' + j + '" id="attacher' + i + 'stream' + j + '">&nbsp;<label for="attacher' + i + 'stream' + j + '">' + escHTML(msg[i].streams[j].name) + '</li>';
                         }
                         html += '</ul>';
                     }
@@ -138,20 +158,29 @@ window.onload = function () {
             }
         });
         
-        socket.on("offer", function (data) {
-            if (data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.pcIndex == "number" && data.sdp) {
-                if (!pcs[data.attacherIndex]) pcs[data.attacherIndex] = {};
-                var pc = new webkitPeerConnection00(null, function onIceCantidate(cantidate, moreToFollow) {
-                    typeof console != "undefined" && console.log("onIceCantidate:", cantidate);
-                    if (cantidate) {
-                        socket.emit("cantidate from viewer", {
-                            attacherIndex: data.attacherIndex,
-                            pcIndex: pcIndex,
-                            label: cantidate.label,
-                            cantidate: cantidate.toSdp()
+        socket.on("offer", function (msg) {
+            if (msg && typeof msg.source == "number" && attachers[msg.source] &&
+                typeof msg.data.streamIndex == "number" && attachers[msg.source].streams[msg.data.streamIndex] &&
+                typeof msg.data.peerIndex == "number" &&
+                msg.data.sdp) {
+                
+                if (!attachers_streams[msg.source]) attachers_streams[msg.source] = [];
+                if (!attachers_streams[msg.source][msg.data.streamIndex]) attachers_streams[msg.source][msg.data.streamIndex] = [];
+                var pc = new webkitPeerConnection00(null, function onIceCandidate(candidate, moreToFollow) {
+                    console.log("onIceCandidate:", candidate);
+                    if (candidate) {
+                        socket.emit("to attacher", {
+                            destination: msg.source,
+                            event: "candidate",
+                            data: {
+                                streamIndex: msg.data.streamIndex,
+                                peerIndex: msg.data.peerIndex,
+                                label: candidate.label,
+                                candidate: candidate.toSdp()
+                            }
                         });
                     }
-                    typeof console != "undefined" && console.log(moreToFollow ? "more to follow" : "no more to follow");
+                    console.log(moreToFollow ? "more to follow" : "no more to follow");
                 });
                 pc.onaddstream = function (event) {
                     var video = document.createElement("video");
@@ -160,23 +189,32 @@ window.onload = function () {
                     cameras.push(video);
                     layoutCameras();
                 };
-                pc.setRemoteDescription(pc.SDP_OFFER, new SessionDescription(data.sdp));
-                var offer = pc.remoteDescription;
+                var offer = new SessionDescription(msg.data.sdp);
+                pc.setRemoteDescription(pc.SDP_OFFER, offer);
+                //var offer = pc.remoteDescription;
                 var answer = pc.createAnswer(offer.toSdp(), {video: true});
                 pc.setLocalDescription(pc.SDP_ANSWER, answer);
-                pcs[data.attacherIndex][data.pcIndex] = pc;
-                socket.emit("answer", {
-                    attacherIndex: data.attacherIndex,
-                    pcIndex: data.pcIndex,
-                    sdp: answer.toSdp()
+                socket.emit("to attacher", {
+                    destination: msg.source,
+                    event: "answer",
+                    data: {
+                        streamIndex: msg.data.streamIndex,
+                        peerIndex: msg.data.peerIndex,
+                        sdp: answer.toSdp()
+                    }
                 });
-                pcs[data.attacherIndex][data.pcIndex].startIce();
+                pc.startIce();
+                attachers_streams[msg.source][msg.data.streamIndex][msg.data.peerIndex] = pc;
             }
         });
         
-        socket.on("cantidate", function (data) {
-            if (data && typeof data.attacherIndex == "number" && pcs[data.attacherIndex] && typeof data.pcIndex == "number" && pcs[data.attacherIndex][data.pcIndex] && data.label && data.cantidate) {
-                pcs[data.attacherIndex][data.pcIndex].processIceMessage(new IceCantidate(data.label, data.cantidate));
+        socket.on("candidate", function (msg) {
+            if (msg && typeof msg.source == "number" &&
+                typeof msg.data.streamIndex == "number" && attachers_streams[msg.source][msg.data.streamIndex] &&
+                typeof msg.data.peerIndex == "number" && attachers_streams[msg.source][msg.data.streamIndex][msg.data.peerIndex] &&
+                msg.data.label && msg.data.candidate) {
+                
+                attachers_streams[msg.source][msg.data.streamIndex][msg.data.peerIndex].processIceMessage(new IceCandidate(msg.data.label, msg.data.candidate));
             }
         });
         

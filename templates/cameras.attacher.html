@@ -12,7 +12,16 @@
 }
 
 video {
+    min-height: 320px;
     max-height: 40%;
+}
+
+/* If there's only one video */
+div:first-child:last-child > video {
+    max-height: 60%;
+    max-height: -moz-calc(100% - 170px);
+    max-height: -webkit-calc(100% - 170px);
+    max-height: calc(100% - 170px);
 }
 
 .container {
@@ -31,6 +40,11 @@ video {
 .container h2:hover {
     text-decoration: none;
 }
+
+.container button {
+    float: right;
+    padding: 2px 8px !important;
+}
 </style>
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
@@ -43,7 +57,7 @@ var config = {{{config}}};
 <section class="textcentered">
     <header><h1>Attach a Camera</h1></header>
     <div id="main">
-        <table class="pretty" style="width: auto; margin: auto;"><tr><td><span id="status">Loading...</span></td></tr></table>
+        <table class="pretty" style="width: auto; margin: auto;"><tr><td><span id="status"><noscript>ERROR: JavaScript is required to view this page.</noscript></span></td></tr></table>
         <div id="content"></div>
         <p style="display: none;"><button id="addCamera" type="button">Add another camera</button></p>
     </div>

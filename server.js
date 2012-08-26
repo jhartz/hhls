@@ -579,12 +579,11 @@ io.of("/control").on("connection", function (socket) {
 var attachers = [];
 var viewers = [];
 io.of("/cameras").on("connection", function (socket) {
-    // from attacher
-    socket.on("attacher init", function (data) {
+    socket.on("attacher init", function (msg) {
         var attacherIndex = attachers.length;
         attachers.push({
-            name: data.name,
-            location: data.location,
+            name: msg.name,
+            location: msg.location,
             streams: [],
             socket: socket
         });
@@ -593,7 +592,6 @@ io.of("/cameras").on("connection", function (socket) {
         });
     });
     
-    // from viewer
     socket.on("viewer init", function () {
         var viewerIndex = viewers.length;
         viewers.push({
@@ -605,11 +603,10 @@ io.of("/cameras").on("connection", function (socket) {
         });
     });
     
-    // from attacher
-    socket.on("streams", function (data) {
+    socket.on("streams", function (msg) {
         socket.get("attacherIndex", function (err, attacherIndex) {
-            if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && Array.isArray(data)) {
-                attachers[attacherIndex].streams = data;
+            if (typeof attacherIndex == "number" && attachers[attacherIndex] && msg && Array.isArray(msg)) {
+                attachers[attacherIndex].streams = msg;
                 sendAttachers();
             } else {
                 socket.emit("init");
@@ -617,14 +614,13 @@ io.of("/cameras").on("connection", function (socket) {
         });
     });
     
-    // from viewer
-    socket.on("request signal", function (data, callback) {
+    socket.on("to attacher", function (msg) {
         socket.get("viewerIndex", function (err, viewerIndex) {
-            if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.streamIndex == "number" && attachers[data.attacherIndex].streams[data.streamIndex]) {
-                console.log("viewer " + viewerIndex + " is requesting stream " + data.streamIndex + " from attacher " + data.attacherIndex);
-                attachers[data.attacherIndex].socket.emit("request signal", {
-                    viewerIndex: viewerIndex,
-                    streamIndex: data.streamIndex
+            if (typeof viewerIndex == "number" && viewers[viewerIndex] && typeof msg.destination == "number" && attachers[msg.destination] && msg.event && msg.data) {
+                console.log("\nto attacher: " + JSON.stringify(msg));
+                attachers[msg.destination].socket.emit(msg.event, {
+                    source: viewerIndex,
+                    data: msg.data
                 });
             } else {
                 socket.emit("init");
@@ -632,65 +628,13 @@ io.of("/cameras").on("connection", function (socket) {
         });
     });
     
-    // from attacher
-    socket.on("offer", function (data) {
+    socket.on("to viewer", function (msg) {
         socket.get("attacherIndex", function (err, attacherIndex) {
-            if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && typeof data.viewerIndex == "number" && viewers[data.viewerIndex] && typeof data.pcIndex == "number" && data.sdp) {
-                console.log("attacher " + attacherIndex + " is sending an offer to viewer " + data.viewerIndex + " with pc " + data.pcIndex);
-                viewers[data.viewerIndex].socket.emit("offer", {
-                    attacherIndex: attacherIndex,
-                    pcIndex: data.pcIndex,
-                    sdp: data.sdp
-                });
-            } else {
-                socket.emit("init");
-            }
-        });
-    });
-    
-    // from viewer
-    socket.on("answer", function (data) {
-        socket.get("viewerIndex", function (err, viewerIndex) {
-            if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.pcIndex == "number" && data.sdp) {
-                console.log("viewer " + viewerIndex + " is sending an answer to attacher " + data.attacherIndex + " with pc " + pcIndex);
-                attachers[data.attacherIndex].socket.emit("answer", {
-                    viewerIndex: viewerIndex,
-                    pcIndex: data.pcIndex,
-                    sdp: data.sdp
-                });
-            } else {
-                socket.emit("init");
-            }
-        });
-    });
-    
-    // from attacher
-    socket.on("cantidate from attacher", function (data) {
-        socket.get("attacherIndex", function (err, attacherIndex) {
-            if (typeof attacherIndex == "number" && attachers[attacherIndex] && data && typeof data.viewerIndex == "number" && viewers[data.viewerIndex] && typeof data.pcIndex == "number" && data.label && data.cantidate) {
-                console.log("attacher " + attacherIndex + " is sending a cantidate to viewer " + data.viewerIndex + " with pc " + data.pcIndex);
-                viewers[data.viewerIndex].socket.emit("cantidate", {
-                    attacherIndex: attacherIndex,
-                    pcIndex: data.pcIndex,
-                    label: data.label,
-                    cantidate: data.cantidate
-                });
-            } else {
-                socket.emit("init");
-            }
-        });
-    });
-    
-    // from viewer
-    socket.on("cantidate from viewer", function (data) {
-        socket.get("viewerIndex", function (err, viewerIndex) {
-            if (typeof viewerIndex == "number" && viewers[viewerIndex] && data && typeof data.attacherIndex == "number" && attachers[data.attacherIndex] && typeof data.pcIndex == "number" && data.label && data.cantidate) {
-                console.log("viewer " + viewerIndex + " is sending a cantidate to attacher " + data.attacherIndex + " with pc " + data.pcIndex);
-                attachers[data.attacherIndex].socket.emit("cantidate", {
-                    viewerIndex: viewerIndex,
-                    pcIndex: data.pcIndex,
-                    label: data.label,
-                    cantidate: data.cantidate
+            if (typeof attacherIndex == "number" && attachers[attacherIndex] && typeof msg.destination == "number" && viewers[msg.destination] && msg.event && msg.data) {
+                console.log("\nto viewer " + JSON.stringify(msg));
+                viewers[msg.destination].socket.emit(msg.event, {
+                    source: attacherIndex,
+                    data: msg.data
                 });
             } else {
                 socket.emit("init");
