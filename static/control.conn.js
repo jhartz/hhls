@@ -144,7 +144,7 @@ var conn = {
     
     showmsg: function (msg) {
         $("#client_title").text("Server Connection");
-        $("#client_list").html(escHTML(msg).replace(/\n/g, "<br>"));
+        $("#client_list").html(shared.escHTML(msg, true));
         if ($("#client_details").attr("data-cid")) {
             $("#client_details").click();
         }
