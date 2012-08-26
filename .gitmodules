@@ -1,0 +1,3 @@
+[submodule "modules/jsonsettings"]
+	path = modules/jsonsettings
+	url = https://github.com/jhartz/jsonsettings.git
