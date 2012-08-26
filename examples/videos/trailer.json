@@ -1,0 +1,22 @@
+[
+    {
+        "time": 7,
+        "command": "effect",
+        "data": {
+            "preset": "thunder1"
+        }
+    },
+    {
+        "time": 15.45,
+        "command": "pause"
+    },
+    {
+        "time": 20,
+        "command": "effect",
+        "data": {
+            "channel": "movietheatre_lighting",
+            "dimness": 88,
+            "time": 4
+        }
+    }
+]

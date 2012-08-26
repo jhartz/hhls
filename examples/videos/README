@@ -1,11 +1,14 @@
 This directory contains video files that can be played in the video player.
 The directory name can be changed in config.js
 
+
 If you include one video (same basename) in multiple formats (different extensions), the video player will automatically figure out which one to use based on the computer's compatibility.
 Example: movie.webm, movie.mp4, movie.ogv
 (They're all the same video, but just in different formats; the video player now has a choice in case it is not compatible with one of the formats.)
 
+
 You can include cues in the video (almost like subtitles only visible to the control, not to the full-screen video playing to the audience) by writing them in a WebVTT file called basename.vtt where basename is the name of the video (without the extension).
+
 
 You can run effects at specific times in the video by including details in a JSON file called basename.json where basename is the name of the video (without the extension).
 
@@ -22,12 +25,10 @@ Format for the JSON file:
 TIME is a JavaScript number (float) representing a point in the video (in seconds)
 
 COMMAND is one of:
-    pause*    (pauses the video)
+    pause     (pauses the video)
     effect    (plays an effect)
 
-* no DATA with command
-
-DATA depends on the COMMAND...
+DATA specifies more info if COMMAND is "effect":
     "command": "effect",
     "data": {
         "preset": "...",
@@ -40,3 +41,7 @@ DATA depends on the COMMAND...
         "sound": "...",
         "channel": "..."
     }
+
+
+To see an example of this system, see the trailer.* files in this directory.
+NOTE: The included example movie (Big Buck Bunny trailer, in trailer.ogv/trailer.mp4) is (c) copyright 2008, Blender Foundation / www.bigbuckbunny.org
