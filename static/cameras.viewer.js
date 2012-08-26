@@ -33,7 +33,6 @@ function openOptions() {
     attachers_streams = [];
     cameras = [];
     layoutCameras();
-    document.getElementById("options_btn_container").style.display = "none";
     document.getElementById("options").style.display = "block";
 }
 
@@ -53,7 +52,6 @@ function closeOptions() {
             });
         }
     }
-    document.getElementById("options_btn_container").style.display = "block";
 }
 
 function layoutCameras() {
@@ -99,6 +97,10 @@ window.onload = function () {
     } else if (typeof webkitPeerConnection00 == "undefined") {
         document.body.innerHTML = "<p>ERROR: Your browser does not support PeerConnection (webkitPeerConnection00).<br>Please upgrade to a more modern browser.</p>";
     } else {
+        var div = document.createElement("div");
+        div.innerHTML = "Loading...";
+        document.getElementById("cameras").appendChild(div);
+        
         socket = io.connect("/cameras");
         socket.on("connecting", function () {
             status("Connecting to server...");
@@ -125,12 +127,23 @@ window.onload = function () {
             status("Failed to reconnect to server");
         });
         
-        document.getElementById("options_btn").addEventListener("click", function () {
-            openOptions();
-        }, false);
-        
         document.getElementById("options_go").addEventListener("click", function () {
             closeOptions();
+        }, false);
+        
+        document.addEventListener("keydown", function (event) {
+            if (event.keyCode == 27) {
+                // Escape key
+                event.preventDefault();
+                // (actual handler in keyup)
+            }
+        }, false);
+        document.addEventListener("keyup", function (event) {
+            if (event.keyCode == 27) {
+                // Escape key
+                event.preventDefault();
+                if (initialized) openOptions();
+            }
         }, false);
         
         socket.on("attachers", function (msg) {

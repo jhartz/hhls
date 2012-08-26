@@ -34,6 +34,7 @@ body {
 
 p.heading {
     font-size: 20pt;
+    margin-bottom: 3px;
 }
 
 #options_cameras {
@@ -63,11 +64,11 @@ p.heading {
 <body>
 <div id="cameras"><noscript>ERROR: JavaScript is required to view this page.</noscript></div>
 <div id="options" style="display: none;">
-    <p><span class="heading">Status:</span><br><span id="status"></span></p>
+    <p><span class="heading">Connection Status</span><br><span id="status"></span></p>
     <p class="heading">Cameras</p>
     <div id="options_cameras"></div>
     <p><button id="options_go" type="button">Go</button></p>
+    <p><em>NOTE: Press <strong>Esc</strong> to go back to the camera list after clicking <strong>Go</strong>.</em></p>
 </div>
-<div id="options_btn_container" style="display: none;"><button id="options_btn" type="button">Options</button></div>
 </body>
 </html>

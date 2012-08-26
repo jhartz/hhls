@@ -15,7 +15,6 @@ TODO
 
  - Camera Viewer:
     - Add option (in "options") for a time delay for the camera (like "20 seconds" or something) to delay the video (so we can have a camera on the people as they enter somewhere, and show it later)
-    - Add option (in "options") to auto-hide the top bar and any other metadata shown (in case we want to make the camera feed visible to the audience)
     - Onclick on the actual video should be play/pause, and if we do this also have a "back to live feed" button - maybe a "play" arrow with a vertical line on the right... >|
 
 Alternatives to the HTML5/WebRTC camera system:
