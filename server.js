@@ -185,10 +185,7 @@ function serveResources(req, res) {
                     filelist.push({file: files[i]});
                 }
             }
-            writer.write(res, "resources.html", {
-                dir: config.RESOURCES_DIR,
-                files: filelist
-            });
+            writer.write(res, "resources.html", {files: filelist});
         }
     });
 }
@@ -259,7 +256,7 @@ function serveControl(url, req, res) {
                         }
                         counter++;
                         if (counter == 1) videolist += "<tr>\n";
-                        videolist += '<td><button type="button" class="vidbtn" data-vidbtn="/' + shared.escHTML(config.VIDEO_DIR) + '/' + shared.escHTML(video) + '" data-formats="' + shared.escHTML(JSON.stringify(videos[video].files)) + '"' + extra + ' style="min-width: 50%;">' + shared.escHTML(video) + '</button></td>\n';
+                        videolist += '<td><button type="button" class="vidbtn" data-vidbtn="/videos/' + shared.escHTML(video) + '" data-formats="' + shared.escHTML(JSON.stringify(videos[video].files)) + '"' + extra + ' style="min-width: 50%;">' + shared.escHTML(video) + '</button></td>\n';
                         if (counter == 3) {
                             videolist += "</tr>\n";
                             counter = 0;
@@ -405,7 +402,7 @@ function serveClientFrame(url, req, res) {
                                     for (var i = 0; i < sounds[sound].files.length; i++) {
                                         var ext = sounds[sound].files[i][0];
                                         var type = sounds[sound].files[i][1];
-                                        soundlist += '<source src="/' + shared.escHTML(config.SOUND_DIR) + '/' + shared.escHTML(sound) + '.' + shared.escHTML(ext) + '" type="' + shared.escHTML(type) + '">';
+                                        soundlist += '<source src="/sounds/' + shared.escHTML(sound) + '.' + shared.escHTML(ext) + '" type="' + shared.escHTML(type) + '">';
                                     }
                                     soundlist += '</audio>\n';
                                 }
