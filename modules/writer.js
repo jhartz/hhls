@@ -3,8 +3,10 @@
 
 // node modules
 var util = require("util"),
-    path = require("path"),
-    mu = require("mu2");
+    path = require("path");
+
+// required modules
+var mu = require("mu2");
 
 mu.root = path.join(__dirname, "..", "templates");
 if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development") {

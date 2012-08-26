@@ -4,8 +4,10 @@
 
 // node modules
 var fs = require("fs"),
-    path = require("path"),
-    mime = require("mime");
+    path = require("path");
+
+// required modules
+var mime = require("mime");
 
 // my modules
 var writer = require("./writer");

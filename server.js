@@ -2,11 +2,14 @@
 
 // node modules
 var app = require("http").createServer(handler),
-    io = require("socket.io").listen(app),
     fs = require("fs"),
     path = require("path"),
     dns = require("dns"),
     url_module = require("url");
+
+// required modules
+var mime = require("mime"),
+    io = require("socket.io").listen(app);
 
 // my modules
 var config = require("./config"),
