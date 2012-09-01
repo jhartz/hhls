@@ -93,6 +93,9 @@ section > header {
 
 section > header h1 {
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 section > footer {
@@ -106,7 +109,11 @@ section.flatfooter > footer {
 }
 
 section > div {
+    height: 100%;
     max-height: 100%;
+    max-height: -moz-calc(100% - 20px);
+    max-height: -webkit-calc(100% - 20px);
+    max-height: calc(100% - 20px);
     overflow: auto;
     padding: 10px;
 }
@@ -153,6 +160,7 @@ button {
     cursor: pointer;
     color: inherit;
     font-family: inherit;
+    font-size: 9pt;
     text-align: center;
     text-decoration: none;
 
@@ -245,15 +253,8 @@ span.lilbutton a {
     font-style: italic;
 }
 
-#video_selection {
-    overflow: auto;
-}
-
-#video_selection table {
-    width: 99%;
-}
-
-#video_selection table td {
+table.threeway > thead > tr > td, table.threeway > tbody > tr > td, table.threeway > tr > td,
+table.threeway > thead > tr > th, table.threeway > tbody > tr > th, table.threeway > tr > th {
     padding: 15px;
     width: 33%;
     text-align: center;

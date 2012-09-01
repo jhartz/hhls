@@ -30,26 +30,23 @@ function addCamera() {
         streams[streamIndex].stream = stream;
         sendStreams();
         
-        var div = document.createElement("div");
-        div.id = "div" + streamIndex;
-        div.className = "container";
+        var container = document.createElement("div");
+        container.id = "container" + streamIndex;
+        container.className = "container";
         
         var button = document.createElement("button");
         button.innerHTML = "X";
-        div.appendChild(button);
+        container.appendChild(button);
         
         var h2 = document.createElement("h2");
         h2.innerHTML = shared.escHTML(streams[streamIndex].name);
-        div.appendChild(h2);
+        container.appendChild(h2);
         
         var video = document.createElement("video");
         video.id = "video" + streamIndex;
         video.autoplay = true;
         video.src = window.URL.createObjectURL(stream);
-        div.appendChild(video);
-        
-        var outer = document.createElement("div");
-        outer.appendChild(div);
+        container.appendChild(video);
         
         h2.addEventListener("click", function () {
             var newname = prompt("Name:", streams[streamIndex].name);
@@ -65,10 +62,10 @@ function addCamera() {
             }
             delete streams[streamIndex];
             sendStreams();
-            document.getElementById("content").removeChild(outer);
+            document.getElementById("content").removeChild(container);
         }, false);
         
-        document.getElementById("content").appendChild(outer);
+        document.getElementById("content").appendChild(container);
     }, function (err) {
         status("ERROR: getUserMedia failed!\nMake sure your camera is connected.");
         typeof console != "undefined" && console.log("getUserMedia ERROR:", err);
