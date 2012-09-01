@@ -35,7 +35,7 @@ var settings = {
     
     <div id="effects_waiting"><table style="width: 100%;"><tr><td id="effects_statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
     
-    <div id="effects_controls" data-level="1" style="display: none; min-height: 100%;">
+    <div id="effects_controls" data-level="1" style="display: none;">
         <form id="effects_form">
             <table id="effects_table" class="topped" style="width: 100%; border-collapse: collapse;"><tbody>
                 <tr>
@@ -190,7 +190,7 @@ var settings = {
         <div id="video_selection_back" class="bottomcorner" style="display: none;"><button type="button">Back to video</button></div>
     </div>
     
-    <div id="video_playing" style="display: none; height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;">
+    <div id="video_playing" class="nopadding" style="display: none; overflow: hidden; border-radius: 0 0 11px 11px;">
         <table style="width: 100%; height: 100%; border-style: none; border-collapse: collapse;"><tr><td style="text-align: center;"><video id="video_vid" preload="auto" controls title="While seeking the videos (or if the videos become out of sync), click and hold on the seek bar for a few seconds and then release." style="background-color: black;"></video></td></tr></table>
         <div id="visual_cue_container" style="display: none;"><div id="visual_cue">[visual cue area]</div></div>
         <div id="video_playing_back" class="topcorner"><button type="button">Back to video list</button></div>
@@ -199,7 +199,7 @@ var settings = {
 {{/videos}}{{#miniclient}}
 <section id="ctrl_miniclient" class="top minimized" style="display: none;">
     <header><h1>Mini-Client</h1></header>
-    <div style="height: 100%; padding: 0; overflow: hidden; border-radius: 0 0 11px 11px;"><iframe src="/client?layout=1x1&amp;nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
+    <div class="nopadding" style="overflow: hidden; border-radius: 0 0 11px 11px;"><iframe src="/client?layout=1x1&amp;nostyle" scrolling="" style="width: 100%; height: 100%; border: none;"></iframe></div>
 </section>
 {{/miniclient}}
 <section class="bottom flatfooter" style="display: none;">

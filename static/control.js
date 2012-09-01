@@ -1,10 +1,6 @@
 function resizer(use_animate) {
-    $("section").not("minimized").children("header").each(function () {
-        $(this).parent().css("padding-top", Math.round($(this).outerHeight()) + "px");
-    });
     $("section").not("minimized").children("footer:visible").each(function () {
-        var extra = $(this).parent().is(".top") ? 20 : 0;
-        $(this).parent().css("padding-bottom", Math.round($(this).outerHeight() + extra) + "px");
+        $(this).parent().css("padding-bottom", Math.round($(this).outerHeight()) + "px");
     });
     
     var height = $("#dummy").outerHeight(true) - $("section.bottom").outerHeight(true);

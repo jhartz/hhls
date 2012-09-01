@@ -118,6 +118,14 @@ section > div {
     padding: 10px;
 }
 
+section > div.blackoverlay, section > div.nopadding {
+    max-height: 100%;
+}
+
+section > div.nopadding {
+    padding: 0;
+}
+
 section.textcentered {
     text-align: center;
 }
