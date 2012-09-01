@@ -39,9 +39,11 @@ var conn = {
                         $("#client_details_location").text(data.location);
                         $("#client_details_ip").text(data.ip);
                         $("#client_details_layouter").empty();
+                        var channelcount = 0;
                         for (var y = 1; y <= data.y; y++) {
                             var html = '<tr>';
                             for (var x = 1; x <= data.x; x++) {
+                                channelcount++;
                                 var channel = "&nbsp;"
                                 if (data.frames[x] && data.frames[x][y] && data.frames[x][y].channel) {
                                     channel = shared.escHTML(data.frames[x][y].channel);
@@ -52,6 +54,7 @@ var conn = {
                             html += '</tr>';
                             $("#client_details_layouter").append(html);
                         }
+                        $("#client_details_channel_plural").css("display", channelcount == 1 ? "none" : "");
                         $("#client_details").fadeIn();
                     }
                 } catch (err) {}
