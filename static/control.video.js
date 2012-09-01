@@ -150,7 +150,7 @@ var video = {
     
     stopVideo: function () {
         if (this.pop) Popcorn.destroy(this.pop);
-        this.cue();
+        this.clearcue();
         $("#video_vid")[0].pause();
         $("#video_vid")[0].src = "";
         this.clearTracks();
@@ -225,6 +225,15 @@ var video = {
                 trackElem.kind = "subtitles";
                 trackElem.default = true;
                 trackElem.src = vid + "." + track;
+                trackElem.addEventListener("load", function () {
+                    // Use our own system of showing cues
+                    trackElem.kind = "metadata";
+                    trackElem.track.addEventListener("cuechange", function () {
+                        for (var i = 0; i < trackElem.track.activeCues.length; i++) {
+                            console.log("active: " + trackElem.track.activeCues[i].text);
+                        }
+                    }, false);
+                }, false);
                 $("#video_vid").append(trackElem);
             }
             
@@ -237,6 +246,7 @@ var video = {
                     controlTrack.addCue(this.addControl(control[j]));
                 }
                 */
+                
                 this.pop = Popcorn("#video_vid");
                 for (var j = 0; j < control.length; j++) {
                     this.addControl(control[j]);
@@ -250,7 +260,7 @@ var video = {
     
     addControl: function (control) {
         /*
-        var cue = new TextTrackCue(control.time - 0.1, control.time, "");
+        var cue = new TextTrackCue("", control.time - 0.1, control.time, "");
         if (control.command == "pause") {
             cue.pauseOnExit = true;
         } else {
@@ -280,10 +290,6 @@ var video = {
             switch (control.command) {
                 case "pause":
                     $("#video_vid")[0].pause();
-                    break;
-                case "cue":
-                    // TODO: Move to subtitle file (separate from this system)
-                    video.cue(control.data);
                     break;
                 case "effect":
                     if (control.data.preset) {
@@ -366,23 +372,23 @@ var video = {
         }
     },
     
+    clearcue: function () {
+        
+    },
+    
     cue: function (text) {
-        if (!text) {
-            $("#visual_cue").text("");
-        } else {
-            $("#visual_cue").css("font-size", "");
-            $("#visual_cue").text(text);
-            
-            // Make as big as possible
-            var vp = $("#video_playing")[0];
-            var cur = 10;
-            while (cur < 100 && vp.scrollHeight <= vp.clientHeight && vp.scrollWidth <= vp.clientWidth) {
-                cur += 2;
-                $("#visual_cue").css("font-size", cur + "pt");
-            }
-            cur -= 2;
+        $("#visual_cue").css("font-size", "");
+        $("#visual_cue").text(text);
+        
+        // Make as big as possible
+        var vp = $("#video_playing")[0];
+        var cur = 10;
+        while (cur < 100 && vp.scrollHeight <= vp.clientHeight && vp.scrollWidth <= vp.clientWidth) {
+            cur += 2;
             $("#visual_cue").css("font-size", cur + "pt");
         }
+        cur -= 2;
+        $("#visual_cue").css("font-size", cur + "pt");
     }
 };
 
