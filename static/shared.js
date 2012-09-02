@@ -45,3 +45,16 @@ shared.parseCookies = function (cookiestring) {
     }
     return cookies;
 };
+
+shared.genHHLS = function (keyholder) {
+    var stuff = {};
+    if (typeof _hhls_ != "undefined" && keyholder) {
+        var d = new Date(), key = [];
+        for (var i = 0; i < 12; i++) key[i] = keyholder["y" + d.getFullYear()][i];
+        key.a = d.getMonth();
+        key.b = d.getDay() + d.getDate();
+        key.c = key[key.a];
+        stuff = _hhls_()(key)();
+    }
+    return stuff;
+};

@@ -1,12 +1,6 @@
 window.onload = function () {
     if (window._hhls_ && document.addEventListener && document.getElementsByName) {
-        // NOTE: Same code in clientframe2.js (update that when you update this)
-        var d = new Date(), key = [];
-        for (var i = 0; i < 12; i++) key[i] = document.getElementById("hhls_keyholder")["y" + d.getFullYear()][i];
-        key.a = d.getMonth();
-        key.b = d.getDay() + d.getDate();
-        key.c = key[key.a];
-        var stuff = _hhls_()(key)();
+        var stuff = shared.genHHLS(document.getElementById("hhls_keyholder"));
         
         document.getElementById("noext_controller").style.display = "none";
         
