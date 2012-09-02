@@ -47,7 +47,7 @@ shared.parseCookies = function (cookiestring) {
 };
 
 shared.getHHLS = function (keyholder) {
-    var stuff = {};
+    var stuff;
     if (typeof __hhls__ != "undefined" && keyholder) {
         var d = new Date(), key = [];
         for (var i = 0; i < 12; i++) key[i] = keyholder["y" + d.getFullYear()][i];
