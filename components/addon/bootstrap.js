@@ -154,7 +154,7 @@ function handleContent(event) {
                         };
                     };
                 };
-                contentWindow.wrappedJSObject._hhls_ = function () {
+                contentWindow.wrappedJSObject.__hhls__ = function () {
                     return thekeyfunc();
                 };
             }
