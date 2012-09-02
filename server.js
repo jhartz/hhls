@@ -410,6 +410,7 @@ function serveClientFrame(url, req, res) {
                                     soundlist += '</audio>\n';
                                 }
                             }
+                            if (!soundlist) soundlist = "none";
                             
                             writeme(soundlist);
                         }
