@@ -11,6 +11,13 @@ Cu.import("resource://gre/modules/Services.jsm");
     - To send a result back to the client, update return_obj.value (data in this property is automatically sent back to a callback function supplied by the client).
 */
 var client_commands = {
+    hello: function (args, return_obj) {
+        if (args[0] == "spanish") {
+            return_obj.value = "Hola mundo";
+        } else {
+            return_obj.value = "Hello world";
+        }
+    },
     browse: function (args, return_obj) {
         return_obj.value = "HELLO.WORLD";
     }
@@ -127,7 +134,7 @@ function handleContent(event) {
                         if (valid) {
                             var cmds = [];
                             for (var prop in client_commands) {
-                                if (client_commands.hasOwnProperty(prop)) {
+                                if (client_commands.hasOwnProperty(prop) && typeof client_commands[prop] == "function") {
                                     cmds.push(prop);
                                 }
                             }
