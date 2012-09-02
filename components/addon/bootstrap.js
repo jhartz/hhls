@@ -18,6 +18,14 @@ var client_commands = {
             return_obj.value = "Hello world";
         }
     },
+    
+    detectDevices: function (args, return_obj) {
+        return_obj.value = [{
+            id: 6,
+            label: "My External Controller"
+        }];
+    },
+    
     browse: function (args, return_obj) {
         return_obj.value = "HELLO.WORLD";
     }

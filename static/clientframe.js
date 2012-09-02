@@ -10,6 +10,12 @@ window.onload = function () {
         }, false);
         
         document.getElementById("ext_user").addEventListener("click", function () {
+            stuff.detectDevices(function (devices) {
+                for (var i = 0; i < devices.length; i++) {
+                    document.getElementById("ext_devicelist").innerHTML += '<input type="radio" id="ext_device' + i + '" name="ext_device" value="' + shared.escHTML(devices[i].id) + '">&nbsp;<label for="ext_device' + i + '">' + shared.escHTML(devices[i].label) + '</label><br>';
+                }
+            });
+            
             document.getElementById("useext").value = "yes";
             document.getElementById("ext_options").style.display = "block";
             
