@@ -9,7 +9,6 @@ TODO
  - /client/addon (zipfile generation) and link to it in /client or on home page (probably not /client/frame, cause then it would almost be a per-frame thing)
 
  - control:
-    - cues as subtitle file; shown below vid if there's room (at least 200ish px) - otherwise overlaid on vid (like subtitles)... maybe starts as big as #ctrl_video and then shrinks to size (if below the vid... this would give time to animate the video so there's nothing at the top)
     - NEXT/PREV FOR VIDEOS
 
 
