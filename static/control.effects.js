@@ -779,19 +779,6 @@ var effects = {
         
         // Flash background
         flash("#ctrl_effects");
-        /*
-        if (!this.transitioning) {
-            this.transitioning = true;
-            $("#ctrl_effects").css("background-image", "none").addClass("flash");
-            setTimeout(function () {
-                $("#ctrl_effects").removeClass("flash");
-                setTimeout(function () {
-                    $("#ctrl_effects").css("background-image", "");
-                    effects.transitioning = false;
-                }, 200 + 5);
-            }, 200 + 100);
-        }
-        */
     }
 };
 
