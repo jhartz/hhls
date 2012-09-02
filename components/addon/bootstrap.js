@@ -23,6 +23,7 @@ var client_commands = {
     },
     
     detectDevices: function (args, return_obj) {
+        // TODO: detect devices
         return_obj.value = [{
             id: 6,
             label: "My External Controller"
@@ -30,7 +31,7 @@ var client_commands = {
     },
     
     browse: function (args, return_obj) {
-        // browse for executable
+        // TODO: browse for executable
         var index = executables.length;
         executables[index] = "/path/to/executable";
         return_obj.value = index;
@@ -39,7 +40,7 @@ var client_commands = {
     run: function (args, return_obj) {
         // args: executable index, state or dimness (number/boolean)
         if (args.length > 1 && args[0] in executables && (typeof args[1] == "boolean" || (typeof args[1] == "number" && args[1] >= 0 && args[1] <= 100))) {
-            // nsIProcess ...
+            // TODO: nsIProcess ...
             return_obj.value = {success: true};
         } else {
             return_obj.value = {
