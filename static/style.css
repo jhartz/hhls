@@ -40,10 +40,6 @@ section {
     border-radius: 9px;
     padding-top: 38px;
     box-shadow: 1px 1px 3px #ccc;
-    
-    -webkit-transition: background-color .2s linear;
-    -moz-transition: background-color .2s linear;
-    transition: background-color .2s linear;
 }
 
 section h1, section h2 {
@@ -52,10 +48,6 @@ section h1, section h2 {
 
 section.flatfooter {
     border-radius: 9px 9px 3px 3px;
-}
-
-section.flash {
-    background-color: #1D353F;
 }
 
 section.left {
@@ -325,4 +317,14 @@ div.bottomcorner {
     position: absolute;
     right: 0;
     bottom: 0;
+}
+
+.preflash {
+    -webkit-transition: background-color .2s linear;
+    -moz-transition: background-color .2s linear;
+    transition: background-color .2s linear;
+}
+
+.flash {
+    background-color: #1D353F;
 }

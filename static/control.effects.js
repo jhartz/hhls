@@ -778,6 +778,8 @@ var effects = {
         });
         
         // Flash background
+        flash("#ctrl_effects");
+        /*
         if (!this.transitioning) {
             this.transitioning = true;
             $("#ctrl_effects").css("background-image", "none").addClass("flash");
@@ -789,6 +791,7 @@ var effects = {
                 }, 200 + 5);
             }, 200 + 100);
         }
+        */
     }
 };
 

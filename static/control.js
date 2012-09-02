@@ -238,3 +238,18 @@ function toggle(section, newelem, oncomplete) {
     $newelem.show();
     if (typeof oncomplete == "function") oncomplete();
 }
+
+function flash(elem) {
+    // Flash background of elem
+    var $elem = $(elem);
+    var transitioning = $elem.data("transitioning");
+    if (!transitioning) {
+        $elem.addClass("preflash").data("transitioning", true).css("background-image", "none").addClass("flash");
+        setTimeout(function () {
+            $elem.removeClass("flash");
+            setTimeout(function () {
+                $elem.css("background-image", "").data("transitioning", false);
+            }, 200 + 5);
+        }, 200 + 100);
+    }
+}
