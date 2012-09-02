@@ -110,7 +110,7 @@ function handleContent(event) {
                 var key_creation = new Date();
                 contentWindow.wrappedJSObject.document.getElementById("hhls_keyholder")["y" + key_creation.getFullYear()] = secret;
                 
-                var checkkey = function (key, that) {
+                var checkkey = function (key) {
                     var stuff = {};
                     
                     // Begin key checking...
