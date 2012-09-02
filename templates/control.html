@@ -5,6 +5,17 @@
 <title>Control - Haunted House</title>
 <link rel="stylesheet" type="text/css" href="/static/style.css">
 <link rel="stylesheet" type="text/css" href="/static/cardflip.css">
+<style type="text/css">
+.visual_cue {
+    font-size: 16pt;
+    padding: 10px;
+    border-top: 1px solid white;
+}
+
+.visual_cue:first-child {
+    border-top: none;
+}
+</style>
 <script type="text/javascript" src="/static/jquery.js"></script>
 <script type="text/javascript" src="/static/popcorn.js"></script>
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
@@ -191,8 +202,10 @@ var settings = {
     </div>
     
     <div id="video_playing" class="nopadding" style="display: none; overflow: hidden; border-radius: 0 0 11px 11px;">
-        <table style="width: 100%; height: 100%; border-style: none; border-collapse: collapse;"><tr><td style="text-align: center;"><video id="video_vid" preload="auto" controls title="While seeking the videos (or if the videos become out of sync), click and hold on the seek bar for a few seconds and then release." style="background-color: black;"></video></td></tr></table>
-        <div id="visual_cue_container" style="display: none;"><div id="visual_cue">[visual cue area]</div></div>
+        <table style="width: 100%; height: 100%; border-style: none; border-collapse: collapse;"><tr><td style="text-align: center;">
+            <video id="video_vid" preload="auto" controls title="While seeking the videos (or if the videos become out of sync), click and hold on the seek bar for a few seconds and then release." style="background-color: black;"></video>
+            <div id="visual_cue_container" style="display: none; position: absolute; width: 100%; max-height: 100%; left: 0; top: 38px; right: 0; background-color: #1D353F; color: white; box-shadow: inset 0 0 100px black; opacity: .8; overflow: auto;"><table style="width: 100%; height: 100%;"><tr><td id="visual_cue_td"></td></tr></table></div>
+        </td></tr></table>
         <div id="video_playing_back" class="topcorner"><button type="button">Back to video list</button></div>
     </div>
 </section>

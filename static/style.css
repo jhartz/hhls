@@ -260,19 +260,6 @@ table.threeway > thead > tr > th, table.threeway > tbody > tr > th, table.threew
     text-align: center;
 }
 
-#visual_cue_container {
-    height: 100%;
-    background-color: #1D353F;
-    color: white;
-    border-radius: 9px;
-    box-shadow: inset 0 0 15px black;
-}
-
-#visual_cue {
-    padding: 10px;
-    text-align: center;
-}
-
 table.pretty {
     border-collapse: collapse;
     margin: 0;

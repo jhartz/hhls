@@ -44,6 +44,19 @@ var video = {
                 video.toggle("selection");
             });
             
+            $("#visual_cue_container").click(function (event) {
+                var $vcc = $(this);
+                if ($vcc.data("shortened")) {
+                    $vcc.data("shortened", false);
+                    $vcc.css("margin-bottom", "0px");
+                    $vcc.css("height", "auto");
+                } else {
+                    $vcc.data("shortened", true);
+                    $vcc.css("margin-bottom", Math.max(0, $vcc.outerHeight() - (event.pageY - 51)) + "px");
+                    $vcc.css("height", Math.max(10, event.pageY - 51) + "px");
+                }
+            });
+            
             // TODO: Use MediaController to sync videos (once browsers implement it)
             // http://dev.w3.org/html5/spec/media-elements.html#synchronising-multiple-media-elements
             // But how would we do that cross-window? (If we somehow clone a node and add it to another window, would it keep the relationship?)
@@ -229,9 +242,11 @@ var video = {
                     // Use our own system of showing cues
                     trackElem.kind = "metadata";
                     trackElem.track.addEventListener("cuechange", function () {
+                        var cues = [];
                         for (var i = 0; i < trackElem.track.activeCues.length; i++) {
-                            console.log("active: " + trackElem.track.activeCues[i].text);
+                            cues.push(trackElem.track.activeCues[i].text);
                         }
+                        video.cue(cues);
                     }, false);
                 }, false);
                 $("#video_vid").append(trackElem);
@@ -372,23 +387,55 @@ var video = {
         }
     },
     
-    clearcue: function () {
-        
+    clearcue: function (animate) {
+        if (animate) {
+            $(".visual_cue").slideUp(function () {
+                $(this).remove();
+            });
+            $("#visual_cue_container").fadeOut();
+        } else {
+            $(".visual_cue").remove();
+            $("#visual_cue_container").hide();
+        }
     },
     
-    cue: function (text) {
-        $("#visual_cue").css("font-size", "");
-        $("#visual_cue").text(text);
-        
-        // Make as big as possible
-        var vp = $("#video_playing")[0];
-        var cur = 10;
-        while (cur < 100 && vp.scrollHeight <= vp.clientHeight && vp.scrollWidth <= vp.clientWidth) {
-            cur += 2;
-            $("#visual_cue").css("font-size", cur + "pt");
+    cue: function (cues) {
+        var $container = $("#visual_cue_container");
+        if (cues.length == 0) {
+            if ($container.is(":visible")) {
+                this.clearcue(true);
+            } else {
+                this.clearcue();
+            }
+        } else {
+            var new_cue_map = {};
+            for (var i = 0; i < cues.length; i++) {
+                new_cue_map[cues[i]] = true;
+            }
+            $(".visual_cue").each(function () {
+                if (new_cue_map.hasOwnProperty($(this).data("cue"))) {
+                    new_cue_map[$(this).data("cue")] = false;
+                } else {
+                    $(this).slideUp(function () {
+                        $(this).remove();
+                    });
+                }
+            });
+            if (!$container.is(":visible")) {
+                $container.fadeIn();
+            }
+            for (var cue in new_cue_map) {
+                if (new_cue_map.hasOwnProperty(cue) && new_cue_map[cue]) {
+                    var $cue = $("<div />");
+                    $cue.addClass("visual_cue");
+                    $cue.css("display", "none");
+                    $cue.data("cue", cue);
+                    $cue.text(cue);
+                    $("#visual_cue_td").append($cue);
+                    $cue.slideDown();
+                }
+            }
         }
-        cur -= 2;
-        $("#visual_cue").css("font-size", cur + "pt");
     }
 };
 
