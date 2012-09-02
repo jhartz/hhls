@@ -5,6 +5,9 @@ TODO
     - file browsing
     - exec running (nsIProcess)
 
+ - client2:
+    - some CSS calc(...) tricks for layouting?
+
  - clientframe2:
     - client FF add-on (forwarding of "ext_device" from URL into JavaScript on server; client prompting for custom command line execs for "on" and "off" commands if selected (and prefs in "options") ... and change the "Change Channel" button to "Change Channel or Device" if we're using a device)
     - automatic lighting based on sound for timed channels
