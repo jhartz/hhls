@@ -1,14 +1,19 @@
-function client_channel(x, y, channel) {
+function subst_url(name, value) {
     if (history.replaceState) {
         var oldquery = "&" + location.search.substring(1);
-        if (oldquery.indexOf("&channel_" + x + "x" + y + "=") != -1) {
-            var badquery = oldquery.substring(oldquery.indexOf("&channel_" + x + "x" + y + "=") + 1);
-            oldquery = oldquery.substring(0, oldquery.indexOf("&channel_" + x + "x" + y + "="));
+        while (oldquery.indexOf("&" + name + "=") != -1) {
+            var badquery = oldquery.substring(oldquery.indexOf("&" + name + "=") + 1);
+            oldquery = oldquery.substring(0, oldquery.indexOf("&" + name + "="));
             if (badquery.indexOf("&") != -1) oldquery += badquery.substring(badquery.indexOf("&"));
         }
         oldquery = oldquery.substring(1);
-        history.replaceState({}, "", location.pathname + "?" + oldquery + "&channel_" + x + "x" + y + "=" + encodeURIComponent(channel));
+        history.replaceState({}, "", location.pathname + "?" + oldquery + "&" + name + "=" + encodeURIComponent(value));
     }
+}
+
+function client_details(x, y, channel, controller) {
+    subst_url("channel_" + x + "x" + y, channel);
+    if (controller) subst_url("controller_" + x + "x" + y, controller);
 }
 
 window.onload = function () {

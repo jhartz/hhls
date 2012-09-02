@@ -11,19 +11,19 @@
 <div style="position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-color: black; color: white; padding: 10px; overflow: auto;"><table style="width: 100%; height: 100%;"><tbody><tr><td>
     <div id="loading" style="text-align: center;"><noscript><p>ERROR: JavaScript is required to view this page.</p></noscript></div>
     <div id="panel_start" style="display: none; margin: auto; border: 1px solid grey; border-radius: 5px; padding: 10px;">
-        <div id="ext_controller">
-            <p style="text-align: center;"><button id="ext_user" type="button">Use External Controller</button></p>
-            <p style="text-align: center;"><button id="ext_skipper" type="button" style="border: none;">Skip</button></p>
+        <div id="prompt_controller">
+            <p style="text-align: center;"><button id="btn_use_controller" type="button">Use External Controller</button></p>
+            <p style="text-align: center;"><button id="btn_skip_controller" type="button" style="border: none;">Skip</button></p>
         </div>
-        <div id="noext_controller">
-            <form id="former" action="/client/frame">
-                <input type="hidden" name="cid" value="{{cid}}"><input type="hidden" name="x" value="{{x}}"><input type="hidden" name="y" value="{{y}}"><input type="hidden" id="useext" name="useext" value="no">
+        <div id="not_controller">
+            <form id="theform" action="/client/frame">
+                <input type="hidden" name="cid" value="{{cid}}"><input type="hidden" name="x" value="{{x}}"><input type="hidden" name="y" value="{{y}}"><input type="hidden" id="use_controller" name="use_controller" value="no">
                 <p>Select a channel:</p>
                 <p>{{{channellist}}}</p>
-                <div id="ext_options" style="display: none;">
+                <div id="controller_options" style="display: none;">
                     <p id="hhls_keyholder">Detected devices:</p>
-                    <p id="ext_devicelist"></p>
-                    <p><input type="radio" id="ext_device_custom" name="ext_device" value="custom">&nbsp;<label for="ext_device_custom">Custom Executable</label></p>
+                    <p id="devicelist"></p>
+                    <p><input type="radio" id="controller_exec" name="controller" value="exec">&nbsp;<label for="controller_exec">Custom Executable</label></p>
                 </div>
                 <p><input type="submit" value="Go"></p>
             </form>

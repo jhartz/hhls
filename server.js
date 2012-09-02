@@ -335,6 +335,7 @@ function serveClient(url, req, res) {
             for (x = 1; x <= xval; x++) {
                 var extra = "";
                 if (fquery(url.query["channel_" + x + "x" + y])) extra += "&channel=" + encodeURIComponent(fquery(url.query["channel_" + x + "x" + y]));
+                if (fquery(url.query["controller_" + x + "x" + y])) extra += "&controller=" + encodeURIComponent(fquery(url.query["controller_" + x + "x" + y]));
                 iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + shared.escHTML(extra) + '" scrolling="no">Loading...</iframe></td>\n';
             }
             iframes += "            </tr>\n";
@@ -384,11 +385,18 @@ function serveClientFrame(url, req, res) {
                     } else if (typeof details.state != "undefined") {
                         old_prop = '{state: ' + details.state + '}';
                     }
+                    
+                    var controller = null;
+                    if (fquery(url.query.use_controller) == "yes") {
+                        controller = fquery(url.query.controller);
+                    }
+                    
                     writer.write(res, "clientframe2.html", {
                         cid: cid, x: x, y: y,
                         channel: channel.replace(/"/g, '\\"'), channeltype: details.type,
                         sounds: soundlist || false,
-                        old_prop: old_prop
+                        old_prop: old_prop,
+                        controller: JSON.stringify(controller)
                     });
                 };
                 
