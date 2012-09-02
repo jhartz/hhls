@@ -241,6 +241,12 @@ var video = {
                 trackElem.addEventListener("load", function () {
                     // Use our own system of showing cues
                     trackElem.kind = "metadata";
+                    var flashfunc = function () {
+                        flash("#ctrl_video");
+                    };
+                    for (var i = 0; i < trackElem.track.cues.length; i++) {
+                        trackElem.track.cues[i].onenter = flashfunc;
+                    }
                     trackElem.track.addEventListener("cuechange", function () {
                         var cues = [];
                         for (var i = 0; i < trackElem.track.activeCues.length; i++) {
