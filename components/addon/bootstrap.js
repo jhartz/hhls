@@ -4,6 +4,8 @@ var Cu = Components.utils;
 
 Cu.import("resource://gre/modules/Services.jsm");
 
+var executables = [];
+
 /* Client Commands...
     - Include any commands that should be visible to the client here. (The functions are not called directly, so none of the code in the functions in this object is actually visible to the client.)
     - Each function is passed 2 arguments: "args" and "return_obj"
@@ -12,6 +14,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 */
 var client_commands = {
     hello: function (args, return_obj) {
+        // args: language
         if (args[0] == "spanish") {
             return_obj.value = "Hola mundo";
         } else {
@@ -27,7 +30,37 @@ var client_commands = {
     },
     
     browse: function (args, return_obj) {
-        return_obj.value = "HELLO.WORLD";
+        // browse for executable
+        var index = executables.length;
+        executables[index] = "/path/to/executable";
+        return_obj.value = index;
+    },
+    
+    toggleDevice: function (args, return_obj) {
+        // args: device ID, state
+        if (args.length > 1) {
+            var state = !!args[1];
+            // TODO: toggle device
+            return_obj.value = {success: true};
+        } else {
+            return_obj.value = {
+                success: false,
+                error: "missing args"
+            };
+        }
+    },
+    
+    dimDevice: function (args, return_obj) {
+        // args: device ID, dimness
+        if (args.length > 1 && typeof args[1] == "number" && args[1] >= 0 && args[1] <= 100) {
+            // TODO: dim device
+            return_obj.value = {success: true};
+        } else {
+            return_obj.value = {
+                success: false,
+                error: "missing or invalid args"
+            };
+        }
     }
 };
 
