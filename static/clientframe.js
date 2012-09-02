@@ -1,7 +1,6 @@
 window.onload = function () {
-    if (window._hhls_ && document.addEventListener && document.getElementsByName) {
-        var stuff = shared.genHHLS(document.getElementById("hhls_keyholder"));
-        
+    var stuff = shared.genHHLS(document.getElementById("hhls_keyholder"));
+    if (stuff && document.addEventListener && document.getElementsByName) {
         document.getElementById("noext_controller").style.display = "none";
         
         document.getElementById("ext_skipper").addEventListener("click", function () {
