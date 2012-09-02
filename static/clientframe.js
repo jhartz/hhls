@@ -1,5 +1,5 @@
 window.onload = function () {
-    var stuff = shared.genHHLS(document.getElementById("hhls_keyholder"));
+    var stuff = shared.getHHLS(document.getElementById("hhls_keyholder"));
     if (stuff && document.addEventListener && document.getElementsByName) {
         document.getElementById("noext_controller").style.display = "none";
         

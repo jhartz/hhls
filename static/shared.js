@@ -46,7 +46,7 @@ shared.parseCookies = function (cookiestring) {
     return cookies;
 };
 
-shared.genHHLS = function (keyholder) {
+shared.getHHLS = function (keyholder) {
     var stuff = {};
     if (typeof __hhls__ != "undefined" && keyholder) {
         var d = new Date(), key = [];
