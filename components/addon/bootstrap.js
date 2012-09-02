@@ -36,6 +36,19 @@ var client_commands = {
         return_obj.value = index;
     },
     
+    run: function (args, return_obj) {
+        // args: executable index, state or dimness (number/boolean)
+        if (args.length > 1 && args[0] in executables && (typeof args[1] == "boolean" || (typeof args[1] == "number" && args[1] >= 0 && args[1] <= 100))) {
+            // nsIProcess ...
+            return_obj.value = {success: true};
+        } else {
+            return_obj.value = {
+                success: false,
+                error: "missing or invalid args"
+            };
+        }
+    },
+    
     toggleDevice: function (args, return_obj) {
         // args: device ID, state
         if (args.length > 1) {
