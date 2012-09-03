@@ -5,6 +5,21 @@ var Cu = Components.utils;
 Cu.import("resource://gre/modules/Services.jsm");
 
 var executables = [];
+function getHash(str) {
+    var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
+    converter.charset = "UTF-8";
+    var result = {};
+    var data = converter.convertToByteArray("._-+MYHASH+-_." + str + "_____#$HGFDXHkjgfdsyui87654", result);
+    var ch = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
+    ch.init(ch.MD5);
+    ch.update(data, data.length);
+    var hash = ch.finish(false);
+    var toHexString = function (charCode) {
+        return ("0" + charCode.toString(16)).slice(-2);
+    };
+    var sum = [toHexString(hash.charCodeAt(i)) for (i in hash)].join("");
+    return sum;
+}
 
 /* Client Commands...
     - Include any commands that should be visible to the client here. (The functions are not called directly, so none of the code in the functions in this object is actually visible to the client.)
@@ -14,7 +29,6 @@ var executables = [];
 */
 var client_commands = {
     hello: function (args, return_obj) {
-        // args: language
         if (args[0] == "spanish") {
             return_obj.value = "Hola mundo";
         } else {
@@ -30,49 +44,90 @@ var client_commands = {
         }];
     },
     
+    setDevice: function ([device, state], return_obj) {
+        if (device) {
+            if (typeof state == "boolean") state = Number(state);
+            if (typeof state == "number" && (state == 0 || state == 1)) {
+                // TODO: change device state
+                return_obj.value = {success: true};
+            } else {
+                return_obj.value = {
+                    success: false,
+                    error: "invalid state"
+                };
+            }
+        } else {
+            return_obj.value = {
+                success: false,
+                error: "invalid device"
+            };
+        }
+    },
+    
     browse: function (args, return_obj) {
-        // TODO: browse for executable
-        var index = executables.length;
-        executables[index] = "/path/to/executable";
-        return_obj.value = index;
-    },
-    
-    run: function (args, return_obj) {
-        // args: executable index, state or dimness (number/boolean)
-        if (args.length > 1 && args[0] in executables && (typeof args[1] == "boolean" || (typeof args[1] == "number" && args[1] >= 0 && args[1] <= 100))) {
-            // TODO: nsIProcess ...
-            return_obj.value = {success: true};
+        var fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+        fp.init(Services.wm.getMostRecentWindow("navigator:browser"), "Select an Executable", Ci.nsIFilePicker.modeOpen);
+        if (fp.show() == Ci.nsIFilePicker.returnOK) {
+            var path = fp.file.path;
+            var index = executables.length;
+            executables[index] = {
+                path: path,
+                args: []
+            };
+            
+            // Create a hash of the executable URL (in case we restart and have new stuff in "executables" but someone still has an old index)
+            var sum = getHash(index + "::path:" + path);
+            
+            return_obj.value = {
+                success: true,
+                index: index,
+                sum: sum,
+                path: path
+            };
         } else {
             return_obj.value = {
                 success: false,
-                error: "missing or invalid args"
+                error: "browsing cancelled"
             };
         }
     },
     
-    toggleDevice: function (args, return_obj) {
-        // args: device ID, state
-        if (args.length > 1) {
-            var state = !!args[1];
-            // TODO: toggle device
-            return_obj.value = {success: true};
+    run: function ([index, sum, state], return_obj) {
+        // Make sure "index" is the index of a valid executable (check hash/sum to make sure)
+        if (index in executables && getHash(index + "::path:" + executables[index].path) == sum) {
+            if (typeof state == "boolean") state = Number(state);
+            if (typeof state == "number" && (state == 0 || state == 1)) {
+                // TODO: nsIProcess with executables[index].path and executables[index].args+[String(state)]
+                return_obj.value = {success: true};
+            } else {
+                return_obj.value = {
+                    success: false,
+                    error: "invalid state"
+                };
+            }
         } else {
             return_obj.value = {
                 success: false,
-                error: "missing args"
+                error: "invalid executable index or sum"
             };
         }
     },
     
-    dimDevice: function (args, return_obj) {
-        // args: device ID, dimness
-        if (args.length > 1 && typeof args[1] == "number" && args[1] >= 0 && args[1] <= 100) {
-            // TODO: dim device
-            return_obj.value = {success: true};
+    setExecArgs: function ([index, sum, args], return_obj) {
+        if (index in executables && getHash(index + "::path:" + executables[index].path) == sum) {
+            if (Array.isArray(args)) {
+                executables[index].args = args;
+                return_obj.value = {success: true};
+            } else {
+                return_obj.value = {
+                    success: false,
+                    error: "invalid args"
+                };
+            }
         } else {
             return_obj.value = {
                 success: false,
-                error: "missing or invalid args"
+                error: "invalid executable index or sum"
             };
         }
     }

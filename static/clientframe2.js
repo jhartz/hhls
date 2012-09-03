@@ -160,7 +160,7 @@ window.onload = function () {
         
         // Tell parent what channel we are (so it can record it in its URL)
         try {
-            parent.client_details(x, y, channel, controller);
+            parent.client_details(x, y, channel, controller, controller_exec);
         } catch (err) {
             console.log("ERROR in sending client details to parent: ", err);
         }

@@ -334,8 +334,11 @@ function serveClient(url, req, res) {
             iframes += "            <tr>\n";
             for (x = 1; x <= xval; x++) {
                 var extra = "";
-                if (fquery(url.query["channel_" + x + "x" + y])) extra += "&channel=" + encodeURIComponent(fquery(url.query["channel_" + x + "x" + y]));
-                if (fquery(url.query["controller_" + x + "x" + y])) extra += "&controller=" + encodeURIComponent(fquery(url.query["controller_" + x + "x" + y]));
+                ["channel", "controller", "controller_exec"].forEach(function (item) {
+                    if (fquery(url.query[item + "_" + x + "x" + y])) {
+                        extra += "&" + item + "=" + encodeURIComponent(fquery(url.query[item + "_" + x + "x" + y]));
+                    }
+                });
                 iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + shared.escHTML(extra) + '" scrolling="no">Loading...</iframe></td>\n';
             }
             iframes += "            </tr>\n";
@@ -386,17 +389,20 @@ function serveClientFrame(url, req, res) {
                         old_prop = '{state: ' + details.state + '}';
                     }
                     
-                    var controller = null;
-                    if (fquery(url.query.use_controller) == "yes") {
+                    var controller = null, controller_exec = null;
+                    if (fquery(url.query.use_controller) != "no") {
                         controller = fquery(url.query.controller);
+                        controller_exec = fquery(url.query.controller_exec);
                     }
                     
                     writer.write(res, "clientframe2.html", {
                         cid: cid, x: x, y: y,
-                        channel: channel.replace(/"/g, '\\"'), channeltype: details.type,
+                        channel: JSON.stringify(channel),
+                        channeltype: details.type,
                         sounds: soundlist || false,
                         old_prop: old_prop,
-                        controller: JSON.stringify(controller)
+                        controller: JSON.stringify(controller),
+                        controller_exec: JSON.stringify(controller_exec)
                     });
                 };
                 

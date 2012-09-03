@@ -11,9 +11,10 @@ function subst_url(name, value) {
     }
 }
 
-function client_details(x, y, channel, controller) {
+function client_details(x, y, channel, controller, controller_exec) {
     subst_url("channel_" + x + "x" + y, channel);
     if (controller) subst_url("controller_" + x + "x" + y, controller);
+    if (controller_exec) subst_url("controller_exec_" + x + "x" + y, controller_exec);
 }
 
 window.onload = function () {
