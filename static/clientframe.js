@@ -1,6 +1,6 @@
 window.onload = function () {
     var stuff = shared.getHHLS(document.getElementById("hhls_keyholder"));
-    if (stuff && document.addEventListener && document.getElementsByName) {
+    if (stuff && typeof stuff.i == "undefined" && document.addEventListener && document.getElementsByName) {
         document.getElementById("not_controller").style.display = "none";
         
         document.getElementById("btn_skip_controller").addEventListener("click", function (event) {
