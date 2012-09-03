@@ -2,7 +2,6 @@ TODO
 
  - components/addon
     - device detection and interaction
-    - exec running (nsIProcess)
 
  - clientframe2:
     - Implement device/controller stuff... Show a small icon on the page if it is being used with a controller or device (mouseover shows more info about the controller/device)
