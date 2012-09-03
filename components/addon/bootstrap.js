@@ -341,9 +341,11 @@ function handleContent(event) {
                                 }
                             }
                             cmds.forEach(function (cmd) {
-                                stuff[cmd] = function (callback, args) {
-                                    run_client_command(cmd, callback, args);
-                                };
+                                if (cmd != "i") {
+                                    stuff[cmd] = function (callback, args) {
+                                        run_client_command(cmd, callback, args);
+                                    };
+                                }
                             });
                         } else {
                             stuff.i = i;
