@@ -24,6 +24,9 @@ var client_commands = {
         return_obj.value = [{
             id: 6,
             label: "My External Controller"
+        }, {
+            id: 3,
+            label: "My Other External Controller"
         }];
     },
     
@@ -72,49 +75,96 @@ var client_commands = {
         }
     },
     
-    setExecArgs: function ([index, sum, args], return_obj) {
-        if (index in executables && getHash(index + "::path:" + executables[index].file.path) == sum) {
-            if (Array.isArray(args)) {
-                executables[index].args = args;
+    getPreviousExecs: function (args, return_obj) {
+        var execs = [];
+        for (var i = 0; i < executables.length; i++) {
+            execs[i] = {
+                index: i,
+                sum: getHash(i + "::path:" + executables[i].file.path),
+                path: executables[i].file.path,
+                args: executables[i].args
+            };
+        }
+        return_obj.value = execs;
+    },
+    
+    getExecArgs: function ([index, sum], return_obj) {
+        if (index in executables) {
+            if (getHash(index + "::path:" + executables[index].file.path) == sum) {
                 return_obj.value = {
                     success: true,
-                    empty: !args.length
+                    args: executables[index].args
                 };
             } else {
                 return_obj.value = {
                     success: false,
-                    error: "invalid args"
+                    error: "invalid executable sum"
                 };
             }
         } else {
             return_obj.value = {
                 success: false,
-                error: "invalid executable index or sum"
+                error: "invalid executable index"
+            };
+        }
+    },
+    
+    setExecArgs: function ([index, sum, args], return_obj) {
+        if (index in executables) {
+            if (getHash(index + "::path:" + executables[index].file.path) == sum) {
+                if (Array.isArray(args)) {
+                    executables[index].args = args;
+                    return_obj.value = {
+                        success: true,
+                        empty: !args.length
+                    };
+                } else {
+                    return_obj.value = {
+                        success: false,
+                        error: "invalid args"
+                    };
+                }
+            } else {
+                return_obj.value = {
+                    success: false,
+                    error: "invalid executable sum"
+                };
+            }
+        } else {
+            return_obj.value = {
+                success: false,
+                error: "invalid executable index"
             };
         }
     },
     
     runExec: function ([index, sum, state], return_obj) {
-        // Make sure "index" is the index of a valid executable (check hash/sum to make sure)
-        if (index in executables && getHash(index + "::path:" + executables[index].file.path) == sum) {
-            if (typeof state == "boolean") state = Number(state);
-            if (typeof state == "number" && (state == 0 || state == 1)) {
-                var args = executables[index].args;
-                args.push(String(state));
-                var process = Cc["@mozilla.org/process/util;1"].createInstance(Ci.nsIProcess);
-                process.init(executables[index].file);
-                process.runAsync(args, args.length);
-                return_obj.value = {success: true};
+        if (index in executables) {
+            if (getHash(index + "::path:" + executables[index].file.path) == sum) {
+                if (typeof state == "boolean") state = Number(state);
+                if (typeof state == "number" && (state == 0 || state == 1)) {
+                    var args = executables[index].args;
+                    args.push(String(state));
+                    var process = Cc["@mozilla.org/process/util;1"].createInstance(Ci.nsIProcess);
+                    process.init(executables[index].file);
+                    process.runAsync(args, args.length);
+                    return_obj.value = {success: true};
+                } else {
+                    return_obj.value = {
+                        success: false,
+                        error: "invalid state"
+                    };
+                }
             } else {
                 return_obj.value = {
                     success: false,
-                    error: "invalid state"
+                    error: "invalid executable sum"
                 };
             }
         } else {
             return_obj.value = {
                 success: false,
-                error: "invalid executable index or sum"
+                error: "invalid executable index"
             };
         }
     }

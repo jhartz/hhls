@@ -19,22 +19,69 @@ window.onload = function () {
                 }
             });
             
+            var success = function (index, sum, path) {
+                window._exec_index = index;
+                window._exec_sum = sum;
+                window._exec_path = path;
+                window._exec_args = [];
+                document.getElementById("controller_exec").value = index + "::" + sum;
+                document.getElementById("controller_exec_path").innerHTML = shared.escHTML(path);
+                document.getElementById("controller_exec_moreinfo").innerHTML = shared.escHTML("(" + index + "::" + sum + ")");
+                document.getElementById("controller_exec_ifOneArg").style.display = "inline";
+                document.getElementById("controller_exec_ifMultipleArgs").style.display = "none";
+                document.getElementById("controller_exec_arguments").style.display = "inline";
+                document.getElementById("controller_exec_arguments").innerHTML = "Arguments";
+            };
+            
+            stuff.getPreviousExecs(function (execs) {
+                if (execs.length > 0) {
+                    execs.reverse();
+                    for (var i = 0; i < execs.length; i++) {
+                        var option = document.createElement("option");
+                        option.value = execs[i].index + "::" + execs[i].sum;
+                        option.innerHTML = "<i>" + shared.escHTML(execs[i].path) + "</i>";
+                        option.setAttribute("data-path", execs[i].path);
+                        if (execs[i].args.length > 0) {
+                            var newargs = [];
+                            for (var j = 0; j < execs[i].args.length; j++) {
+                                newargs.push(execs[i].args[j].replace(/ /g, "\\ "));
+                            }
+                            option.innerHTML += "&nbsp; &nbsp; &nbsp;" + shared.escHTML(newargs.join(" "));
+                        }
+                        document.getElementById("controller_exec_prev").appendChild(option);
+                    }
+                    document.getElementById("controller_exec_prev").addEventListener("change", function () {
+                        var val = document.getElementById("controller_exec_prev").value;
+                        var option = document.getElementById("controller_exec_prev").options[document.getElementById("controller_exec_prev").selectedIndex];
+                        if (val && val.indexOf("::") != -1) {
+                            var index = parseInt(val.substring(0, val.indexOf("::")), 10);
+                            var sum = val.substring(val.indexOf("::") + 2);
+                            if (!isNaN(index) && sum) {
+                                stuff.getExecArgs(function (data) {
+                                    if (data.success) {
+                                        success(index, sum, option.getAttribute("data-path"));
+                                        window._exec_args = data.args;
+                                        if (data.args.length > 0) {
+                                            document.getElementById("controller_exec_ifOneArg").style.display = "none";
+                                            document.getElementById("controller_exec_ifMultipleArgs").style.display = "inline";
+                                            document.getElementById("controller_exec_arguments").innerHTML = "Arguments...";
+                                        }
+                                    } else {
+                                        alert("Error loading executable data: " + data.error);
+                                    }
+                                }, [index, sum]);
+                            }
+                        }
+                        document.getElementById("controller_exec_prev").value = "nil";
+                    }, false);
+                } else {
+                    document.getElementById("controller_exec_prev_container").style.display = "none";
+                }
+            });
+            
             document.getElementById("controller_exec_browse").addEventListener("click", function (event) {
                 event.preventDefault();
                 
-                var success = function (index, sum, path) {
-                    window._exec_index = index;
-                    window._exec_sum = sum;
-                    window._exec_path = path;
-                    window._exec_args = [];
-                    document.getElementById("controller_exec").value = index + "::" + sum;
-                    document.getElementById("controller_exec_path").innerHTML = shared.escHTML(path);
-                    document.getElementById("controller_exec_moreinfo").innerHTML = shared.escHTML("(" + index + "::" + sum + ")");
-                    document.getElementById("controller_exec_ifOneArg").style.display = "inline";
-                    document.getElementById("controller_exec_ifMultipleArgs").style.display = "none";
-                    document.getElementById("controller_exec_arguments").style.display = "inline";
-                    document.getElementById("controller_exec_arguments").innerHTML = "Arguments";
-                };
                 if (event.shiftKey) {
                     var path = prompt("Path:", window._exec_path || "");
                     if (path && shared.trim(path)) {
@@ -67,7 +114,6 @@ window.onload = function () {
                         if (oldargs.length) oldargs += " ";
                         oldargs += window._exec_args[i].replace(/ /g, "\\ ");
                     }
-                    console.log("oldargs:", oldargs);
                     var args = (prompt("Enter any extra arguments (space-separated)\nEscape literal spaces with a backslash", oldargs) || "").split(" ");
                     var newargs = [], withnext = "";
                     for (var i = 0; i < args.length; i++) {
@@ -81,7 +127,6 @@ window.onload = function () {
                         }
                     }
                     window._exec_args = newargs;
-                    console.log("newargs:", newargs);
                     stuff.setExecArgs(function (result) {
                         if (result.success) {
                             if (result.empty) {
