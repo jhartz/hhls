@@ -6,6 +6,7 @@ var is_on = false,
     sounds = {},
     source,
     stuff = null,
+    prevState = null,
     oneffectplay = function () {},
     oneffectnext = function () {},
     oneffectstop = function () {};
@@ -52,24 +53,27 @@ function status(text, in_loading) {
 function dim(percent) {
     if (controller && stuff) {
         var state = percent >= 50;
-        if (controller == "exec") {
-            if (controller_exec && controller_exec.indexOf("::") != -1) {
-                var index = parseInt(controller_exec.substring(0, controller_exec.indexOf("::")), 10);
-                var sum = controller_exec.substring(controller_exec.indexOf("::") + 2);
-                stuff.runExec(function (result) {
-                    if (!result.success) {
-                        status("ERROR sending state to exec: " + result.error);
-                    }
-                }, [index, sum, state]);
-            } else {
-                status("ERROR parsing controller_exec!");
-            }
-        } else {
-            stuff.setDevice(function (result) {
-                if (!result.success) {
-                    status("ERROR sending state to device: " + result.error);
+        if (state !== prevState) {
+            prevState = state;
+            if (controller == "exec") {
+                if (controller_exec && controller_exec.indexOf("::") != -1) {
+                    var index = parseInt(controller_exec.substring(0, controller_exec.indexOf("::")), 10);
+                    var sum = controller_exec.substring(controller_exec.indexOf("::") + 2);
+                    stuff.runExec(function (result) {
+                        if (!result.success) {
+                            status("ERROR sending state to exec: " + result.error);
+                        }
+                    }, [index, sum, state]);
+                } else {
+                    status("ERROR parsing controller_exec!");
                 }
-            }, [controller, state]);
+            } else {
+                stuff.setDevice(function (result) {
+                    if (!result.success) {
+                        status("ERROR sending state to device: " + result.error);
+                    }
+                }, [controller, state]);
+            }
         }
     }
     document.getElementById("bg").style.opacity = percent / 100;
