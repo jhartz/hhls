@@ -143,11 +143,9 @@ var client_commands = {
             if (getHash(index + "::path:" + executables[index].file.path) == sum) {
                 if (typeof state == "boolean") state = Number(state);
                 if (typeof state == "number" && (state == 0 || state == 1)) {
-                    var args = executables[index].args;
-                    args.push(String(state));
                     var process = Cc["@mozilla.org/process/util;1"].createInstance(Ci.nsIProcess);
                     process.init(executables[index].file);
-                    process.runAsync(args, args.length);
+                    process.runAsync(executables[index].args.concat(String(state)), executable[index].args.length + 1);
                     return_obj.value = {success: true};
                 } else {
                     return_obj.value = {
