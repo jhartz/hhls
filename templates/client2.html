@@ -15,18 +15,6 @@ body {
 }
 
 iframe {
-    width: 100%;
-    height: 100%;
-    border-style: none;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-td {
-    text-align: center;
     border: 1px solid #2E0587;
 }
 
@@ -39,18 +27,27 @@ span.btn:hover {
     text-decoration: none;
 }
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
 
 #status {
     width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
     background-color: #2E0587;
     color: white;
-    height: 24px;
+    height: 20px;
     overflow: hidden;
 }
 
 #status table td {
     width: 50%;
-    padding-top: 2px;
+    padding-top: 3px;
+    text-align: center;
     vertical-align: top;
     text-overflow: ellipsis;
 }
@@ -62,22 +59,6 @@ span.btn:hover {
     width: 34%;
 }
 {{/closebtn}}
-
-#iframeholder {
-    position: absolute;
-    top: 24px;
-    bottom: 2px;
-    left: 0;
-    right: 0;
-}
-
-#iframeholder table {
-    height: 100%;
-}
-
-#iframeholder table td {
-    height: {{td_height}}%;
-}
 </style>
 <script type="text/javascript" src="/static/shared.js"></script>
 <script type="text/javascript" src="/static/client2.js"></script>
@@ -97,8 +78,7 @@ span.btn:hover {
     </div>
 
     <div id="iframeholder">
-        <table>
-{{{iframes}}}        </table>
+{{{iframes}}}
     </div>
 </div>
 </body>

@@ -329,6 +329,10 @@ function serveClient(url, req, res) {
             frames: {}
         });
         
+        var calc = function (prop, val) {
+            return prop + ": -webkit-calc(" + val + "); " + prop + ": -moz-calc(" + val + "); " + prop + ": calc(" + val + ");";
+        };
+        
         var iframes = "", x, y;
         for (y = 1; y <= yval; y++) {
             iframes += "            <tr>\n";
@@ -339,18 +343,15 @@ function serveClient(url, req, res) {
                         extra += "&" + item + "=" + encodeURIComponent(fquery(url.query[item + "_" + x + "x" + y]));
                     }
                 });
-                iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + shared.escHTML(extra) + '" scrolling="no">Loading...</iframe></td>\n';
+                iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + shared.escHTML(extra) + '" scrolling="no" style="position: absolute; ' + calc("top", "(100% - 20px) / " + yval + " * " + (y - 1) + " + 20px") + " " + calc("height", "(100% - 20px) / " + yval + " - 2px") + " " + calc("left", "100% / " + xval + " * " + (x - 1)) + " " + calc("width", "100% / " + xval + " - 2px") + '">Loading...</iframe></td>\n';
             }
             iframes += "            </tr>\n";
         }
-        
-        var td_height = Math.round(100 / yval);
         
         writer.write(res, "client2.html", {
             name: name,
             location: location,
             closebtn: (xval == 1 && yval == 1 ? false : true),
-            td_height: td_height,
             iframes: iframes
         }, {"Set-Cookie": cookies});
     }, function (name, location, hostname) {
