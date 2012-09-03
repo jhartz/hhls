@@ -4,23 +4,6 @@ var Cu = Components.utils;
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-var executables = [];
-function getHash(str) {
-    var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
-    converter.charset = "UTF-8";
-    var result = {};
-    var data = converter.convertToByteArray("._-+MYHASH+-_." + str + "_____#$HGFDXHkjgfdsyui87654", result);
-    var ch = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
-    ch.init(ch.MD5);
-    ch.update(data, data.length);
-    var hash = ch.finish(false);
-    var toHexString = function (charCode) {
-        return ("0" + charCode.toString(16)).slice(-2);
-    };
-    var sum = [toHexString(hash.charCodeAt(i)) for (i in hash)].join("");
-    return sum;
-}
-
 /* Client Commands...
     - Include any commands that should be visible to the client here. (The functions are not called directly, so none of the code in the functions in this object is actually visible to the client.)
     - Each function is passed 2 arguments: "args" and "return_obj"
@@ -67,37 +50,60 @@ var client_commands = {
     browse: function (args, return_obj) {
         var fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
         fp.init(Services.wm.getMostRecentWindow("navigator:browser"), "Select an Executable", Ci.nsIFilePicker.modeOpen);
-        if (fp.show() == Ci.nsIFilePicker.returnOK) {
-            var path = fp.file.path;
-            var index = executables.length;
-            executables[index] = {
-                path: path,
-                args: []
-            };
-            
-            // Create a hash of the executable URL (in case we restart and have new stuff in "executables" but someone still has an old index)
-            var sum = getHash(index + "::path:" + path);
-            
-            return_obj.value = {
-                success: true,
-                index: index,
-                sum: sum,
-                path: path
-            };
+        if (fp.show() == Ci.nsIFilePicker.returnOK && fp.file && fp.file.path) {
+            return_obj.value = storeExec(fp.file);
+        } else {
+            return_obj.value = {success: false};
+        }
+    },
+    
+    setExec: function ([path], return_obj) {
+        var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+        try {
+            file.initWithPath(path);
+        } catch (err) {}
+        if (path && file.path) {
+            return_obj.value = storeExec(file);
         } else {
             return_obj.value = {
                 success: false,
-                error: "browsing cancelled"
+                error: "invalid path"
             };
         }
     },
     
-    run: function ([index, sum, state], return_obj) {
+    setExecArgs: function ([index, sum, args], return_obj) {
+        if (index in executables && getHash(index + "::path:" + executables[index].file.path) == sum) {
+            if (Array.isArray(args)) {
+                executables[index].args = args;
+                return_obj.value = {
+                    success: true,
+                    empty: !args.length
+                };
+            } else {
+                return_obj.value = {
+                    success: false,
+                    error: "invalid args"
+                };
+            }
+        } else {
+            return_obj.value = {
+                success: false,
+                error: "invalid executable index or sum"
+            };
+        }
+    },
+    
+    runExec: function ([index, sum, state], return_obj) {
         // Make sure "index" is the index of a valid executable (check hash/sum to make sure)
-        if (index in executables && getHash(index + "::path:" + executables[index].path) == sum) {
+        if (index in executables && getHash(index + "::path:" + executables[index].file.path) == sum) {
             if (typeof state == "boolean") state = Number(state);
             if (typeof state == "number" && (state == 0 || state == 1)) {
-                // TODO: nsIProcess with executables[index].path and executables[index].args+[String(state)]
+                var args = executables[index].args;
+                args.push(String(state));
+                var process = Cc["@mozilla.org/process/util;1"].createInstance(Ci.nsIProcess);
+                process.init(executables[index].file);
+                process.runAsync(args, args.length);
                 return_obj.value = {success: true};
             } else {
                 return_obj.value = {
@@ -111,27 +117,63 @@ var client_commands = {
                 error: "invalid executable index or sum"
             };
         }
-    },
-    
-    setExecArgs: function ([index, sum, args], return_obj) {
-        if (index in executables && getHash(index + "::path:" + executables[index].path) == sum) {
-            if (Array.isArray(args)) {
-                executables[index].args = args;
-                return_obj.value = {success: true};
-            } else {
-                return_obj.value = {
-                    success: false,
-                    error: "invalid args"
-                };
-            }
-        } else {
-            return_obj.value = {
-                success: false,
-                error: "invalid executable index or sum"
-            };
-        }
     }
 };
+
+/* Client Command Helpers
+   Any "util" or "common" functions between client command functions above should go here
+*/
+
+var executables = [];
+
+function getHash(str) {
+    var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
+    converter.charset = "UTF-8";
+    var result = {};
+    var data = converter.convertToByteArray("._-+MYHASH+-_." + str + "_____#$HGFDXHkjgfdsyui87654", result);
+    var ch = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
+    ch.init(ch.MD5);
+    ch.update(data, data.length);
+    var hash = ch.finish(false);
+    var toHexString = function (charCode) {
+        return ("0" + charCode.toString(16)).slice(-2);
+    };
+    var sum = [toHexString(hash.charCodeAt(i)) for (i in hash)].join("");
+    return sum;
+}
+
+function storeExec(file) {
+    if (file.exists()) {
+        if (!file.isDirectory()) {
+            var index = executables.length;
+            executables[index] = {
+                file: file,
+                args: []
+            };
+            
+            // Create a hash of the executable URL (in case we restart and have new stuff in "executables" but someone still has an old index)
+            var sum = getHash(index + "::path:" + file.path);
+            
+            return {
+                success: true,
+                index: index,
+                sum: sum,
+                path: file.path
+            };
+        } else {
+            return {
+                success: false,
+                error: "file is a directory"
+            };
+        }
+    } else {
+        return {
+            success: false,
+            error: "file doesn't exist"
+        };
+    }
+}
+
 
 function install(data, reason) {}
 function uninstall(data, reason) {}

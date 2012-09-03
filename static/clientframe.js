@@ -22,21 +22,39 @@ window.onload = function () {
             document.getElementById("controller_exec_browse").addEventListener("click", function (event) {
                 event.preventDefault();
                 
-                stuff.browse(function (data) {
-                    if (data.success) {
-                        window._exec_index = data.index;
-                        window._exec_sum = data.sum;
-                        window._exec_args = [];
-                        document.getElementById("controller_exec").value = data.index + "::" + data.sum;
-                        document.getElementById("controller_exec_path").innerHTML = shared.escHTML(data.path);
-                        document.getElementById("controller_exec_moreinfo").innerHTML = shared.escHTML("(" + data.index + "::" + data.sum + ")");
-                        document.getElementById("controller_exec_ifOneArg").style.display = "inline";
-                        document.getElementById("controller_exec_ifMultipleArgs").style.display = "none";
-                        document.getElementById("controller_exec_arguments").innerHTML = "Arguments";
-                    } else {
-                        alert("Error browsing for file: " + data.error);
+                var success = function (index, sum, path) {
+                    window._exec_index = index;
+                    window._exec_sum = sum;
+                    window._exec_path = path;
+                    window._exec_args = [];
+                    document.getElementById("controller_exec").value = index + "::" + sum;
+                    document.getElementById("controller_exec_path").innerHTML = shared.escHTML(path);
+                    document.getElementById("controller_exec_moreinfo").innerHTML = shared.escHTML("(" + index + "::" + sum + ")");
+                    document.getElementById("controller_exec_ifOneArg").style.display = "inline";
+                    document.getElementById("controller_exec_ifMultipleArgs").style.display = "none";
+                    document.getElementById("controller_exec_arguments").style.display = "inline";
+                    document.getElementById("controller_exec_arguments").innerHTML = "Arguments";
+                };
+                if (event.shiftKey) {
+                    var path = prompt("Path:", window._exec_path || "");
+                    if (path && shared.trim(path)) {
+                        stuff.setExec(function (data) {
+                            if (data.success) {
+                                success(data.index, data.sum, data.path);
+                            } else {
+                                alert("Error setting file path: " + data.error);
+                            }
+                        }, [shared.trim(path)]);
                     }
-                });
+                } else {
+                    stuff.browse(function (data) {
+                        if (data.success) {
+                            success(data.index, data.sum, data.path);
+                        } else if (data.error) {
+                            alert("Error browsing for file: " + data.error);
+                        }
+                    });
+                }
             }, false);
             
             document.getElementById("controller_exec_arguments").addEventListener("click", function (event) {
@@ -66,9 +84,15 @@ window.onload = function () {
                     console.log("newargs:", newargs);
                     stuff.setExecArgs(function (result) {
                         if (result.success) {
-                            document.getElementById("controller_exec_ifOneArg").style.display = "none";
-                            document.getElementById("controller_exec_ifMultipleArgs").style.display = "inline";
-                            document.getElementById("controller_exec_arguments").innerHTML = "Arguments...";
+                            if (result.empty) {
+                                document.getElementById("controller_exec_ifOneArg").style.display = "inline";
+                                document.getElementById("controller_exec_ifMultipleArgs").style.display = "none";
+                                document.getElementById("controller_exec_arguments").innerHTML = "Arguments";
+                            } else {
+                                document.getElementById("controller_exec_ifOneArg").style.display = "none";
+                                document.getElementById("controller_exec_ifMultipleArgs").style.display = "inline";
+                                document.getElementById("controller_exec_arguments").innerHTML = "Arguments...";
+                            }
                         } else {
                             alert("Error setting arguments: " + result.error);
                         }
