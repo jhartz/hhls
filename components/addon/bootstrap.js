@@ -64,7 +64,9 @@ var client_commands = {
         var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
         try {
             file.initWithPath(path);
-        } catch (err) {}
+        } catch (err) {
+            Cu.reportError(err);
+        }
         if (path && file.path) {
             return_obj.value = storeExec(file);
         } else {
@@ -309,8 +311,15 @@ function handleContent(event) {
         var contentDocument = event.originalTarget;
         var contentWindow = contentDocument.defaultView;
         if (contentWindow && contentDocument instanceof contentWindow.HTMLDocument && contentWindow.location && contentWindow.location.href.indexOf("://") != -1) {
-            // TODO: Test location against extensions.hhls.server
-            if (contentWindow.document.getElementById("hhls_keyholder")) {
+            var branch = Services.prefs.getBranch("extensions.hhls.");
+            var server, content;
+            try {
+                server = Services.io.newURI(branch.getCharPref("server"), null, null);
+                content = Services.io.newURI(contentWindow.location.href, null, null);
+            } catch (err) {
+                Cu.reportError(err);
+            }
+            if (server && content && server.prePath == content.prePath && contentWindow.document.getElementById("hhls_keyholder")) {
                 var secret = [];
                 for (var i = 0; i < 12; i++) secret[i] = Math.random() * 2;
                 
