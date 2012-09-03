@@ -57,7 +57,7 @@ table.bordered > tbody > tr > td {
 <script type="text/javascript" src="/static/shared.js"></script>
 <script type="text/javascript">
 var cid = {{cid}}, x = {{x}}, y = {{y}};
-var channel = {{{channel}}}, channeltype = "{{{channeltype}}}";
+var channel = "{{{channel}}}", channeltype = "{{{channeltype}}}";
 var controller = {{{controller}}};
 var controller_exec = {{{controller_exec}}};
 {{#old_prop}}var old_prop = {{{old_prop}}};
@@ -124,7 +124,7 @@ var controller_exec = {{{controller_exec}}};
                 </td>
             </tr>
         </tbody></table>
-        <div style="text-align: center;">Channel: <span style="font-style: italic;">{{channel}}</span> ({{channeltype}})<br><span id="options_changechannel" class="btn">Change Channel<span id="options_changechannel_ifcontroller"> or Controller</span></span></div>
+        <div style="text-align: center;">Channel: <span id="options_channel_label" style="font-style: italic;">{{channel}}</span> ({{channeltype}})<br><span id="options_changechannel" class="btn">Change Channel<span id="options_changechannel_ifcontroller"> or Controller</span></span></div>
         <div style="text-align: center; margin-top: 10px;"><button id="options_close" type="button">Close</button></div>
     </div>
 </td></tr></tbody></table></div>

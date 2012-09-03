@@ -398,7 +398,7 @@ function serveClientFrame(url, req, res) {
                     
                     writer.write(res, "clientframe2.html", {
                         cid: cid, x: x, y: y,
-                        channel: JSON.stringify(channel),
+                        channel: channel.replace(/\"/g, "\\\""),
                         channeltype: details.type,
                         sounds: soundlist || false,
                         old_prop: old_prop,
