@@ -5,7 +5,6 @@ TODO
 
  - clientframe2:
     - Implement device/controller stuff... Show a small icon on the page if it is being used with a controller or device (mouseover shows more info about the controller/device)
-    - change the "Change Channel" button to "Change Channel or Controller" if we're using a device
     - automatic lighting based on sound for timed channels
     - show in "loaded sounds" only when audio is loaded
 

@@ -116,6 +116,7 @@ window.onload = function () {
         document.getElementById("options_changechannel").addEventListener("click", function (event) {
             location.href = "/client/frame?cid=" + cid + "&x=" + x + "&y=" + y;
         }, false);
+        if (!controller) document.getElementById("options_changechannel_ifcontroller").style.display = "none";
         
         document.getElementById("options_oncolor").addEventListener("change", function (event) {
             oncolor = document.getElementById("options_oncolor").value;
