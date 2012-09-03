@@ -5,7 +5,7 @@ var is_on = false,
     volume = 80,
     sounds = {},
     source,
-    stuff,
+    stuff = null,
     oneffectplay = function () {},
     oneffectnext = function () {},
     oneffectstop = function () {};
@@ -50,6 +50,28 @@ function status(text, in_loading) {
 }
 
 function dim(percent) {
+    if (controller && stuff) {
+        var state = percent >= 50;
+        if (controller == "exec") {
+            if (controller_exec && controller_exec.indexOf("::") != -1) {
+                var index = parseInt(controller_exec.substring(0, controller_exec.indexOf("::")), 10);
+                var sum = controller_exec.substring(controller_exec.indexOf("::") + 2);
+                stuff.runExec(function (result) {
+                    if (!result.success) {
+                        status("ERROR sending state to exec: " + result.error);
+                    }
+                }, [index, sum, state]);
+            } else {
+                status("ERROR parsing controller_exec!");
+            }
+        } else {
+            stuff.setDevice(function (result) {
+                if (!result.success) {
+                    status("ERROR sending state to device: " + result.error);
+                }
+            }, [controller, state]);
+        }
+    }
     document.getElementById("bg").style.opacity = percent / 100;
 }
 
@@ -99,6 +121,11 @@ window.onload = function () {
         status("Loading...", true);
         
         stuff = shared.getHHLS(document.getElementById("hhls_keyholder"));
+        if (typeof stuff.i != "undefined") {
+            var i_err = stuff.i;
+            stuff = null;
+            alert("ERROR: Authentication error with HHLS Client Add-on\nDetails:" + i_err);
+        }
         
         document.getElementById("options_btn").addEventListener("click", function (event) {
             document.getElementById("options").style.display = "block";
@@ -112,6 +139,8 @@ window.onload = function () {
         document.getElementById("options_closeconn").addEventListener("click", function (event) {
             closeconn();
         }, false);
+        
+        if (channel == "0") document.getElementById("options_channel_label").innerHTML = "Default Channel";
         
         document.getElementById("options_changechannel").addEventListener("click", function (event) {
             location.href = "/client/frame?cid=" + cid + "&x=" + x + "&y=" + y;
