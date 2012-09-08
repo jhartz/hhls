@@ -79,14 +79,20 @@ var video = {
                 seeking: seekfunc,
                 seeked: seekfunc,
                 play: function () {
-                    if (video.winref && !video.adjusting_seek) {
-                        video.adjusting_seek = true;
-                        video.vid.pause();
-                        video.winref.document.getElementById("main_vid").pause();
-                        seekfunc();
-                        video.vid.play();
-                        video.winref.document.getElementById("main_vid").play();
-                        video.adjusting_seek = false;
+                    if (video.winref) {
+                        if (video.adjusting_seek) {
+                            video.adjusting_seek = false;
+                        } else {
+                            // TODO: Does this whole thingie actually help?
+                            video.adjusting_seek = true;
+                            var a = video.winref.document.getElementById("main_vid");
+                            var b = video.vid;
+                            a.pause();
+                            b.pause();
+                            seekfunc();
+                            a.play();
+                            b.play();
+                        }
                     }
                 },
                 pause: function () {
