@@ -11,6 +11,8 @@ var MEDIA_KEY_CODE_MAP = {
 var video = {
     winref: null,
     nowinref: false,
+    adjusting_seek: false,
+    vid: null,
     pop: null,
     RESIZE_VIDEO_TO_SCREEN_DIMENSIONS: false,
     
@@ -19,6 +21,8 @@ var video = {
         if (typeof testelem.canPlayType != "function") {
             $("#video_openwin").html("<div>ERROR: Your browser does not support some of the HTML5 and JavaScript features required by the video player.</div><div>Please upgrade to a more modern browser to use the video player.</div>");
         } else {
+            this.vid = document.getElementById("video_vid");
+            
             $(window).on("unload beforeunload", function () {
                 video.closewin();
             });
@@ -64,26 +68,31 @@ var video = {
             var seekfunc = function () {
                 if (video.winref) {
                     var a = video.winref.document.getElementById("main_vid");
-                    var b = document.getElementById("video_vid");
+                    var b = video.vid;
                     a.currentTime = b.currentTime;
                 }
             };
             var adjustfunc = function () {
                 video.adjust();
             };
-            $("#video_vid").on({
+            $(this.vid).on({
                 loadedmetadata: adjustfunc,
                 loadeddata: adjustfunc,
                 seeking: seekfunc,
                 seeked: seekfunc,
                 play: function () {
-                    if (video.winref) {
-                        video.winref.document.getElementById("main_vid").play();
+                    if (video.winref && !video.adjusting_seek) {
+                        video.adjusting_seek = true;
+                        video.vid.pause();
+                        video.winref.document.getElementById("main_vid").pause();
                         seekfunc();
+                        video.vid.play();
+                        video.winref.document.getElementById("main_vid").play();
+                        video.adjusting_seek = false;
                     }
                 },
                 pause: function () {
-                    if (video.winref) {
+                    if (video.winref && !video.adjusting_seek) {
                         video.winref.document.getElementById("main_vid").pause();
                         seekfunc();
                     }
@@ -164,8 +173,8 @@ var video = {
     stopVideo: function () {
         if (this.pop) Popcorn.destroy(this.pop);
         this.clearcue();
-        $("#video_vid")[0].pause();
-        $("#video_vid")[0].src = "";
+        this.vid.pause();
+        this.vid.src = "";
         this.clearTracks();
         if (this.winref) {
             this.winref.document.getElementById("main_vid").pause();
@@ -177,7 +186,7 @@ var video = {
     
     clearTracks: function () {
         $("#video_vid track").remove();
-        var tracks = $("#video_vid")[0].textTracks;
+        var tracks = this.vid.textTracks;
         if (tracks) {
             for (var i = 0; i < tracks.length; i++) {
                 for (var j = 0; k < tracks[i].cues.length; j++) {
@@ -193,7 +202,7 @@ var video = {
             var ext = "";
             var maybe = [];
             for (var i = 0; i < formats.length; i++) {
-                var canplay = $("#video_vid")[0].canPlayType(formats[i][1]);
+                var canplay = this.vid.canPlayType(formats[i][1]);
                 if (canplay == "probably") {
                     ext = formats[i][0];
                     break;
@@ -213,9 +222,9 @@ var video = {
             
             var url = vid + "." + ext;
             this.clearTracks();
-            if ($("#video_vid")[0].currentTime) $("#video_vid")[0].currentTime = 0;
-            $("#video_vid")[0].src = url;
-            $("#video_vid")[0].load();
+            if (this.vid.currentTime) this.vid.currentTime = 0;
+            this.vid.src = url;
+            this.vid.load();
             
             if (this.winref) {
                 // More details for video syncing are in video.init()
@@ -255,14 +264,14 @@ var video = {
                         video.cue(cues);
                     }, false);
                 }, false);
-                $("#video_vid").append(trackElem);
+                $(this.vid).append(trackElem);
             }
             
             if (control && control.length) {
                 // TODO: Instead of Popcorn, just use TextTracks
                 // (supported in Chrome dev)
                 /*
-                var controlTrack = $("#video_vid")[0].addTextTrack("metadata");
+                var controlTrack = this.vid.addTextTrack("metadata");
                 for (var j = 0; j < control.length; j++) {
                     controlTrack.addCue(this.addControl(control[j]));
                 }
@@ -310,7 +319,7 @@ var video = {
         this.pop.cue(time, function (options) {
             switch (control.command) {
                 case "pause":
-                    $("#video_vid")[0].pause();
+                    video.vid.pause();
                     break;
                 case "effect":
                     if (control.data.preset) {
@@ -328,28 +337,27 @@ var video = {
     },
     
     runcmd: function (cmd) {
-        var vid = $("#video_vid")[0];
         switch ((cmd + "").toLowerCase()) {
             case "play":
             case "pause":
             case "play/pause":
-                vid[vid.paused ? "play" : "pause"]();
+                this.vid[this.vid.paused ? "play" : "pause"]();
                 break;
             case "stop":
                 this.stopVideo();
                 break;
             case "vol up":
             case "volume up":
-                vid.volume += 0.1;
+                this.vid.volume += 0.1;
                 break;
             case "vol down":
             case "volume down":
-                vid.volume -= 0.1;
+                this.vid.volume -= 0.1;
                 break;
             case "mute":
             case "unmute":
             case "mute/unmute":
-                vid.muted = !vid.muted;
+                this.vid.muted = !this.vid.muted;
                 break;
             case "next":
                 alert("TODO");
@@ -363,7 +371,7 @@ var video = {
     adjust: function () {
         if (!$("#ctrl_video").is(".minimized") && $("#video_playing").css("display") != "none") {
             // Adjust width/height of video preview
-            $("#video_vid").css("width", "1px").css("height", "1px");
+            $(this.vid).css("width", "1px").css("height", "1px");
             
             var maxwidth = $("#ctrl_video").width();
             var maxheight = $("#ctrl_video").height();
@@ -371,8 +379,8 @@ var video = {
             var ratio;
             if (this.RESIZE_VIDEO_TO_SCREEN_DIMENSIONS) {
                 ratio = screen.width / screen.height;
-            } else if ($("#video_vid")[0].videoWidth && $("#video_vid")[0].videoHeight) {
-                ratio = $("#video_vid")[0].videoWidth / $("#video_vid")[0].videoHeight;
+            } else if (this.vid.videoWidth && this.vid.videoHeight) {
+                ratio = this.vid.videoWidth / this.vid.videoHeight;
             }
             var width, height;
             if (ratio) {
@@ -389,7 +397,7 @@ var video = {
                 width = maxwidth;
                 height = maxheight;
             }
-            $("#video_vid").css("width", width + "px").css("height", height + "px");
+            $(this.vid).css("width", width + "px").css("height", height + "px");
         }
     },
     
