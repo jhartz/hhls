@@ -11,9 +11,6 @@ TODO
 
  - /client/addon (zipfile generation) and link to it in /client or on home page (probably not /client/frame, cause then it would look like a per-frame thing)
 
- - control:
-    - NEXT/PREV FOR VIDEOS
-
  - Camera Viewer:
     - Add option (in "options") for a time delay for the camera (like "20 seconds" or something) to delay the video (so we can have a camera on the people as they enter somewhere, and show it later)
     - Onclick on the actual video should be play/pause, and if we do this also have a "back to live feed" button - maybe a "play" arrow with a vertical line on the right... >|

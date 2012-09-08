@@ -2,8 +2,6 @@ var MEDIA_KEY_CODE_MAP = {
     173: "mute",
     174: "vol down",
     175: "vol up",
-    176: "next",
-    177: "prev",
     178: "stop",
     179: "play/pause"
 };
@@ -358,12 +356,6 @@ var video = {
             case "unmute":
             case "mute/unmute":
                 this.vid.muted = !this.vid.muted;
-                break;
-            case "next":
-                alert("TODO");
-                break;
-            case "prev":
-                alert("TODO");
                 break;
         }
     },
