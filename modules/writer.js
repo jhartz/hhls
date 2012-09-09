@@ -2,8 +2,7 @@
 
 
 // node modules
-var util = require("util"),
-    path = require("path");
+var path = require("path");
 
 // required modules
 var mu = require("mu2");
@@ -30,8 +29,7 @@ exports.write = function (res, template, vars, status, headers) {
     if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development") {
         mu.clearCache();
     }
-    var stream = mu.compileAndRender(template, vars || {});
-    util.pump(stream, res);
+    mu.compileAndRender(template, vars || {}).pipe(res);
 };
 
 exports.writeError = function (res, num, details) {
