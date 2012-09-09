@@ -74,8 +74,8 @@ function handler(req, res) {
             serveClient(url, req, res);
         } else if (urlpart == "frame") {
             serveClientFrame(url, req, res);
-        } else if (urlpart == "addon") {
-            staticserve.zipfile(path.join("components", "addon"), req, res);
+        } else if (urlpart == "addon.xpi") {
+            staticserve.zipfile(req, res, path.join("components", "addon"), "application/x-xpinstall");
         } else {
             writer.writeError(res, 404);
         }

@@ -7,7 +7,8 @@ var fs = require("fs"),
     path = require("path");
 
 // required modules
-var mime = require("mime");
+var mime = require("mime"),
+    AdmZip = require("adm-zip");
 
 // my modules
 var writer = require("./writer");
@@ -75,7 +76,15 @@ exports.serve = function (req, res, filename, contentDir) {
     });
 };
 
-exports.zipfile = function (dir, req, res) {
-    res.writeHead(200, {"Content-type": "text/plain"});
-    res.end("Serving: " + dir);
+exports.zipfile = function (req, res, dir, type) {
+    var zip = new AdmZip();
+    zip.addLocalFolder(dir);
+    var buf = zip.toBuffer();
+    res.writeHead(200, {
+        "Content-Type": type ? type : "application/zip",
+        "Content-Length": buf.length,
+        "Cache-Control": "no-cache"
+    });
+    res.write(buf);
+    res.end();
 };
