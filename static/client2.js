@@ -7,6 +7,7 @@ function subst_url(name, value) {
             if (badquery.indexOf("&") != -1) oldquery += badquery.substring(badquery.indexOf("&"));
         }
         oldquery = oldquery.substring(1);
+        // TODO: Why is this causing the page to be reloaded?
         history.replaceState({}, "", location.pathname + "?" + oldquery + "&" + name + "=" + encodeURIComponent(value));
     }
 }
