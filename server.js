@@ -365,14 +365,11 @@ function serveClient(url, req, res) {
         var vars = {
             name: name,
             location: location,
-            hostname: hostname
+            hostname: hostname,
+            styling: !(url.query && typeof url.query.nostyle != "undefined")
         };
-        vars.styling = !!(url.query && typeof url.query.nostyle == "undefined");
         if (url.query && fquery(url.query.layout) && fquery(url.query.layout).trim().search(/^[1-9]x[1-9]$/) != -1) {
-            vars.show_layout = false;
             vars.layout = fquery(url.query.layout).trim();
-        } else {
-            vars.show_layout = true;
         }
         
         writer.write(res, "client.html", vars);
