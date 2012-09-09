@@ -351,7 +351,7 @@ function serveClient(url, req, res) {
         writer.write(res, "client2.html", {
             name: name,
             location: location,
-            closebtn: (xval == 1 && yval == 1 ? false : true),
+            closebtn: !(xval == 1 && yval == 1),
             iframes: iframes
         }, {"Set-Cookie": cookies});
     }, function (name, location, hostname) {
