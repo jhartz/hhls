@@ -15,7 +15,7 @@ if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development")
     console.log("Using mu cache");
 }
 
-// myutil.write(res, template name, [template vars, [status], [headers]])
+// writer.write(res, template name, [template vars, [status], [headers]])
 exports.write = function (res, template, vars, status, headers) {
     if (status && typeof status == "object") {
         headers = status;
