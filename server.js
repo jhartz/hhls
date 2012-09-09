@@ -402,12 +402,14 @@ function serveClientFrame(url, req, res) {
                     
                     writer.write(res, "clientframe2.html", {
                         cid: cid, x: x, y: y,
-                        channel: channel.replace(/\"/g, "\\\""),
-                        channeltype: details.type,
-                        sounds: soundlist || false,
-                        old_prop: old_prop,
+                        channel_js: JSON.stringify(channel),
+                        channeltype_js: JSON.stringify(details.type),
                         controller: JSON.stringify(controller),
-                        controller_exec: JSON.stringify(controller_exec)
+                        controller_exec: JSON.stringify(controller_exec),
+                        old_prop: old_prop,
+                        sounds: soundlist || false,
+                        channel: channel == "0" ? "Default Channel" : channel,
+                        channeltype: details.type
                     });
                 };
                 

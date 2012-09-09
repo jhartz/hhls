@@ -57,13 +57,13 @@ table.bordered > tbody > tr > td {
 <script type="text/javascript" src="/static/shared.js"></script>
 <script type="text/javascript">
 var cid = {{cid}}, x = {{x}}, y = {{y}};
-var channel = "{{{channel}}}", channeltype = "{{{channeltype}}}";
+var channel = {{{channel_js}}}, channeltype = {{{channeltype_js}}};
 var controller = {{{controller}}};
 var controller_exec = {{{controller_exec}}};
 {{#old_prop}}var old_prop = {{{old_prop}}};
 {{/old_prop}}</script>
 <script type="text/javascript" src="/static/clientframe2.js"></script>
-<script type="text/javascript" src="/static/clientframe2.{{{channeltype}}}.js"></script>
+<script type="text/javascript" src="/static/clientframe2.{{channeltype}}.js"></script>
 </head>
 
 <body>
