@@ -333,19 +333,26 @@ function serveClient(url, req, res) {
             return prop + ": -webkit-calc(" + val + "); " + prop + ": -moz-calc(" + val + "); " + prop + ": calc(" + val + ");";
         };
         
-        var iframes = "", x, y;
+        var iframes = [], x, y;
         for (y = 1; y <= yval; y++) {
-            iframes += "            <tr>\n";
             for (x = 1; x <= xval; x++) {
+                var iframe = {};
                 var extra = "";
                 ["channel", "controller", "controller_exec"].forEach(function (item) {
                     if (fquery(url.query[item + "_" + x + "x" + y])) {
                         extra += "&" + item + "=" + encodeURIComponent(fquery(url.query[item + "_" + x + "x" + y]));
                     }
                 });
-                iframes += '                <td><iframe src="/client/frame?cid=' + cid + '&amp;x=' + x + '&amp;y=' + y + shared.escHTML(extra) + '" scrolling="no" style="position: absolute; ' + calc("top", "(100% - 20px) / " + yval + " * " + (y - 1) + " + 20px") + " " + calc("height", "(100% - 20px) / " + yval + " - 2px") + " " + calc("left", "100% / " + xval + " * " + (x - 1)) + " " + calc("width", "100% / " + xval + " - 2px") + '">Loading...</iframe></td>\n';
+                iframe.cid = cid;
+                iframe.x = x;
+                iframe.y = y;
+                iframe.extra = extra;
+                iframe.top = "(100% - 20px) / " + yval + " * " + (y - 1) + " + 20px";
+                iframe.height = "(100% - 20px) / " + yval + " - 2px";
+                iframe.left = "100% / " + xval + " * " + (x - 1);
+                iframe.width = "100% / " + xval + " - 2px";
+                iframes.push(iframe);
             }
-            iframes += "            </tr>\n";
         }
         
         writer.write(res, "client2.html", {

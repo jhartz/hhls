@@ -78,7 +78,9 @@ table {
     </div>
 
     <div id="iframeholder">
-{{{iframes}}}
+{{#iframes}}
+        <iframe src="/client/frame?cid={{cid}}&amp;x={{x}}&amp;y={{y}}{{extra}}" scrolling="no" style="position: absolute; top: -webkit-calc({{top}}); top: -moz-calc({{top}}); top: calc({{top}}); height: -webkit-calc({{height}}); height: -moz-calc({{height}}); height: calc({{height}}); left: -webkit-calc({{left}}); left: -moz-calc({{left}}); left: calc({{left}}); width: -webkit-calc({{width}}); width: -moz-calc({{width}}); width: calc({{width}});">Loading...</iframe>
+{{/iframes}}
     </div>
 </div>
 </body>
