@@ -9,7 +9,9 @@ TODO
     - automatic lighting based on sound for timed channels
     - show in "loaded sounds" only when audio is loaded
 
- - /client/addon (zipfile generation) and link to it in /client or on home page (probably not /client/frame, cause then it would look like a per-frame thing)
+ - /client/addon.xpi (zipfile generation)
+    - fix issues (FF says its "corrupted" - maybe examine it in 7-zip?)
+    - link to it in /client or on home page (probably not /client/frame, cause then it would look like a per-frame thing)
 
  - Camera Viewer:
     - Add option (in "options") for a time delay for the camera (like "20 seconds" or something) to delay the video (so we can have a camera on the people as they enter somewhere, and show it later)
