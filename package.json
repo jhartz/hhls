@@ -12,7 +12,7 @@
     "socket.io": "0.9.x",
     "mu2": "0.5.x",
     "mime": "1.2.x",
-    "adm-zip": "0.1.x"
+    "node-native-zip": "1.1.x"
   },
   "repository": {
     "type": "git",

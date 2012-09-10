@@ -8,7 +8,7 @@ var fs = require("fs"),
 
 // required modules
 var mime = require("mime"),
-    AdmZip = require("adm-zip");
+    zip = require("node-native-zip");
 
 // my modules
 var writer = require("./writer");
@@ -76,15 +76,61 @@ exports.serve = function (req, res, filename, contentDir) {
     });
 };
 
+function walk(basedir, callback, dir) {
+    var results = [];
+    if (typeof callback == "function") {
+        fs.readdir(path.join(basedir, dir || ""), function (err, files) {
+            if (err) {
+                console.log("DIRECTORY WALKING ERROR: readdir: " + path.join(basedir, dir || "") + ": ", err);
+                callback(results);
+            } else {
+                var pending = files.length;
+                if (!pending) callback(results);
+                files.forEach(function (file) {
+                    fs.stat(path.join(basedir, dir || "", file), function (err, stat) {
+                        if (err || !stat) {
+                            console.log("DIRECTORY WALKING ERROR: stat: " + path.join(basedir, dir || "", file) + ": " + err);
+                        } else {
+                            if (stat.isDirectory()) {
+                                walk(basedir, function (newfiles) {
+                                    results = results.concat(newfiles);
+                                    if (!--pending) callback(results);
+                                }, path.join(dir || "", file));
+                            } else {
+                                results.push({
+                                    name: path.join(dir || "", file),
+                                    path: path.join(basedir, dir || "", file)
+                                });
+                                if (!--pending) callback(results);
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    }
+}
+
+// Expose walk function in case it's needed elsewhere
+exports.walk = walk;
+
 exports.zipfile = function (req, res, dir, type) {
-    var zip = new AdmZip();
-    zip.addLocalFolder(dir);
-    var buf = zip.toBuffer();
-    res.writeHead(200, {
-        "Content-Type": type ? type : "application/zip",
-        "Content-Length": buf.length,
-        "Cache-Control": "no-cache"
+    var xpi = new zip();
+    walk(dir, function (files) {
+        xpi.addFiles(files, function (err) {
+            if (err) {
+                console.log("XPI ARCHIVING ERROR: ", err);
+                writer.writeError(res, 500);
+            } else {
+                var buf = xpi.toBuffer();
+                res.writeHead(200, {
+                    "Content-Type": type ? type : "application/zip",
+                    "Content-Length": buf.length,
+                    "Cache-Control": "no-cache"
+                });
+                res.write(buf);
+                res.end();
+            }
+        });
     });
-    res.write(buf);
-    res.end();
 };
