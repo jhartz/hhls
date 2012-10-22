@@ -1,6 +1,6 @@
 // Haunted House Logistics Server - config file
 
-exports.PORT = process.env.PORT || 80;
+exports.PORT = process.env.PORT || 8080;
 
 // Directory in which videos are stored (see examples/videos/README)
 // default: "videos"
