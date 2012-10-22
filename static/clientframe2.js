@@ -125,7 +125,7 @@ window.onload = function () {
         status("Loading...", true);
         
         stuff = shared.getHHLS(document.getElementById("hhls_keyholder"));
-        if (typeof stuff.i != "undefined") {
+        if (stuff && typeof stuff.i != "undefined") {
             var i_err = stuff.i;
             stuff = null;
             alert("ERROR: Authentication error with HHLS Client Add-on\nDetails:" + i_err);
