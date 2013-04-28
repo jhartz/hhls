@@ -5,8 +5,8 @@
   "license": "GPL",
   "author": {
     "name": "Jake Hartz",
-    "email": "jake33@rocketmail.com",
-    "url": "http://jhartz.github.com/"
+    "email": "jhartz@outlook.com",
+    "url": "http://jhartz.github.io/"
   },
   "dependencies": {
     "socket.io": "0.9.x",
