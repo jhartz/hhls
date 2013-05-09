@@ -19,7 +19,14 @@ var config = require("./config"),
     jsonsettings = require("./modules/jsonsettings");
 
 
-jsonsettings.default_settings_dir = config.SETTINGS_DIR || "settings";
+// Default config
+if (!config.PORT) config.PORT = 8080;
+if (!config.VIDEOS_DIR) config.VIDEOS_DIR = "content/videos";
+if (!config.SOUNDS_DIR) config.SOUNDS_DIR = "content/sounds";
+if (!config.RESOURCES_DIR) config.RESOURCES_DIR = "content/resources";
+if (!config.SETTINGS_DIR) config.SETTINGS_DIR = "content/settings";
+
+jsonsettings.default_settings_dir = config.SETTINGS_DIR;
 
 io.configure(function () {
     io.enable("browser client minification");
@@ -48,10 +55,10 @@ function handler(req, res) {
             contentDir = contentDir.substring(0, contentDir.indexOf("/"));
             if (contentDir == "resources" && config.RESOURCES_DIR) {
                 contentDir = config.RESOURCES_DIR;
-            } else if (contentDir == "videos" && config.VIDEO_DIR) {
-                contentDir = config.VIDEO_DIR;
-            } else if (contentDir == "sounds" && config.SOUND_DIR) {
-                contentDir = config.SOUND_DIR;
+            } else if (contentDir == "videos" && config.VIDEOS_DIR) {
+                contentDir = config.VIDEOS_DIR;
+            } else if (contentDir == "sounds" && config.SOUNDS_DIR) {
+                contentDir = config.SOUNDS_DIR;
             }
             staticserve.serve(req, res, filename, contentDir);
         }
@@ -207,7 +214,7 @@ var settings = {
 
 function serveControl(url, req, res) {
     var writeme = function (videolist) {
-        fs.readdir(config.SOUND_DIR, function (err, files) {
+        fs.readdir(config.SOUNDS_DIR, function (err, files) {
             if (err) {
                 writer.writeError(res, 500);
             } else {
@@ -234,7 +241,7 @@ function serveControl(url, req, res) {
     if (url.query && typeof url.query.novideo != "undefined") {
         writeme();
     } else {
-        fs.readdir(config.VIDEO_DIR, function (err, files) {
+        fs.readdir(config.VIDEOS_DIR, function (err, files) {
             if (err) {
                 writer.writeError(res, 500);
             } else {
@@ -249,7 +256,7 @@ function serveControl(url, req, res) {
                         }
                         if (videos[video].json) {
                             try {
-                                var control = JSON.parse(fs.readFileSync(path.join(config.VIDEO_DIR, video + ".json"), "utf-8"));
+                                var control = JSON.parse(fs.readFileSync(path.join(config.VIDEOS_DIR, video + ".json"), "utf-8"));
                             } catch (err) {
                                 console.log("ERROR in serveControl, in parsing json for data-control...", err);
                             }
@@ -414,7 +421,7 @@ function serveClientFrame(url, req, res) {
                 };
                 
                 if (details.type == "timed") {
-                    fs.readdir(config.SOUND_DIR, function (err, files) {
+                    fs.readdir(config.SOUNDS_DIR, function (err, files) {
                         if (err) {
                             writer.writeError(res, 500);
                         } else {
