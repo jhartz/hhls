@@ -18,6 +18,17 @@ function client_details(x, y, channel, controller, controller_exec) {
     if (controller_exec) subst_url("controller_exec_" + x + "x" + y, controller_exec);
 }
 
+function fullscreenchange() {
+    var elem = document.getElementById("maincontent");
+    if (document.fullscreenElement == elem || document.fullScreenElement == elem ||
+        document.mozFullscreenElement == elem || document.mozFullScreenElement == elem ||
+        document.webkitFullscreenElement == elem || document.webkitFullScreenElement == elem) {
+        
+        elem.requestPointerLock = elem.requestPointerLock || elem.mozRequestPointerLock || elem.webkitRequestPointerLock;
+        if (typeof elem.requestPointerLock == "function") elem.requestPointerLock();
+    }
+}
+
 window.onload = function () {
     if (document.getElementById && document.getElementsByTagName && document.addEventListener) {
         if (document.getElementById("status_closeall")) {
@@ -32,6 +43,20 @@ window.onload = function () {
         }
         
         document.getElementById("maincontent").style.display = "block";
+        
+        document.addEventListener("fullscreenchange", fullscreenchange, false);
+        document.addEventListener("mozfullscreenchange", fullscreenchange, false);
+        document.addEventListener("webkitfullscreenchange", fullscreenchange, false);
+        
+        var elem = document.getElementById("maincontent");
+        elem.requestFullscreen = (elem.requestFullscreen || elem.requestFullScreen ||
+            elem.mozRequestFullscreen || elem.mozRequestFullScreen ||
+            elem.webkitRequestFullscreen || elem.webkitRequestFullScreen);
+        if (typeof elem.requestFullscreen == "function") {
+            document.getElementById("status").addEventListener("dblclick", function () {
+                elem.requestFullscreen();
+            }, false);
+        }
     } else {
         document.getElementById("loading").innerHTML = "ERROR: Your browser does not support some of the JavaScript features required by this page.<br>Please upgrade to a more modern browser.";
     }
