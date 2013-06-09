@@ -598,7 +598,7 @@ var effects = {
                     if (data.prop.light == "auto") {
                         html += 'auto';
                     } else {
-                        html += '<span title="' + shared.escHTML(JSON.stringify(data.prop.light)) + '" style="cursor: default; font-style: italic;">(custom lighting sequence)</span>';
+                        html += '<span title="' + shared.escHTML(JSON.stringify(data.prop.light)) + '" style="cursor: default; font-style: italic;">(custom lighting pattern)</span>';
                     }
                     if (data.prop.sound) html += "<br>Sound: " + data.prop.sound;
                 } else if (typeof data.prop.dimness != "undefined") {
