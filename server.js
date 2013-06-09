@@ -134,8 +134,9 @@ function fquery(query, helper) {
 }
 
 function testLocationData(url, req, res, successCallback, failCallback) {
-    dns.reverse(req.connection.remoteAddress, function (err, domains) {
+    //dns.reverse(req.connection.remoteAddress, function (err, domains) {
         var hostname = "";
+        /*
         if (!err && domains && domains.length > 0) {
             for (var i = 0; i < domains.length; i++) {
                 if (domains[i]) {
@@ -144,6 +145,7 @@ function testLocationData(url, req, res, successCallback, failCallback) {
                 }
             }
         }
+        */
         
         if (url.query && fquery(url.query.location)) {
             var name = (fquery(url.query.name) || hostname).trim();
@@ -157,7 +159,7 @@ function testLocationData(url, req, res, successCallback, failCallback) {
             var cookies = req.headers.cookie ? shared.parseCookies(req.headers.cookie) : {};
             failCallback(cookies.name || "", cookies.location || "", hostname);
         }
-    });
+    //});
 }
 
 function makeFileList(files, separateMetadata, includeReadme) {
