@@ -1,4 +1,8 @@
 {
+    "chandelier": {
+        "type": "dimmed",
+        "dimness": 60
+    },
     "corrin": {
         "type": "timed"
     },
