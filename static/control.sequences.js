@@ -26,7 +26,7 @@ init.push(function () {
 });
 
 onConnection.push(function () {
-    sequences.toggle("controls");
+    sequences.toggle("main");
 });
 onNoConnection.push(function () {
     sequences.toggle("waiting");

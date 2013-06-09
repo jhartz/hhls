@@ -244,7 +244,8 @@ function toggle(section, newelem, oncomplete) {
     }
     
     // If we're still here, we didn't slide
-    $oldelem.hide();
+    // (possibly because one of the 2 lacks data-level, or because the entire section is hidden)
+    $section.children("div").hide();
     $newelem.show();
     if (typeof oncomplete == "function") oncomplete();
 }
