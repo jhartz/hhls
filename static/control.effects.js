@@ -43,7 +43,6 @@ var KEY_CODE_MAP = {
 
 var effects = {
     oncustom: {timed: false, dimmed: false},
-    transitioning: false,
     channel: "0",
     details: {type: "timed"},
     channels_currentlyediting: null,
