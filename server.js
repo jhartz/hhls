@@ -44,7 +44,7 @@ function handler(req, res) {
         if (url.pathname == "/client/stream") {
             serveStream(url, req, res);
         } else {
-            writer.writeError(res, 404);
+            writer.writeError(res, 406);
         }
     } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, 11) == "/resources/" || url.pathname.substring(0, 8) == "/videos/" || url.pathname.substring(0, 8) == "/sounds/") {
         var filename = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
