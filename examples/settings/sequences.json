@@ -1,8 +1,28 @@
 {
     "NAME": {
-        "length": 20,  // seconds
+        "length": 20,
+        "__comment": "items in \"sequence\" follow same format as stuff in json files for videos in the videos directory",
         "sequence": [
-            // Same format as videoname.json in videos directory
+            {
+                "time": 7,
+                "command": "effect",
+                "data": {
+                    "preset": "thunder1"
+                }
+            },
+            {
+                "time": 15.45,
+                "command": "pause"
+            },
+            {
+                "time": 20,
+                "command": "effect",
+                "data": {
+                    "channel": "movietheatre_lighting",
+                    "dimness": 88,
+                    "time": 4
+                }
+            }
         ]
     }
 }
