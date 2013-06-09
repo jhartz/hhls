@@ -21,10 +21,10 @@ var config = require("./config"),
 
 // Default config
 if (!config.PORT) config.PORT = 8080;
-if (!config.VIDEOS_DIR) config.VIDEOS_DIR = "content/videos";
-if (!config.SOUNDS_DIR) config.SOUNDS_DIR = "content/sounds";
-if (!config.RESOURCES_DIR) config.RESOURCES_DIR = "content/resources";
-if (!config.SETTINGS_DIR) config.SETTINGS_DIR = "content/settings";
+config.VIDEOS_DIR = pickExistingDir(config.VIDEOS_DIR, "content/videos");
+config.SOUNDS_DIR = pickExistingDir(config.SOUNDS_DIR, "content/sounds");
+config.RESOURCES_DIR = pickExistingDir(config.RESOURCES_DIR, "content/resources");
+config.SETTINGS_DIR = pickExistingDir(config.SETTINGS_DIR, "content/settings");
 
 jsonsettings.default_settings_dir = config.SETTINGS_DIR;
 
@@ -96,6 +96,17 @@ function handler(req, res) {
 /*
     UTIL FUNCTIONS
 */
+
+// Pick the first directory from the arguments that exists
+function pickExistingDir() {
+    var dir = "";
+    for (var i = 0; i < arguments.length; i++) {
+        if (arguments[i]) {
+            dir = arguments[i];
+            if (fs.existsSync(dir)) break;
+        }
+    }
+}
 
 // "Format query" - to test/format a member of require("url").parse(..., true).query
 function fquery(query, helper) {
