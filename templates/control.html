@@ -31,6 +31,7 @@ var settings = {
 <script type="text/javascript" src="/static/control.js"></script>{{#videos}}
 <script type="text/javascript" src="/static/control.video.js"></script>{{/videos}}
 <script type="text/javascript" src="/static/control.effects.js"></script>
+<script type="text/javascript" src="/static/control.sequences.js"></script>
 <script type="text/javascript" src="/static/control.conn.js"></script>
 </head>
 
@@ -45,7 +46,7 @@ var settings = {
 <section id="ctrl_effects" class="top" style="display: none;">
     <header><h1>Effects Controller</h1></header>
     
-    <div id="effects_waiting"><table style="width: 100%;"><tr><td id="effects_statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
+    <div id="effects_waiting"><table style="width: 100%;"><tr><td class="statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
     
     <div id="effects_controls" data-level="1" style="display: none;">
         <form id="effects_form">
@@ -184,6 +185,24 @@ var settings = {
     
     <footer class="buttonbox">
         <div><button type="button" data-btn="channels" style="width: 50%;" disabled>Channels</button><button type="button" data-btn="keyboard" style="width: 50%;" disabled>Keyboard Shortcuts</button></div>
+    </footer>
+</section>
+
+<section id="ctrl_sequences" class="top" style="display: none;">
+    <header><h1>Sequences</h1></header>
+    
+    <div id="sequences_waiting"><table style="width: 100%;"><tr><td class="statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
+    
+    <div id="sequences_main" data-level="1" style="display: none;">
+        <p>Run one of these sequences:<br>[list]</p>
+    </div>
+    
+    <div id="sequences_manage" data-level="2" style="display: none;">
+        <h2>Manage Sequences</h2>
+    </div>
+    
+    <footer class="buttonbox">
+        <div><button type="button" data-btn="manage" style="width: 100%;" disabled>Manage Sequences</button></div>
     </footer>
 </section>
 {{#videos}}
