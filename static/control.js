@@ -1,33 +1,16 @@
-function resizer(use_animate) {
-    $("section").not("minimized").children("footer:visible").each(function () {
-        $(this).parent().css("padding-bottom", Math.round($(this).outerHeight()) + "px");
-    });
-    
-    var height = $("#dummy").outerHeight(true) - $("section.bottom").outerHeight(true);
-    $("section.top").not(".minimized").each(function () {
-        $(this).find(".topbtn, .attop").css("top", $(this).css("padding-top"));
-        
-        var loading = $(this).data("loading");
-        if (!loading || use_animate) {
-            var diff = $(this).outerHeight(true) - $(this).height();
-            var newheight = Math.floor(height - diff) + "px";
-            if (use_animate) {
-                $(this).animate({height: newheight}, function () {
-                    $(this).data("loading", false);
-                    resizer();
-                });
-            } else {
-                $(this).css("height", newheight);
-            }
-        }
-    });
-    
-    if (typeof video != "undefined") video.adjust();
-}
+// Pushed to by section scripts
+var init = [];
+var onConnection = [];
+var onNoConnection = [];
+var settings_onupdate = {
+    channels: [],
+    keyboard: [],
+    presets: [],
+    sequences: []
+};
+var blockers = {};
 
 var minimized_items = [];
-var init = [];
-var blockers = {};
 
 $(function () {
     $("section").show();
@@ -153,6 +136,33 @@ $(window).on("beforeunload", function () {
     }
 });
 
+function resizer(use_animate) {
+    $("section").not("minimized").children("footer:visible").each(function () {
+        $(this).parent().css("padding-bottom", Math.round($(this).outerHeight()) + "px");
+    });
+    
+    var height = $("#dummy").outerHeight(true) - $("section.bottom").outerHeight(true);
+    $("section.top").not(".minimized").each(function () {
+        $(this).find(".topbtn, .attop").css("top", $(this).css("padding-top"));
+        
+        var loading = $(this).data("loading");
+        if (!loading || use_animate) {
+            var diff = $(this).outerHeight(true) - $(this).height();
+            var newheight = Math.floor(height - diff) + "px";
+            if (use_animate) {
+                $(this).animate({height: newheight}, function () {
+                    $(this).data("loading", false);
+                    resizer();
+                });
+            } else {
+                $(this).css("height", newheight);
+            }
+        }
+    });
+    
+    if (typeof video != "undefined") video.adjust();
+}
+
 function toggle(section, newelem, oncomplete) {
     var $section = $(section);
     var $oldelem = $section.children("div:visible");
@@ -237,6 +247,15 @@ function toggle(section, newelem, oncomplete) {
     $oldelem.hide();
     $newelem.show();
     if (typeof oncomplete == "function") oncomplete();
+}
+
+function toggle_buttonbox(section, newbie, oncomplete) {
+    var $section = $("#ctrl_" + section);
+    toggle($section[0], document.getElementById(section + "_" + newbie), oncomplete || null);
+    
+    $section.children("footer").find("button").removeClass("active");
+    $section.children("footer").find("button[data-btn=\"" + newbie + "\"]").addClass("active");
+    $section.children("footer.buttonbox").find("button").attr("disabled", newbie == "waiting");
 }
 
 function flash(elem) {

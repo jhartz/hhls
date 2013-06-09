@@ -240,12 +240,7 @@ var effects = {
     },
     
     toggle: function (newbie, oncomplete) {
-        toggle($("#ctrl_effects")[0], document.getElementById("effects_" + newbie), oncomplete || null);
-        
-        $("#ctrl_effects > footer button").removeClass("active");
-        $("#ctrl_effects > footer button[data-btn=\"" + newbie + "\"]").addClass("active");
-        
-        $("#ctrl_effects > footer.buttonbox button").attr("disabled", newbie == "waiting");
+        toggle_buttonbox("effects", newbie, oncomplete);
     },
     
     checkinputs: function (reason) {
@@ -784,4 +779,21 @@ var effects = {
 
 init.push(function () {
     effects.init();
+});
+
+onConnection.push(function () {
+    effects.toggle("controls");
+});
+onNoConnection.push(function () {
+    effects.toggle("waiting");
+});
+
+settings_onupdate.channels.push(function () {
+    effects.update_channels();
+});
+settings_onupdate.keyboard.push(function () {
+    effects.update_keyboard();
+});
+settings_onupdate.presets.push(function () {
+    effects.update_presets();
 });

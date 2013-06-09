@@ -67,13 +67,13 @@ var conn = {
             });
             this.socket.on("connect", function () {
                 conn.showmsg("Connected to server");
-                effects.toggle("controls");
+                conn.onConnection();
                 // In case this gets shown again (if there's an error, disconnect, etc.)
-                $("#effects_statuser").text("Server connection necessary");
+                $(".statuser").text("Server connection necessary");
             });
             this.socket.on("connect_failed", function () {
                 conn.showmsg("Failed to establish connection to server");
-                effects.toggle("waiting");
+                conn.onNoConnection();
             });
             
             this.socket.on("message", function (message) {
@@ -90,8 +90,12 @@ var conn = {
                                 break;
                             case "settings":
                                 settings[msg.data.setting] = msg.data.settings;
-                                if (typeof effects["update_" + msg.data.setting] == "function") {
-                                    effects["update_" + msg.data.setting]();
+                                if (settings_onupdate[msg.data.setting]) {
+                                    for (var i = 0; i < settings_onupdate[msg.data.setting].length; i++) {
+                                        if (typeof settings_onupdate[msg.data.setting][i] == "function") {
+                                            settings_onupdate[msg.data.setting][i]();
+                                        }
+                                    }
                                 }
                                 break;
                             default:
@@ -107,24 +111,40 @@ var conn = {
             
             this.socket.on("disconnect", function () {
                 conn.showmsg("Disconnected from server");
-                effects.toggle("waiting");
+                conn.onNoConnection();
             });
             this.socket.on("error", function () {
                 conn.showmsg("Error connecting to server");
-                effects.toggle("waiting");
+                conn.onNoConnection();
             });
             this.socket.on("reconnect", function () {
                 conn.showmsg("Reconnected to server");
-                effects.toggle("controls");
+                conn.onConnection();
             });
             this.socket.on("reconnecting", function () {
                 conn.showmsg("Reconnecting to server...");
-                effects.toggle("waiting");
+                conn.onNoConnection();
             });
             this.socket.on("reconnect_failed", function () {
                 conn.showmsg("Failed to reconnect to server");
-                effects.toggle("waiting");
+                conn.onNoConnection();
             });
+        }
+    },
+    
+    onConnection: function () {
+        for (var i = 0; i < onConnection.length; i++) {
+            if (typeof onConnection[i] == "function") {
+                onConnection[i]();
+            }
+        }
+    },
+    
+    onNoConnection: function () {
+        for (var i = 0; i < onNoConnection.length; i++) {
+            if (typeof onNoConnection[i] == "function") {
+                onNoConnection[i]();
+            }
         }
     },
     
