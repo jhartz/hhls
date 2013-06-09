@@ -223,6 +223,9 @@ var settings = {
     }}),
     presets: new jsonsettings.SettingsFile({filename: "presets.json", onupdate: function () {
         sendSetting("presets");
+    }}),
+    sequences: new jsonsettings.SettingsFile({filename: "sequences.json", onupdate: function () {
+        sendSetting("sequences");
     }})
 };
 
@@ -246,7 +249,8 @@ function serveControl(url, req, res) {
                     miniclient: !!(!url.query || typeof url.query.nominiclient == "undefined"),
                     channels: JSON.stringify(settings.channels.data),
                     keyboard: JSON.stringify(settings.keyboard.data),
-                    presets: JSON.stringify(settings.presets.data)
+                    presets: JSON.stringify(settings.presets.data),
+                    sequences: JSON.stringify(settings.sequences.data)
                 });
             }
         });

@@ -1,5 +1,8 @@
 TODO
 
+ - control:
+    - add something new in the control called a "sequence" that's like a video (with the json system and everything), just without the video
+
  - components/addon
     - device detection and interaction
     - add a system to write executables to a pref so they stay between restarts

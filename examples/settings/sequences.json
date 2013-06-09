@@ -1,0 +1,8 @@
+{
+    "NAME": {
+        "length": 20,  // seconds
+        "sequence": [
+            // Same format as videoname.json in videos directory
+        ]
+    }
+}
