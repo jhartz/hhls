@@ -20,7 +20,7 @@ var config = require("./config"),
 
 
 // Default config
-if (!config.PORT) config.PORT = 8080;
+if (!config.PORT) config.PORT = process.env.PORT || 8080;
 config.VIDEOS_DIR = pickExistingDir(config.VIDEOS_DIR, "content/videos");
 config.SOUNDS_DIR = pickExistingDir(config.SOUNDS_DIR, "content/sounds");
 config.RESOURCES_DIR = pickExistingDir(config.RESOURCES_DIR, "content/resources");
