@@ -106,6 +106,7 @@ function pickExistingDir() {
             if (fs.existsSync(dir)) break;
         }
     }
+    return dir;
 }
 
 // "Format query" - to test/format a member of require("url").parse(..., true).query
