@@ -219,9 +219,8 @@ var sequences = {
         var minutes = Math.floor(seconds / 60);
         seconds = (seconds - minutes * 60).toString();
         if (seconds.length == 1) seconds = "0" + seconds;
-        var hundredths = Math.round(secondpart * 100).toString();
-        if (hundredths.length == 1) hundredths = "0" + hundredths;
-        return minutes + ":" + seconds + "." + hundredths;
+        var tenths = Math.round(secondpart * 10).toString();
+        return minutes + ":" + seconds + "." + tenths;
     },
     
     add: function (sequencename) {
@@ -235,7 +234,7 @@ var sequences = {
             var sequencename = sequences.queue.shift();
             var details = settings.sequences[sequencename];
             $("#sequences_playing_title").text(sequencename);
-            $("#sequences_playing_time").text("0:00 / " + sequences.timefmt(details.length));
+            $("#sequences_playing_time").text("0:00.0 / " + sequences.timefmt(details.length));
             $("#sequences_playing_progress").css("width", "0%");
             $("#sequences_playing").show();
             for (var i = 0; i < details.sequence.length; i++) {
