@@ -126,10 +126,13 @@ $(window).resize(function () {
     resizer();
 });
 
-$(window).on("beforeunload", function () {
+$(window).on("beforeunload", function (event) {
     for (var blocker in blockers) {
         if (blockers.hasOwnProperty(blocker)) {
             if (blockers[blocker]) {
+                if (/Firefox[\/\s](\d+)/.test(navigator.userAgent) && Number(RegExp.$1) >= 4) {
+                    alert(blockers[blocker]);
+                }
                 return blockers[blocker];
             }
         }
@@ -271,5 +274,24 @@ function flash(elem) {
                 $elem.css("background-image", "").data("transitioning", false);
             }, 200 + 5);
         }, 200 + 100);
+    }
+}
+
+function controlcmd(control) {
+    switch (control.command) {
+        case "pause":
+            if (typeof video != "undefined") video.vid.pause();
+            break;
+        case "effect":
+            if (control.data.preset) {
+                effects.sendpreset(control.data.channel || "0", control.data.preset);
+            } else if (control.data.channel && control.data.state) {
+                effects.sendtoggle(control.data.channel, control.data.state);
+            } else if (control.data.channel && control.data.dimness) {
+                effects.sendpattern(control.data.channel, control.data.dimness, control.data.time);
+            } else if (control.data.light || control.data.sound) {
+                effects.sendpattern(control.data.channel || "0", control.data.light, control.data.sound);
+            }
+            break;
     }
 }
