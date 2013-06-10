@@ -657,26 +657,32 @@ io.of("/control").on("connection", function (socket) {
         if (typeof msg == "object" && msg.about) {
             switch (msg.about) {
                 case "effects_cmd":
-                    sendMsg(msg.data, msg.data.channel);
-                    if (msg.data.command == "play") {
-                        if (typeof msg.data.prop.dimness != "undefined") {
-                            settings.channels.data[msg.data.channel].dimness = msg.data.prop.dimness;
-                            settings.channels.update();
-                        } else if (typeof msg.data.prop.state != "undefined") {
-                            var state = settings.channels.data[msg.data.channel].state || 0;
-                            if (msg.data.prop.state == -1) {
-                                state = Number(!state);
-                            } else {
-                                state = msg.data.prop.state;
+                    if (msg.data && msg.data.channel) {
+                        sendMsg(msg.data, msg.data.channel);
+                        if (msg.data.command && msg.data.command == "play" && msg.data.prop) {
+                            if (typeof msg.data.prop.dimness != "undefined") {
+                                settings.channels.data[msg.data.channel].dimness = msg.data.prop.dimness;
+                                settings.channels.update();
+                            } else if (typeof msg.data.prop.state != "undefined") {
+                                var state = settings.channels.data[msg.data.channel].state || 0;
+                                if (msg.data.prop.state == -1) {
+                                    state = Number(!state);
+                                } else {
+                                    state = msg.data.prop.state;
+                                }
+                                settings.channels.data[msg.data.channel].state = state;
+                                settings.channels.update();
                             }
-                            settings.channels.data[msg.data.channel].state = state;
-                            settings.channels.update();
                         }
                     }
                     break;
                 case "settings":
-                    settings[msg.data.setting].data = msg.data.settings;
-                    settings[msg.data.setting].update();
+                    if (settings[msg.data.setting]) {
+                        settings[msg.data.setting].data = msg.data.settings;
+                        settings[msg.data.setting].update();
+                    } else {
+                        console.log("io (/control): invalid setting");
+                    }
                     break;
                 default:
                     sendForward(msg.about, msg.data);
