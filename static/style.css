@@ -34,12 +34,18 @@ section {
     left: 0;
     right: 0;
     bottom: 0;
-    margin: 10px;
+    margin: 2px;
     background: #CFDDE0 url(bg.png);
     border: 1px solid #C9D7DA;
     border-radius: 9px;
     padding-top: 38px;
     box-shadow: 1px 1px 3px #ccc;
+}
+
+@media screen and (min-width: 740px) {
+    section {
+        margin: 10px;
+    }
 }
 
 section h1, section h2 {
