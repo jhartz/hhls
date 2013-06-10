@@ -300,5 +300,10 @@ function controlcmd(details) {
         case "stop":
             effects.stop(details.data.channel || "0");
             break;
+        case "sequence":
+            if (details.data.sequencename && settings.sequences.hasOwnProperty(details.data.sequencename)) {
+                sequences.add(details.data.sequencename);
+            }
+            break;
     }
 }
