@@ -301,17 +301,7 @@ var video = {
             cue.onexit = function () {
                 // This will only be fired if playback goes thru control.time
                 // (not if we're seeking and we pass over it)
-                if (control.command == "effect") {
-                    if (control.data.preset) {
-                        effects.sendpreset(control.data.channel || "0", control.data.preset);
-                    } else if (control.data.channel && control.data.state) {
-                        effects.sendtoggle(control.data.channel, control.data.state);
-                    } else if (control.data.channel && control.data.dimness) {
-                        effects.sendpattern(control.data.channel, control.data.dimness, control.data.time);
-                    } else if (control.data.light || control.data.sound) {
-                        effects.sendpattern(control.data.channel || "0", control.data.light, control.data.sound);
-                    }
-                }
+                controlcmd(control);
             };
         }
         return cue;
@@ -319,24 +309,8 @@ var video = {
         
         var time = control.time;
         if (time) time = Popcorn.util.toSeconds(time);
-        
         this.pop.cue(time, function (options) {
-            switch (control.command) {
-                case "pause":
-                    video.vid.pause();
-                    break;
-                case "effect":
-                    if (control.data.preset) {
-                        effects.sendpreset(control.data.channel || "0", control.data.preset);
-                    } else if (control.data.channel && control.data.state) {
-                        effects.sendtoggle(control.data.channel, control.data.state);
-                    } else if (control.data.channel && control.data.dimness) {
-                        effects.sendpattern(control.data.channel, control.data.dimness, control.data.time);
-                    } else if (control.data.light || control.data.sound) {
-                        effects.sendpattern(control.data.channel || "0", control.data.light, control.data.sound);
-                    }
-                    break;
-            }
+            controlcmd(control);
         });
     },
     
