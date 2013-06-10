@@ -1,7 +1,7 @@
 TODO
 
  - control:
-    - add something new in the control called a "sequence" that's like a video (with the json system and everything), just without the video
+    - Finish the "edit sequence" thingie
 
  - client2:
     - Implement FS/PointerLock so it's easy to go full screen and if pointer lock is enabled then screensaver/low power mode (screen dimming) SHOULDN'T happen (TODO: test this)
