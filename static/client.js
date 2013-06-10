@@ -1,6 +1,6 @@
 window.onload = function () {
     if (document.getElementById && document.getElementById("customizer_span") && document.addEventListener && document.createElement) {
-        document.getElementById("customizer_span").innerHTML += '<input id="customizer_input1" name="layout_x" size="2" type="range" min="1" max="9">x<input id="customizer_input2" name="layout_y" size="2" type="range" min="1" max="9">';
+        document.getElementById("customizer_span").innerHTML += '<input id="customizer_input1" name="layout_x" size="2" type="number" min="1" max="9">x<input id="customizer_input2" name="layout_y" size="2" type="number" min="1" max="9">';
         
         document.getElementById("customizer_select").addEventListener("change", function (event) {
             if (this.value == "custom") {

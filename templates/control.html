@@ -96,7 +96,7 @@ var settings = {
                             <div class="back">
                                 <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
                                 <div><br style="clear: both;">
-                                    <p><label for="effects_custom_dimness">Dimness: </label><input type="range" id="effects_custom_dimness" size="3" pattern="(100|[0-9]{1,2}(\.[0-9]*)?)">&nbsp;<span id="effects_custom_dimness_label"></span></p>
+                                    <p><label for="effects_custom_dimness">Dimness: </label><input type="number" id="effects_custom_dimness" size="3" min="0" max="100" pattern="(100|[0-9]{1,2}(\.[0-9]*)?)">&nbsp;<span id="effects_custom_dimness_label"></span></p>
                                     <p><label for="effects_custom_time">Fading Time (seconds): </label><input type="number" id="effects_custom_time" size="3" pattern="[0-9]+(\.[0-9]*)?"></p>
                                     <p style="text-align: right;"><span class="lilbutton effects_custom_customize">Save as Preset</span></p>
                                 </div>
