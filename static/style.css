@@ -315,3 +315,7 @@ div.bottomcorner {
 .flash {
     background-color: #1D353F;
 }
+
+.strikeonhover:hover {
+    text-decoration: line-through;
+}
