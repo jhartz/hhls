@@ -388,7 +388,7 @@ var effects = {
     
     update_channelman: function () {
         var usedin_default = this.channel_used_in("0", "Yes", "&nbsp;");
-        var html = '<tr><td class="disabled">Default Channel</td><td class="disabled">timed</td><td style="text-align: center;">' + usedin_default.keyboard + '</td><td style="text-align: center;">' + usedin_default.video + '</td><td style="text-align: center;">' + usedin_default.clients + '</td></tr>';
+        var html = '<tr><td class="disabled">Default Channel</td><td class="disabled">timed</td><td style="text-align: center;">' + usedin_default.keyboard + '</td><td style="text-align: center;">' + usedin_default.sequences + '</td><td style="text-align: center;">' + usedin_default.video + '</td><td style="text-align: center;">' + usedin_default.clients + '</td></tr>';
         for (var channel in settings.channels) {
             if (settings.channels.hasOwnProperty(channel)) {
                 var details = settings.channels[channel];
@@ -401,7 +401,7 @@ var effects = {
                     css = "color: blue;";
                 }
                 var usedin = this.channel_used_in(channel, "Yes", "&nbsp;");
-                html += '<tr><td title="' + shared.escHTML(details.description || channel) + '" style="' + shared.escHTML(css) + '">' + shared.escHTML(channel) + '</td><td>' + type + '</td><td style="text-align: center;">' + usedin.keyboard + '</td><td style="text-align: center;">' + usedin.video + '</td><td style="text-align: center;">' + usedin.clients + '</td>';
+                html += '<tr><td title="' + shared.escHTML(details.description || channel) + '" style="' + shared.escHTML(css) + '">' + shared.escHTML(channel) + '</td><td>' + type + '</td><td style="text-align: center;">' + usedin.keyboard + '</td><td style="text-align: center;">' + usedin.sequences + '</td><td style="text-align: center;">' + usedin.video + '</td><td style="text-align: center;">' + usedin.clients + '</td>';
                 if (usedin.nothing) {
                     html += '<td><span class="lilbutton effects_channels_editor" data-channel="' + shared.escHTML(channel) + '">Edit</span>&nbsp;<span class="lilbutton effects_channels_deleter" data-channel="' + shared.escHTML(channel) + '">Delete</span></td>';
                 }
@@ -433,6 +433,24 @@ var effects = {
             }
         }
         
+        var i, sequence;
+        TOPLOOP: for (var sequencename in settings.sequences) {
+            if (settings.sequences.hasOwnProperty(sequencename) && settings.sequences[sequencename].sequence) {
+                for (i = 0; i < settings.sequences[sequencename].sequence.length; i++) {
+                    sequence = settings.sequences[sequencename].sequence[i];
+                    if (sequence.data) {
+                        if (sequence.data.channel && sequence.data.channel == channel) {
+                            usedin._sequences = true;
+                            break TOPLOOP;
+                        } else if (channel == "0" && !sequence.data.channel) {
+                            usedin._sequences = true;
+                            break TOPLOOP;
+                        }
+                    }
+                }
+            }
+        }
+        
         $("button.vidbtn").each(function () {
             if ($(this).attr("data-control")) {
                 var control;
@@ -455,7 +473,7 @@ var effects = {
             }
         });
         
-        $(["keyboard", "video"]).each(function () {
+        $(["keyboard", "sequences", "video"]).each(function () {
             if (usedin["_" + this]) {
                 if (typeof yesvalue != "undefined" && (typeof yesvalue != "object" || yesvalue)) {
                     usedin[this] = yesvalue;
