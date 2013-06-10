@@ -10,7 +10,7 @@ Example: movie.webm, movie.mp4, movie.ogv
 You can include cues in the video (almost like subtitles only visible to the control, not to the full-screen video playing to the audience) by writing them in a WebVTT file called basename.vtt where basename is the name of the video (without the extension).
 
 
-You can run effects at specific times in the video by including details in a JSON file called basename.json where basename is the name of the video (without the extension).
+You can run effects at specific times in the video by including details in a JSON file called basename.json where basename is the name of the video (without the extension). This follows a very similar format to the way keyboard shortcuts and sequences are stored.
 
 Format for the JSON file:
 
@@ -24,22 +24,23 @@ Format for the JSON file:
 
 TIME is a JavaScript number (float) representing a point in the video (in seconds)
 
-COMMAND is one of:
+COMMAND is one of the commands that can be processed by the controlcmd function in control.js
+Some useful ones are:
     pause     (pauses the video)
     effect    (plays an effect)
 
-DATA specifies more info if COMMAND is "effect":
+DATA specifies more info if COMMAND requires it (like "effect"):
     "command": "effect",
     "data": {
-        "preset": "...",
-        "channel": "..."
+        "channel": "...",
+        "preset": "..."
     }
 
     "command": "effect",
     "data": {
+        "channel": "...",
         "light": [1,2,3,4],
-        "sound": "...",
-        "channel": "..."
+        "sound": "..."
     }
 
 
