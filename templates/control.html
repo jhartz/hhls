@@ -171,7 +171,23 @@ var settings = {
             </thead>
             <tbody id="effects_keyboard_tbody"></tbody>
         </table>
+        <p style="text-align: center;"><span id="effects_keyboard_addnew" class="lilbutton">New Keyboard Shortcut</span></p>
         <p style="text-align: center; font-size: 10pt;">NOTE: All keyboard shortcuts are automatically kept in sync with every other control page on other computers.</p>
+        
+        <div id="effects_keyboard_new" class="blackoverlay" style="display: none;">
+            <p><u>Add Keyboard Shortcut</u></p>
+            <p style="font-size: 10pt;">NOTE: To add a keyboard shortcut for an effect, use the "Save as Keyboard Shortcut" button in the Effects Controller.</p>
+            <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white; text-align: left;">
+                <p>Action: <select id="effects_keyboard_new_action">
+                    <option value="next" title="Stop current lighting/sound in a channel and move to next in queue">Next</option>
+                    <option value="stop" title="Cancel all lighting/sound in a channel that is currently happening or in queue">Stop</option>
+                    <option value="sequence" title="Run a sequence">Sequence</option>
+                </select></p>
+                <p id="effects_keyboard_new_channel">Channel: <select id="effects_keyboard_new_channel_select"></select></p>
+                <p id="effects_keyboard_new_sequence">Sequence: <select id="effects_keyboard_new_sequence_select"></select></p>
+            </td></tr></tbody></table>
+            <p><span id="effects_keyboard_new_submitter" class="lilbutton">Next</span>&nbsp;&nbsp;<span id="effects_keyboard_new_canceller" class="lilbutton">Cancel</span></p>
+        </div>
         
         <div id="effects_keyboard_editor" class="blackoverlay" style="display: none;">
             <p><u>Edit Keyboard Shortcut</u></p>

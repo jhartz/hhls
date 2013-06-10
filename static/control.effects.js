@@ -155,12 +155,29 @@ var effects = {
             effects.keyboard_editor_delete($(this).attr("data-key"));
         });
         
+        $("#effects_keyboard_addnew").click(function () {
+            effects.keyboard_new();
+        });
+        
         $("#effects_keyboard_editor_submitter").click(function () {
             effects.keyboard_editor_save();
         });
         
         $("#effects_keyboard_editor_canceller").click(function () {
             effects.keyboard_editor_cancel();
+        });
+        
+        $("#effects_keyboard_new_action").change(function () {
+            $("#effects_keyboard_new_channel")[["next", "stop"].indexOf($(this).val()) != -1 ? "show" : "hide"]();
+            $("#effects_keyboard_new_sequence")[$(this).val() == "sequence" ? "show" : "hide"]();
+        }).change();;
+        
+        $("#effects_keyboard_new_submitter").click(function () {
+            effects.keyboard_new_save();
+        });
+        
+        $("#effects_keyboard_new_canceller").click(function () {
+            effects.keyboard_new_cancel();
         });
         
         $(document).on("keydown keyup", function (event) {
@@ -227,6 +244,7 @@ var effects = {
         this.update_channels();
         this.update_keyboard();
         this.update_presets();
+        this.update_sequences();
         
         $("#effects_form").submit(function (event) {
             event.preventDefault();
@@ -383,6 +401,34 @@ var effects = {
             if (this.value == selected_channel) this.checked = true;
         });
         this.update_channel_details();
+        
+        
+        // Update the list of channels in the add keyboard shortcut dropdown
+        selected_channel = $("#effects_keyboard_new_channel_select").val() || "0";
+        $("#effects_keyboard_new_channel_select").empty();
+        var option = document.createElement("option");
+        option.value = "0";
+        option.appendChild(document.createTextNode("Default Channel"));
+        $("#effects_keyboard_new_channel_select").append(option);
+        for (var channel in settings.channels) {
+            if (settings.channels.hasOwnProperty(channel)) {
+                var details = settings.channels[channel];
+                var css = "";
+                if (details.type && details.type == "toggled") {
+                    css = "color: red;";
+                } else if (details.type && details.type == "dimmed") {
+                    css = "color: blue;";
+                }
+                option = document.createElement("option");
+                option.value = channel;
+                option.setAttribute("style", css);
+                option.setAttribute("title", details.description || channel);
+                option.appendChild(document.createTextNode(channel));
+                $("#effects_keyboard_new_channel_select").append(option);
+            }
+        }
+        // Re-select previously selected channel
+        $("#effects_keyboard_new_channel_select").val(selected_channel);
         
         this.update_channelman();
     },
@@ -564,7 +610,9 @@ var effects = {
                     option.style.color = "grey";
                     effects.keyboard_valid.push(key);
                 }
-                if (keys[key].data && keys[key].data.channel && keys[key].data.channel != "0") {
+                if (keys[key].command == "sequence") {
+                    html += '<td><i>N/A</i></td>';
+                } else if (keys[key].data && keys[key].data.channel && keys[key].data.channel != "0") {
                     html += '<td>' + shared.escHTML(keys[key].data.channel) + '</td>';
                 } else {
                     html += '<td>Default Channel</td>';
@@ -633,6 +681,8 @@ var effects = {
                     }
                 }
                 return html;
+            } else if (details.command == "sequence" && details.data) {
+                return "Sequence: " + shared.escHTML(details.data.sequencename || '""');
             } else {
                 return "<i>" + shared.escHTML(details.command) + "</i>";
             }
@@ -673,7 +723,11 @@ var effects = {
         blockers.effects_keyboard_editor = "Please finish editing the keyboard shortcut before exiting.";
         this.keyboard_currentlyediting = details;
         
-        $("#effects_keyboard_editor_channel").text(details.data.channel == "0" ? "Default Channel" : details.data.channel);
+        if (details.data.channel) {
+            $("#effects_keyboard_editor_channel").text(details.data.channel == "0" ? "Default Channel" : details.data.channel);
+        } else {
+            $("#effects_keyboard_editor_channel").html("<i>N/A</i>");
+        }
         if (istoggled) {
             $("#effects_keyboard_editor_action").hide();
             $("#effects_keyboard_editor_channeltoggled").show();
@@ -709,6 +763,52 @@ var effects = {
             delete settings.keyboard[key];
         }
         conn.sendsetting("keyboard");
+    },
+    
+    keyboard_new: function (sequencename) {
+        this.toggle("keyboard", function () {
+            $("#effects_keyboard_new").fadeIn();
+        });
+    },
+    
+    keyboard_new_save: function () {
+        if (!$("#effects_keyboard_new_action").val()) {
+            alert("Please choose an action.");
+        } else {
+            $("#effects_keyboard_new").fadeOut();
+            var action = $("#effects_keyboard_new_action").val();
+            var details = {
+                command: action,
+                data: {}
+            };
+            if (["next", "stop"].indexOf(action) != -1) details.data.channel = $("#effects_keyboard_new_channel_select").val() || "0";
+            if (action == "sequence") details.data.sequencename = $("#effects_keyboard_new_sequence_select").val();
+            this.keyboard_editor(details);
+        }
+    },
+    
+    keyboard_new_cancel: function () {
+        $("#effects_keyboard_new").fadeOut();
+    },
+    
+    update_sequences: function () {
+        // Update the list of sequences in the add keyboard shortcut dropdown
+        var selected_sequence = $("#effects_keyboard_new_sequence_select").val() || null;
+        $("#effects_keyboard_new_sequence_select").empty();
+        for (var sequencename in settings.sequences) {
+            if (settings.sequences.hasOwnProperty(sequencename)) {
+                var details = settings.sequences[sequencename];
+                option = document.createElement("option");
+                option.value = sequencename;
+                option.setAttribute("title", details.description || sequencename);
+                option.appendChild(document.createTextNode(sequencename));
+                $("#effects_keyboard_new_sequence_select").append(option);
+            }
+        }
+        // Re-select previously selected sequence
+        if (selected_sequence) $("#effects_keyboard_new_sequence_select").val(selected_sequence);
+        
+        this.update_channelman();
     },
     
     update_presets: function () {
@@ -819,4 +919,7 @@ settings_onupdate.keyboard.push(function () {
 });
 settings_onupdate.presets.push(function () {
     effects.update_presets();
+});
+settings_onupdate.sequences.push(function () {
+    effects.update_sequences();
 });
