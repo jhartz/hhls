@@ -64,6 +64,17 @@ section.right {
     left: 50%;
 }
 
+@media screen and (max-width: 580px) {
+    body.topbottomonsmallscreen section.left {
+        right: 0;
+        bottom: 50%;
+    }
+    body.topbottomonsmallscreen section.right {
+        left: 0;
+        top: 50%;
+    }
+}
+
 section.top {
     bottom: auto;
     /* NOTE: Requires other positioning magic to make the "top" and "bottom" elements resize automatically with each other */
