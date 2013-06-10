@@ -219,7 +219,7 @@ var sequences = {
         var minutes = Math.floor(seconds / 60);
         seconds = (seconds - minutes * 60).toString();
         if (seconds.length == 1) seconds = "0" + seconds;
-        var tenths = Math.round(secondpart * 10).toString();
+        var tenths = Math.floor(secondpart * 10).toString();
         return minutes + ":" + seconds + "." + tenths;
     },
     
