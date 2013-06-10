@@ -659,7 +659,7 @@ io.of("/control").on("connection", function (socket) {
                 case "effects_cmd":
                     if (msg.data && msg.data.channel) {
                         sendMsg(msg.data, msg.data.channel);
-                        if (msg.data.command && msg.data.command == "play" && msg.data.prop) {
+                        if (msg.data.command && msg.data.command == "effect" && msg.data.prop) {
                             if (typeof msg.data.prop.dimness != "undefined") {
                                 settings.channels.data[msg.data.channel].dimness = msg.data.prop.dimness;
                                 settings.channels.update();
