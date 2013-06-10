@@ -16,8 +16,8 @@
     border-top: none;
 }
 </style>
-<script type="text/javascript" src="/static/jquery.js"></script>
-<script type="text/javascript" src="/static/popcorn.js"></script>
+<script type="text/javascript" src="/static/jquery.js"></script>{{#videos}}
+<script type="text/javascript" src="/static/popcorn.js"></script>{{/videos}}
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/static/shared.js"></script>
 <script type="text/javascript">
@@ -52,7 +52,7 @@ var settings = {
         <form id="effects_form">
             <table id="effects_table" class="topped" style="width: 100%; border-collapse: collapse;"><tbody>
                 <tr>
-                    <td style="width: 50%;"><div id="effects_channellist" class="panelbox">Loading...</div></td>
+                    <td style="width: 50%;"><div id="effects_channellist" class="panelbox" style="height: 174px;">Loading...</div></td>
                     <td style="width: 50%;">
                         <div id="effects_timedpanel" class="panel effects_panel">
                             <div class="front">
@@ -82,7 +82,7 @@ var settings = {
                                 </div>
                             </div>
                         </div>
-                        <div id="effects_toggledpanel" class="panelbox effects_panel" style="display: none; text-align: center;">
+                        <div id="effects_toggledpanel" class="panelbox effects_panel" style="display: none; height: 174px; text-align: center;">
                             <table style="margin: auto;">
                                 <tr><td><button id="effects_toggledpanel_on">On</button></td><td><button id="effects_toggledpanel_off">Off</button></td></tr>
                                 <tr><td colspan="2"><button id="effects_toggledpanel_toggle">Toggle</button></td></tr>
@@ -125,6 +125,7 @@ var settings = {
                     <th>Name</th>
                     <th>Type</th>
                     <th>Used in<br>Keyboard Shortcuts</th>
+                    <th>Used in<br>Sequences</th>
                     <th>Used in<br>JSON Video Controllers</th>
                     <th>Connected Clients</th>
                 </tr>
@@ -184,7 +185,7 @@ var settings = {
     </div>
     
     <footer class="buttonbox">
-        <div><button type="button" data-btn="channels" style="width: 50%;" disabled>Channels</button><button type="button" data-btn="keyboard" style="width: 50%;" disabled>Keyboard Shortcuts</button></div>
+        <div><button type="button" data-btn="channels" style="width: 50%;" disabled>Manage Channels</button><button type="button" data-btn="keyboard" style="width: 50%;" disabled>Keyboard Shortcuts</button></div>
     </footer>
 </section>
 
@@ -194,20 +195,79 @@ var settings = {
     <div id="sequences_waiting"><table style="width: 100%;"><tr><td class="statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
     
     <div id="sequences_main" data-level="1" style="display: none;">
-        <p>Run one of these sequences:<br>[list]</p>
+        <form id="sequences_form">
+            <table id="sequences_table" class="topped" style="width: 100%; border-collapse: collapse;"><tbody>
+                <tr>
+                    <td style="width: 50%;">
+                        <div id="sequences_list" class="panelbox">Loading...</div>
+                        <div style="text-align: center;"><button id="sequences_play">Play</button></div>
+                    </td>
+                    <td style="width: 50%;">
+                        <div id="sequences_playing" class="panelbox" style="position: relative; display: none;">
+                            <div id="sequences_playing_title">Now Playing</div>
+                            <div id="sequences_playing_time" style="text-align: center; padding-top: 10px; font-size: 90%;">00:00.00 / 00:00.00</div>
+                            <div id="sequences_playing_progress" style="background-color: black; position: absolute; left: 0; right: 0; bottom: 0; font-size: 10px;">&nbsp;</div>
+                            <div style="font-size: 10px;">&nbsp;</div>
+                        </div>
+                        <div id="sequences_queue" class="panelbox" style="display: none;">
+                            <h3 style="text-align: center;">Queue</h3>
+                            <div id="sequences_queue_content">Loading...</div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody></table>
+        </form>
     </div>
     
     <div id="sequences_manage" data-level="2" style="display: none;">
-        <h2>Manage Sequences</h2>
+        <h2>Sequence Manager</h2>
+        <table class="pretty" style="width: auto; margin: auto;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Length</th>
+                </tr>
+            </thead>
+            <tbody id="sequences_manage_tbody"></tbody>
+        </table>
+        <p style="text-align: center;"><span id="sequences_manage_addnew" class="lilbutton">New Sequence</span></p>
+        <p style="text-align: center; font-size: 10pt;">NOTE: All sequences are automatically kept in sync with every other control page on other computers.</p>
+        
+        <div id="sequences_manage_editor" class="blackoverlay" style="display: none;">
+            <p><u>Edit Sequence</u></p>
+            <table class="pretty" style="margin: auto;"><tbody><tr><td style="border: 1px solid white; text-align: left;">
+                <p>Name: <input id="sequences_manage_editor_name"></p>
+                <p>Length: <input id="sequences_manage_editor_length" type="number" min="0" size="3"> seconds &nbsp; <span id="sequences_manage_editor_length_help" class="lilbutton">(?)</span></p>
+                <p style="margin-bottom: 0;">Sequence:</p>
+                <table class="pretty">
+                    <thead><tr>
+                        <th style="border: 1px solid white; text-align: center;">Time</th>
+                        <th style="border: 1px solid white; text-align: center;">Action</th>
+                    </tr></thead>
+                    <tbody id="sequences_manage_editor_sequence"></tbody>
+                    <tfoot><tr>
+                        <td style="border: 1px solid white;"><input id="sequences_manage_editor_new_time" type="number" min="0" size="3"></td>
+                        <td style="border: 1px solid white;">
+                            <p>Channel: <select id="sequences_manage_editor_new_channel"></select></p>
+                            <p id="sequences_manage_editor_new_timed" style="display: none;">Preset: <select id="sequences_manage_editor_new_timed_preset"></select></p>
+                            <p id="sequences_manage_editor_new_toggled" style="display: none;">State: <select id="sequences_manage_editor_new_toggled_select"><option value="1">on</option><option value="0">off</option><option value="-1">toggled</option></select></p>
+                            <p id="sequences_manage_editor_new_dimmed" style="display: none;">Preset: <select id="sequences_manage_editor_new_dimmed_preset"></select></p>
+                        </td>
+                        <td style="border: 1px solid white;"><span id="sequences_manage_editor_new" class="lilbutton">Add</span></td>
+                    </tr></tfoot>
+                </table>
+            </td></tr></tbody></table>
+            <p><span id="sequences_manage_editor_submitter" class="lilbutton">Save</span>&nbsp;&nbsp;<span id="sequences_manage_editor_canceller" class="lilbutton">Cancel</span></p>
+        </div>
     </div>
     
     <footer class="buttonbox">
-        <div><button type="button" data-btn="manage" style="width: 100%;" disabled>Manage Sequences</button></div>
+        <div><button type="button" data-btn="manage" style="width: 50%;" disabled>Manage Sequences</button><button type="button" data-btn="keyboard" style="width: 50%;" disabled>Keyboard Shortcuts</button></div>
     </footer>
 </section>
 {{#videos}}
 <section id="ctrl_video" class="top minimized" style="display: none;">
-    <header><h1>Video Controls</h1></header>
+    <header><h1>Video</h1></header>
     <div id="video_openwin" style="text-align: center;">
         <p><button id="video_openwin_go" type="button" style="font-size: inherit;">Open video-playing window</button></p>
         <p><span id="video_openwin_skip" class="lilbutton">skip</span></p>
