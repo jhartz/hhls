@@ -291,7 +291,7 @@ table.layouter > tbody > tr > td, table.layouter > tr > td {
 
 table.topped > tbody > tr > td, table.topped > tr > td {
     vertical-align: top;
-    white-space: nowrap;
+    /* white-space: nowrap; */
 }
 
 div.topcorner {
