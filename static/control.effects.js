@@ -140,9 +140,9 @@ var effects = {
             var newtype = $("#effects_channels_newtype").val();
             var newdesc = $.trim($("#effects_channels_newdesc").val());
             if (effects.check_channel_inputs(newname, newtype, newdesc)) {
-                var prop = {type: newtype};
-                if (newdesc) prop.description = newdesc;
-                settings.channels[newname] = prop;
+                var details = {type: newtype};
+                if (newdesc) details.description = newdesc;
+                settings.channels[newname] = details;
                 conn.sendsetting("channels");
                 $("#effects_channels_newname").val("");
                 $("#effects_channels_newdesc").val("");
@@ -246,18 +246,19 @@ var effects = {
         if (this.details.type == "toggled") {
             if (reason == "keyboard") {
                 this.keyboard_editor({
-                    channel: this.channel,
-                    command: "play",
-                    prop: {}
+                    command: "effect",
+                    data: {
+                        channel: this.channel
+                    }
                 }, true);
             }
         } else {
             if (!this.oncustom[this.details.type]) {
                 if (reason == "keyboard") {
                     this.keyboard_editor({
-                        channel: this.channel,
-                        command: "play",
-                        prop: {
+                        command: "effect",
+                        data: {
+                            channel: this.channel,
                             preset: $("#effects_preset_" + this.details.type).val()
                         }
                     });
@@ -277,9 +278,9 @@ var effects = {
                     } else {
                         if (reason == "keyboard") {
                             this.keyboard_editor({
-                                channel: this.channel,
-                                command: "play",
-                                prop: {
+                                command: "effect",
+                                data: {
+                                    channel: this.channel,
                                     dimness: dimness,
                                     time: time
                                 }
@@ -310,9 +311,9 @@ var effects = {
                     }
                     if (reason == "keyboard") {
                         this.keyboard_editor({
-                            channel: this.channel,
-                            command: "play",
-                            prop: {
+                            command: "effect",
+                            data: {
+                                channel: this.channel,
                                 light: light,
                                 sound: sound || null
                             }
@@ -423,12 +424,14 @@ var effects = {
         
         for (var key in settings.keyboard) {
             if (settings.keyboard.hasOwnProperty(key)) {
-                if (settings.keyboard[key].channel == channel) {
-                    usedin._keyboard = true;
-                    break;
-                } else if (channel == "0" && !settings.keyboard[key].channel) {
-                    usedin._keyboard = true;
-                    break;
+                if (settings.keyboard[key] && settings.keyboard[key].data) {
+                    if (settings.keyboard[key].data.channel && settings.keyboard[key].data.channel == channel) {
+                        usedin._keyboard = true;
+                        break;
+                    } else if (channel == "0" && !settings.keyboard[key].data.channel) {
+                        usedin._keyboard = true;
+                        break;
+                    }
                 }
             }
         }
@@ -494,14 +497,14 @@ var effects = {
     },
     
     channels_editor: function (channel) {
-        var data = settings.channels[channel];
-        if (data) {
+        var details = settings.channels[channel];
+        if (details) {
             blockers.effects_channels_editor = "Please finish editing the channel before exiting.";
             this.channels_currentlyediting = channel;
             
             $("#effects_channels_editor_name").val(channel);
-            $("#effects_channels_editor_type").val(data.type).change();
-            $("#effects_channels_editor_desc").val(data.description || "");
+            $("#effects_channels_editor_type").val(details.type).change();
+            $("#effects_channels_editor_desc").val(details.description || "");
             
             this.toggle("channels", function () {
                 $("#effects_channels_editor").fadeIn();
@@ -518,9 +521,9 @@ var effects = {
                 delete settings.channels[this.channels_currentlyediting];
             }
             this.channels_currentlyediting = null;
-            var prop = {type: type};
-            if (desc) prop.description = desc;
-            settings.channels[name] = prop;
+            var details = {type: type};
+            if (desc) details.description = desc;
+            settings.channels[name] = details;
             conn.sendsetting("channels");
             $("#effects_channels_editor").fadeOut();
             blockers.effects_channels_editor = null;
@@ -561,8 +564,8 @@ var effects = {
                     option.style.color = "grey";
                     effects.keyboard_valid.push(key);
                 }
-                if (keys[key].channel && keys[key].channel != "0") {
-                    html += '<td>' + shared.escHTML(keys[key].channel) + '</td>';
+                if (keys[key].data && keys[key].data.channel && keys[key].data.channel != "0") {
+                    html += '<td>' + shared.escHTML(keys[key].data.channel) + '</td>';
                 } else {
                     html += '<td>Default Channel</td>';
                 }
@@ -599,25 +602,25 @@ var effects = {
         this.update_channelman();
     },
     
-    keyboard_action_formatter: function (data) {
-        if (data.command) {
-            if (data.command == "play" && data.prop) {
+    keyboard_action_formatter: function (details) {
+        if (details.command) {
+            if (details.command == "effect" && details.data) {
                 var html = "";
-                if (data.prop.preset) {
-                    html += "Preset: " + shared.escHTML(data.prop.preset);
-                } else if (data.prop.light) {
+                if (details.data.preset) {
+                    html += "Preset: " + shared.escHTML(details.data.preset);
+                } else if (details.data.light) {
                     html += 'Light: ';
-                    if (data.prop.light == "auto") {
+                    if (details.data.light == "auto") {
                         html += 'auto';
                     } else {
-                        html += '<span title="' + shared.escHTML(JSON.stringify(data.prop.light)) + '" style="cursor: default; font-style: italic;">(custom lighting pattern)</span>';
+                        html += '<span title="' + shared.escHTML(JSON.stringify(details.data.light)) + '" style="cursor: default; font-style: italic;">(custom lighting pattern)</span>';
                     }
-                    if (data.prop.sound) html += "<br>Sound: " + data.prop.sound;
-                } else if (typeof data.prop.dimness != "undefined") {
-                    html += "Dimness: " + data.prop.dimness;
-                    if (data.prop.time) html += " over " + data.prop.time + " seconds";
-                } else if (typeof data.prop.state != "undefined") {
-                    switch (data.prop.state) {
+                    if (details.data.sound) html += "<br>Sound: " + details.data.sound;
+                } else if (typeof details.data.dimness != "undefined") {
+                    html += "Dimness: " + details.data.dimness;
+                    if (details.data.time) html += " over " + details.data.time + " seconds";
+                } else if (typeof details.data.state != "undefined") {
+                    switch (details.data.state) {
                         case 1:
                             html += "on";
                             break;
@@ -631,7 +634,7 @@ var effects = {
                 }
                 return html;
             } else {
-                return "<i>" + shared.escHTML(data.command) + "</i>";
+                return "<i>" + shared.escHTML(details.command) + "</i>";
             }
         } else {
             return "&nbsp;";
@@ -640,40 +643,43 @@ var effects = {
     
     keyboard_action: function (key) {
         if (settings.keyboard[key]) {
-            var data = settings.keyboard[key];
-            switch (data.command) {
-                case "play":
-                    if (data.prop.preset) {
-                        this.sendpreset(data.channel || "0", data.prop.preset);
-                    } else if (data.prop.light) {
-                        this.sendpattern(data.channel || "0", data.prop.light, data.prop.sound || null);
-                    } else if (typeof data.prop.dimness != "undefined") {
-                        this.sendpattern(data.channel || "0", data.prop.dimness, data.prop.time || 0);
-                    } else if (typeof data.prop.state != "undefined") {
-                        this.sendtoggle(data.channel || "0", data.prop.state);
+            var details = settings.keyboard[key];
+            controlcmd(details);
+            /*
+            switch (details.command) {
+                case "effect":
+                    if (details.data.preset) {
+                        this.sendpreset(details.data.channel || "0", details.data.preset);
+                    } else if (details.data.light) {
+                        this.sendpattern(details.data.channel || "0", details.data.light, details.data.sound || null);
+                    } else if (typeof details.data.dimness != "undefined") {
+                        this.sendpattern(details.data.channel || "0", details.data.dimness, details.data.time || 0);
+                    } else if (typeof details.data.state != "undefined") {
+                        this.sendtoggle(details.data.channel || "0", details.data.state);
                     }
                     break;
                 case "next":
-                    this.next(data.channel || "0");
+                    this.next(details.data.channel || "0");
                     break;
                 case "stop":
-                    this.stop(data.channel || "0");
+                    this.stop(details.data.channel || "0");
                     break;
             }
+            */
         }
     },
     
-    keyboard_editor: function (data, istoggled) {
+    keyboard_editor: function (details, istoggled) {
         blockers.effects_keyboard_editor = "Please finish editing the keyboard shortcut before exiting.";
-        this.keyboard_currentlyediting = data;
+        this.keyboard_currentlyediting = details;
         
-        $("#effects_keyboard_editor_channel").text(data.channel == "0" ? "Default Channel" : data.channel);
+        $("#effects_keyboard_editor_channel").text(details.data.channel == "0" ? "Default Channel" : details.data.channel);
         if (istoggled) {
             $("#effects_keyboard_editor_action").hide();
             $("#effects_keyboard_editor_channeltoggled").show();
         } else {
             $("#effects_keyboard_editor_channeltoggled").hide();
-            $("#effects_keyboard_editor_action").html(this.keyboard_action_formatter(data)).show();
+            $("#effects_keyboard_editor_action").html(this.keyboard_action_formatter(details)).show();
         }
         
         this.toggle("keyboard", function () {
@@ -685,8 +691,8 @@ var effects = {
         var key = $("#effects_keyboard_editor_key").val();
         settings.keyboard[key] = this.keyboard_currentlyediting;
         if ($("#effects_keyboard_editor_channeltoggled").css("display") != "none") {
-            if (!settings.keyboard[key].prop) settings.keyboard[key].prop = {};
-            settings.keyboard[key].prop.state = Number($("#effects_keyboard_editor_state").val());
+            if (!settings.keyboard[key].data) settings.keyboard[key].data = {};
+            settings.keyboard[key].data.state = Number($("#effects_keyboard_editor_state").val());
         }
         conn.sendsetting("keyboard");
         $("#effects_keyboard_editor").fadeOut();
@@ -750,7 +756,7 @@ var effects = {
         conn.sendmsg({
             about: "effects_cmd",
             data: {
-                command: "play",
+                command: "effect",
                 channel: typeof channel == "undefined" ? null : channel,
                 prop: {
                     state: state
@@ -783,7 +789,7 @@ var effects = {
         conn.sendmsg({
             about: "effects_cmd",
             data: {
-                command: "play",
+                command: "effect",
                 channel: typeof channel == "undefined" ? null : channel,
                 prop: prop
             }

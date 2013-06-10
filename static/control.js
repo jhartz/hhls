@@ -278,6 +278,7 @@ function flash(elem) {
 }
 
 function controlcmd(control) {
+    if (!control.data) control.data = {};
     switch (control.command) {
         case "pause":
             if (typeof video != "undefined") video.vid.pause();
@@ -288,10 +289,16 @@ function controlcmd(control) {
             } else if (control.data.channel && control.data.state) {
                 effects.sendtoggle(control.data.channel, control.data.state);
             } else if (control.data.channel && control.data.dimness) {
-                effects.sendpattern(control.data.channel, control.data.dimness, control.data.time);
+                effects.sendpattern(control.data.channel, control.data.dimness, control.data.time || 0);
             } else if (control.data.light || control.data.sound) {
-                effects.sendpattern(control.data.channel || "0", control.data.light, control.data.sound);
+                effects.sendpattern(control.data.channel || "0", control.data.light, control.data.sound || null);
             }
+            break;
+        case "next":
+            effects.next(control.data.channel || "0");
+            break;
+        case "stop":
+            effects.stop(control.data.channel || "0");
             break;
     }
 }

@@ -1,15 +1,15 @@
 {
     "g": {
-        "channel": "0",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "0",
             "preset": "bob"
         }
     },
     "k": {
-        "channel": "0",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "0",
             "light": [
                 100,
                 150,
@@ -43,55 +43,55 @@
         }
     },
     "b": {
-        "channel": "stairwell_blacklights",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "stairwell_blacklights",
             "state": -1
         }
     },
     "c": {
-        "channel": "movietheatre_lighting",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "movietheatre_lighting",
             "dimness": 90,
             "time": 0
         }
     },
     "d": {
-        "channel": "movietheatre_lighting",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "movietheatre_lighting",
             "dimness": 90,
             "time": 4
         }
     },
     "[space]": {
-        "channel": "movietheatre_lighting",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "movietheatre_lighting",
             "dimness": 0,
             "time": 3
         }
     },
     "/": {
-        "channel": "stairwell_blacklights",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "stairwell_blacklights",
             "state": 0
         }
     },
     "e": {
-        "channel": "0",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "0",
             "light": "auto",
             "sound": "thunder1"
         }
     },
     "\\": {
-        "channel": "stairwell_blacklights",
-        "command": "play",
-        "prop": {
+        "command": "effect",
+        "data": {
+            "channel": "stairwell_blacklights",
             "state": 1
         }
     }

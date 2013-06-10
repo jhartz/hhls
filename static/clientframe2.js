@@ -215,7 +215,7 @@ window.onload = function () {
             if (data) {
                 if (data.command) {
                     switch (data.command) {
-                        case "play":
+                        case "effect":
                             oneffectplay(data.prop);
                             break;
                         
