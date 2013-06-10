@@ -277,28 +277,28 @@ function flash(elem) {
     }
 }
 
-function controlcmd(control) {
-    if (!control.data) control.data = {};
-    switch (control.command) {
+function controlcmd(details) {
+    if (!details.data) details.data = {};
+    switch (details.command) {
         case "pause":
             if (typeof video != "undefined") video.vid.pause();
             break;
         case "effect":
-            if (control.data.preset) {
-                effects.sendpreset(control.data.channel || "0", control.data.preset);
-            } else if (control.data.channel && control.data.state) {
-                effects.sendtoggle(control.data.channel, control.data.state);
-            } else if (control.data.channel && control.data.dimness) {
-                effects.sendpattern(control.data.channel, control.data.dimness, control.data.time || 0);
-            } else if (control.data.light || control.data.sound) {
-                effects.sendpattern(control.data.channel || "0", control.data.light, control.data.sound || null);
+            if (details.data.preset) {
+                effects.sendpreset(details.data.channel || "0", details.data.preset);
+            } else if (details.data.light || details.data.sound) {
+                effects.sendpattern(details.data.channel || "0", details.data.light, details.data.sound || null);
+            } else if (details.data.channel && typeof details.data.state != "undefined") {
+                effects.sendtoggle(details.data.channel, details.data.state);
+            } else if (details.data.channel && typeof details.data.dimness != "undefined") {
+                effects.sendpattern(details.data.channel, details.data.dimness, details.data.time || 0);
             }
             break;
         case "next":
-            effects.next(control.data.channel || "0");
+            effects.next(details.data.channel || "0");
             break;
         case "stop":
-            effects.stop(control.data.channel || "0");
+            effects.stop(details.data.channel || "0");
             break;
     }
 }

@@ -274,10 +274,10 @@ var sequences = {
         }
     },
     
-    setup: function (control) {
+    setup: function (details) {
         setTimeout(function () {
-            controlcmd(control);
-        }, parseInt(control.time * 1000, 10));
+            controlcmd(details);
+        }, parseInt(details.time * 1000, 10));
     }
 };
 
