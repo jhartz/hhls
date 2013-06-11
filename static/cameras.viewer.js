@@ -2,12 +2,6 @@ function status(msg) {
     document.getElementById("status").innerHTML = shared.escHTML(msg, true);
 }
 
-if (typeof console == "undefined") {
-    console = {
-        log: function () {}
-    };
-}
-
 var initialized = false,
     attachers = [],
     attachers_streams = [],  // pc = attachers_streams[attacherIndex][streamIndex][peerIndex]
