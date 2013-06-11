@@ -146,8 +146,8 @@ var settings = {
         </table>
         
         <div id="effects_channels_editor" class="blackoverlay" style="display: none;">
-            <p><u>Edit Channel</u></p>
-            <table class="pretty" style="margin: auto;"><tbody><tr><td style="text-align: left;">
+            <h3>Edit Channel</h3>
+            <table class="pretty"><tbody><tr><td>
                 <table><tbody>
                     <tr><td>Name:</td><td><input id="effects_channels_editor_name"></td></tr>
                     <tr><td>Type:</td><td><select id="effects_channels_editor_type"><option value="timed" selected>timed</option><option value="toggled">toggled</option><option value="dimmed">dimmed</option></select></td></tr>
@@ -175,9 +175,9 @@ var settings = {
         <p style="text-align: center; font-size: 10pt;">NOTE: All keyboard shortcuts are automatically kept in sync with every other control page on other computers.</p>
         
         <div id="effects_keyboard_new" class="blackoverlay" style="display: none;">
-            <p><u>Add Keyboard Shortcut</u></p>
+            <h3>Add Keyboard Shortcut</h3>
             <p style="font-size: 10pt;">NOTE: To add a keyboard shortcut for an effect, use the "Save as Keyboard Shortcut" button in the Effects Controller.</p>
-            <table class="pretty" style="margin: auto;"><tbody><tr><td style="text-align: left;">
+            <table class="pretty"><tbody><tr><td>
                 <p>Action: <select id="effects_keyboard_new_action">
                     <option value="next" title="Stop current lighting/sound in a channel and move to next in queue">Next</option>
                     <option value="stop" title="Cancel all lighting/sound in a channel that is currently happening or in queue">Stop</option>
@@ -190,8 +190,8 @@ var settings = {
         </div>
         
         <div id="effects_keyboard_editor" class="blackoverlay" style="display: none;">
-            <p><u>Edit Keyboard Shortcut</u></p>
-            <table class="pretty" style="margin: auto;"><tbody><tr><td style="text-align: left;">
+            <h3>Edit Keyboard Shortcut</h3>
+            <table class="pretty"><tbody><tr><td>
                 <p>Key: <select id="effects_keyboard_editor_key"></select></p>
                 <p>Channel: <span id="effects_keyboard_editor_channel">&mdash;</span></p>
                 <p id="effects_keyboard_editor_action"></p>
@@ -251,8 +251,8 @@ var settings = {
         <p style="text-align: center; font-size: 10pt;">NOTE: All sequences are automatically kept in sync with every other control page on other computers.</p>
         
         <div id="sequences_manage_editor" class="blackoverlay" style="display: none;">
-            <p><u>Edit Sequence</u></p>
-            <table class="pretty" style="margin: auto;"><tbody><tr><td style="text-align: left;">
+            <h3>Edit Sequence</h3>
+            <table class="pretty"><tbody><tr><td style="border-style: none;">
                 <p>Name: <input id="sequences_manage_editor_name"></p>
                 <p>Length: <input id="sequences_manage_editor_length" type="number" min="0" size="3"> seconds &nbsp; <span id="sequences_manage_editor_length_help" class="lilbutton">(?)</span></p>
                 <p style="margin-bottom: 0;">Sequence:</p>
@@ -265,7 +265,7 @@ var settings = {
                     <tfoot><tr>
                         <td><input id="sequences_manage_editor_new_time" type="number" min="0" size="3"></td>
                         <td>
-                            <p>Channel: <select id="sequences_manage_editor_new_channel"></select></p>
+                            <div>Channel: <select id="sequences_manage_editor_new_channel"></select></div>
                             <p id="sequences_manage_editor_new_timed" style="display: none;">Preset: <select id="sequences_manage_editor_new_timed_preset"></select></p>
                             <p id="sequences_manage_editor_new_toggled" style="display: none;">State: <select id="sequences_manage_editor_new_toggled_select"><option value="1">on</option><option value="0">off</option><option value="-1">toggled</option></select></p>
                             <p id="sequences_manage_editor_new_dimmed" style="display: none;">Preset: <select id="sequences_manage_editor_new_dimmed_preset"></select></p>
@@ -315,8 +315,8 @@ var settings = {
 <section class="bottom flatfooter" style="display: none;">
     <header><h1><span id="client_title">Server Connection</span></h1></header>
     <div id="client_list" style="text-align: center;">Loading...</div>
-    <div id="client_details" class="blackoverlay" style="display: none; cursor: pointer; padding: 0;">
-        <table style="height: 100%; width: auto; min-width: 300px; margin: auto;"><tbody><tr>
+    <div id="client_details" class="blackoverlay" style="display: none; cursor: pointer; padding: 0; text-align: center;">
+        <table style="height: 100%; width: auto; min-width: 300px;"><tbody><tr>
             <td style="text-align: left;">Name: <span id="client_details_name"></span><br>Location: <span id="client_details_location"></span><br>IP: <span id="client_details_ip"></span></td>
             <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
             <td><p>Channel<span id="client_details_channel_plural">s</span>:</p><table class="layouter" style="width: auto; margin: auto;"><tbody id="client_details_layouter"></tbody></table></td>

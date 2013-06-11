@@ -152,7 +152,24 @@ div.blackoverlay {
     border-radius: 9px;
     z-index: 990;
     overflow: auto;
+}
+
+div.blackoverlay > p {
     text-align: center;
+}
+
+div.blackoverlay h3 {
+    text-align: center;
+    text-decoration: underline;
+}
+
+div.blackoverlay > table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.blackoverlay h3 + table {
+    margin-top: 15px;
 }
 
 section.flatfooter div.blackoverlay {
