@@ -170,7 +170,7 @@ var effects = {
         $("#effects_keyboard_new_action").change(function () {
             $("#effects_keyboard_new_channel")[["next", "stop"].indexOf($(this).val()) != -1 ? "show" : "hide"]();
             $("#effects_keyboard_new_sequence")[$(this).val() == "sequence" ? "show" : "hide"]();
-        }).change();;
+        }).change();
         
         $("#effects_keyboard_new_submitter").click(function () {
             effects.keyboard_new_save();
