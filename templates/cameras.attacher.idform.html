@@ -12,7 +12,7 @@
     <header><h1>Attach a Camera</h1></header>
     <div>
         <form action="/cameras/attacher">
-            <table style="margin: auto;">
+            <table style="margin: auto;"><tbody>
                 <tr>
                     <td><label for="input_name">Computer Name: </label></td>
                     <td><input name="name" id="input_name"{{#hostname}} placeholder="{{hostname}}"{{/hostname}}{{#name}} value="{{name}}"{{/name}}></td>
@@ -24,7 +24,7 @@
                 <tr>
                     <td colspan="2" style="text-align: center;"><input type="submit" value="Go"></td>
                 </tr>
-            </table>
+            </tbody></table>
         </form>
     </div>
 </section>

@@ -47,7 +47,7 @@ var settings = {
 <section id="ctrl_effects" class="top" style="display: none;">
     <header><h1>Effects Controller</h1></header>
     
-    <div id="effects_waiting"><table style="width: 100%;"><tr><td class="statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
+    <div id="effects_waiting"><table style="width: 100%;"><tbody><tr><td class="statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></tbody></table></div>
     
     <div id="effects_controls" data-level="1" style="display: none;">
         <form id="effects_form">
@@ -63,7 +63,7 @@ var settings = {
                             <div class="back">
                                 <ul><li>Custom</li><li class="effects_topreset">Preset</li></ul>
                                 <div><br style="clear: both;">
-                                    <table class="topped">
+                                    <table class="topped"><tbody>
                                         <tr>
                                             <td>Lighting:</td>
                                             <td><input type="radio" id="effects_custom_lighttype_auto" name="effects_custom_lighttype" value="auto"></td>
@@ -78,16 +78,16 @@ var settings = {
                                             <td>Sound:</td>
                                             <td colspan="2"><select id="effects_custom_sound"><option value="" selected>(none)</option>{{{sounds}}}</select></td>
                                         </tr>
-                                    </table>
+                                    </tbody></table>
                                     <p style="text-align: right;"><span class="lilbutton effects_custom_customize">Save as Preset</span></p>
                                 </div>
                             </div>
                         </div>
                         <div id="effects_toggledpanel" class="panelbox effects_panel" style="display: none; height: 174px; text-align: center;">
-                            <table style="margin: auto;">
+                            <table style="margin: auto;"><tbody>
                                 <tr><td><button id="effects_toggledpanel_on">On</button></td><td><button id="effects_toggledpanel_off">Off</button></td></tr>
                                 <tr><td colspan="2"><button id="effects_toggledpanel_toggle">Toggle</button></td></tr>
-                            </table>
+                            </tbody></table>
                         </div>
                         <div id="effects_dimmedpanel" class="panel effects_panel" style="display: none;">
                             <div class="front">
@@ -106,7 +106,7 @@ var settings = {
                     </td>
                 </tr>
                 <tr>
-                    <td><table class="onlywhennotoggle" style="margin: auto;"><tr><td><button id="effects_next" title="Stop current lighting/sound and move to next in queue">Next</button></td><td><button id="effects_stop" title="Cancel all lighting/sound currently happening or in queue">Stop</button></td></tr></table></td>
+                    <td><table class="onlywhennotoggle" style="margin: auto;"><tbody><tr><td><button id="effects_next" title="Stop current lighting/sound and move to next in queue">Next</button></td><td><button id="effects_stop" title="Cancel all lighting/sound currently happening or in queue">Stop</button></td></tr></tbody></table></td>
                     <td style="text-align: center;"><div class="onlywhennotoggle"><button style="min-width: 100px;">Go</button></div></td>
                 </tr>
                 <tr>
@@ -133,26 +133,26 @@ var settings = {
             </thead>
             <tbody id="effects_channels_tbody"></tbody>
             <tfoot>
-                <tr><td style="padding: 0;">&nbsp;</td></tr>
+                <tr><td style="border-style: none; padding: 0;">&nbsp;</td></tr>
                 <tr>
-                    <td><input id="effects_channels_newname" placeholder="Name"></td>
-                    <td><select id="effects_channels_newtype"><option value="timed" selected>timed</option><option value="toggled">toggled</option><option value="dimmed">dimmed</option></select></td>
-                    <td style="width: 10px;">&nbsp;&nbsp;<span id="effects_channels_newbtn" class="lilbutton">Add</span></td>
+                    <td style="border-style: none;"><input id="effects_channels_newname" placeholder="Name"></td>
+                    <td style="border-style: none;"><select id="effects_channels_newtype"><option value="timed" selected>timed</option><option value="toggled">toggled</option><option value="dimmed">dimmed</option></select></td>
+                    <td style="border-style: none; width: 10px;">&nbsp;&nbsp;<span id="effects_channels_newbtn" class="lilbutton">Add</span></td>
                 </tr>
                 <tr>
-                    <td colspan="2"><textarea id="effects_channels_newdesc" placeholder="Description" rows="2" style="width: 100%;"></textarea></td>
+                    <td style="border-style: none;" colspan="2"><textarea id="effects_channels_newdesc" placeholder="Description" rows="2" style="width: 100%;"></textarea></td>
                 </tr>
             </tfoot>
         </table>
         
         <div id="effects_channels_editor" class="blackoverlay" style="display: none;">
             <p><u>Edit Channel</u></p>
-            <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white; text-align: left;">
-                <table>
+            <table class="pretty" style="margin: auto;"><tbody><tr><td style="text-align: left;">
+                <table><tbody>
                     <tr><td>Name:</td><td><input id="effects_channels_editor_name"></td></tr>
                     <tr><td>Type:</td><td><select id="effects_channels_editor_type"><option value="timed" selected>timed</option><option value="toggled">toggled</option><option value="dimmed">dimmed</option></select></td></tr>
                     <tr><td valign="top">Description:</td><td><textarea id="effects_channels_editor_desc" rows="2"></textarea></td></tr>
-                </table>
+                </tbody></table>
             </td></tr></tbody></table>
             <p><span id="effects_channels_editor_submitter" class="lilbutton">Save</span>&nbsp;&nbsp;<span id="effects_channels_editor_canceller" class="lilbutton">Cancel</span></p>
         </div>
@@ -177,7 +177,7 @@ var settings = {
         <div id="effects_keyboard_new" class="blackoverlay" style="display: none;">
             <p><u>Add Keyboard Shortcut</u></p>
             <p style="font-size: 10pt;">NOTE: To add a keyboard shortcut for an effect, use the "Save as Keyboard Shortcut" button in the Effects Controller.</p>
-            <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white; text-align: left;">
+            <table class="pretty" style="margin: auto;"><tbody><tr><td style="text-align: left;">
                 <p>Action: <select id="effects_keyboard_new_action">
                     <option value="next" title="Stop current lighting/sound in a channel and move to next in queue">Next</option>
                     <option value="stop" title="Cancel all lighting/sound in a channel that is currently happening or in queue">Stop</option>
@@ -191,7 +191,7 @@ var settings = {
         
         <div id="effects_keyboard_editor" class="blackoverlay" style="display: none;">
             <p><u>Edit Keyboard Shortcut</u></p>
-            <table class="pretty" style="margin: auto;"><tbody><tr><td style="border-color: white; text-align: left;">
+            <table class="pretty" style="margin: auto;"><tbody><tr><td style="text-align: left;">
                 <p>Key: <select id="effects_keyboard_editor_key"></select></p>
                 <p>Channel: <span id="effects_keyboard_editor_channel">&mdash;</span></p>
                 <p id="effects_keyboard_editor_action"></p>
@@ -209,7 +209,7 @@ var settings = {
 <section id="ctrl_sequences" class="top minimized" style="display: none;">
     <header><h1>Sequences</h1></header>
     
-    <div id="sequences_waiting"><table style="width: 100%;"><tr><td class="statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></table></div>
+    <div id="sequences_waiting"><table style="width: 100%;"><tbody><tr><td class="statuser" style="text-align: center;">Waiting for Server Connection...</td></tr></tbody></table></div>
     
     <div id="sequences_main" data-level="1" style="display: none;">
         <form id="sequences_form">
@@ -252,25 +252,25 @@ var settings = {
         
         <div id="sequences_manage_editor" class="blackoverlay" style="display: none;">
             <p><u>Edit Sequence</u></p>
-            <table class="pretty" style="margin: auto;"><tbody><tr><td style="border: 1px solid white; text-align: left;">
+            <table class="pretty" style="margin: auto;"><tbody><tr><td style="text-align: left;">
                 <p>Name: <input id="sequences_manage_editor_name"></p>
                 <p>Length: <input id="sequences_manage_editor_length" type="number" min="0" size="3"> seconds &nbsp; <span id="sequences_manage_editor_length_help" class="lilbutton">(?)</span></p>
                 <p style="margin-bottom: 0;">Sequence:</p>
                 <table class="pretty">
                     <thead><tr>
-                        <th style="border: 1px solid white; text-align: center;">Time</th>
-                        <th style="border: 1px solid white; text-align: center;">Action</th>
+                        <th style="text-align: center;">Time</th>
+                        <th style="text-align: center;">Action</th>
                     </tr></thead>
                     <tbody id="sequences_manage_editor_sequence"></tbody>
                     <tfoot><tr>
-                        <td style="border: 1px solid white;"><input id="sequences_manage_editor_new_time" type="number" min="0" size="3"></td>
-                        <td style="border: 1px solid white;">
+                        <td><input id="sequences_manage_editor_new_time" type="number" min="0" size="3"></td>
+                        <td>
                             <p>Channel: <select id="sequences_manage_editor_new_channel"></select></p>
                             <p id="sequences_manage_editor_new_timed" style="display: none;">Preset: <select id="sequences_manage_editor_new_timed_preset"></select></p>
                             <p id="sequences_manage_editor_new_toggled" style="display: none;">State: <select id="sequences_manage_editor_new_toggled_select"><option value="1">on</option><option value="0">off</option><option value="-1">toggled</option></select></p>
                             <p id="sequences_manage_editor_new_dimmed" style="display: none;">Preset: <select id="sequences_manage_editor_new_dimmed_preset"></select></p>
                         </td>
-                        <td style="border: 1px solid white;"><span id="sequences_manage_editor_new" class="lilbutton">Add</span></td>
+                        <td><span id="sequences_manage_editor_new" class="lilbutton">Add</span></td>
                     </tr></tfoot>
                 </table>
             </td></tr></tbody></table>
@@ -291,18 +291,18 @@ var settings = {
     </div>
     
     <div id="video_selection" style="display: none;">
-        <table class="threeway" style="width: 100%;">
+        <table class="threeway" style="width: 100%;"><tbody>
 
 {{{videos}}}
-        </table>
+        </tbody></table>
         <div id="video_selection_back" class="bottomcorner" style="display: none;"><button type="button">Back to video</button></div>
     </div>
     
     <div id="video_playing" class="nopadding" style="display: none; overflow: hidden; border-radius: 0 0 11px 11px;">
-        <table style="width: 100%; height: 100%; border-style: none; border-collapse: collapse;"><tr><td style="text-align: center;">
+        <table style="width: 100%; height: 100%; border-style: none; border-collapse: collapse;"><tbody><tr><td style="text-align: center;">
             <video id="video_vid" preload="auto" controls title="While seeking the videos (or if the videos become out of sync), click and hold on the seek bar for a few seconds and then release." style="background-color: black;"></video>
-            <div id="visual_cue_container" style="display: none; position: absolute; width: 100%; max-height: 100%; left: 0; top: 38px; right: 0; background-color: #1D353F; color: white; box-shadow: inset 0 0 100px black; opacity: .8; overflow: auto;"><table style="width: 100%; height: 100%;"><tr><td id="visual_cue_td"></td></tr></table></div>
-        </td></tr></table>
+            <div id="visual_cue_container" style="display: none; position: absolute; width: 100%; max-height: 100%; left: 0; top: 38px; right: 0; background-color: #1D353F; color: white; box-shadow: inset 0 0 100px black; opacity: .8; overflow: auto;"><table style="width: 100%; height: 100%;"><tbody><tr><td id="visual_cue_td"></td></tr></tbody></table></div>
+        </td></tr></tbody></table>
         <div id="video_playing_back" class="topcorner"><button type="button">Back to video list</button></div>
     </div>
 </section>

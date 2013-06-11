@@ -270,8 +270,7 @@ span.lilbutton a {
     font-style: italic;
 }
 
-table.threeway > thead > tr > td, table.threeway > tbody > tr > td, table.threeway > tr > td,
-table.threeway > thead > tr > th, table.threeway > tbody > tr > th, table.threeway > tr > th {
+table.threeway > thead > tr > th, table.threeway > tbody > tr > td, table.threeway > tfoot > tr > td {
     padding: 15px;
     width: 33%;
     text-align: center;
@@ -283,12 +282,15 @@ table.pretty {
     padding: 0;
 }
 
-table.pretty > thead > tr > td, table.pretty > tbody > tr > td, table.pretty > tr > td,
-table.pretty > thead > tr > th, table.pretty > tbody > tr > th, table.pretty > tr > th {
+table.pretty > thead > tr > th, table.pretty > tbody > tr > td, table.pretty > tfoot > tr > td {
     margin: 0;
     padding: 5px;
     font-size: 10pt;
     border: 1px solid #344A55;
+}
+
+div.blackoverlay table.pretty > thead > tr > th, div.blackoverlay table.pretty > tbody > tr > td, div.blackoverlay table.pretty > tfoot > tr > td {
+    border: 1px solid white;
 }
 
 table.layouter {
@@ -298,7 +300,7 @@ table.layouter {
     opacity: 1;
 }
 
-table.layouter > tbody > tr > td, table.layouter > tr > td {
+table.layouter > tbody > tr > td {
     border: 1px solid black;
     background-color: white;
     color: black;
@@ -306,7 +308,7 @@ table.layouter > tbody > tr > td, table.layouter > tr > td {
     min-width: 40px;
 }
 
-table.topped > tbody > tr > td, table.topped > tr > td {
+table.topped > tbody > tr > td {
     vertical-align: top;
     /* white-space: nowrap; */
 }
