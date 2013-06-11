@@ -1,7 +1,15 @@
 {
-    "NAME": {
+    "Test Sequence": {
         "length": 20,
         "sequence": [
+            {
+                "time": 5.5,
+                "command": "effect",
+                "data": {
+                    "channel": "stairwell_blacklights",
+                    "state": 0
+                }
+            },
             {
                 "time": 7,
                 "command": "effect",
