@@ -618,7 +618,7 @@ var effects = {
                     html += '<td>Default Channel</td>';
                 }
                 html += '<td>';
-                html += effects.keyboard_action_formatter(keys[key]);
+                html += controlcmdinfo(keys[key]);
                 html += '</td><td><span class="lilbutton effects_keyboard_deleter" data-key="' + shared.escHTML(key) + '">Delete</span></td>';
             }
             html += '</tr>';
@@ -648,47 +648,6 @@ var effects = {
         $("#effects_keyboard_tbody").html(html);
         
         this.update_channelman();
-    },
-    
-    keyboard_action_formatter: function (details) {
-        if (details.command) {
-            if (details.command == "effect" && details.data) {
-                var html = "";
-                if (details.data.preset) {
-                    html += "Preset: " + shared.escHTML(details.data.preset);
-                } else if (details.data.light) {
-                    html += 'Light: ';
-                    if (details.data.light == "auto") {
-                        html += 'auto';
-                    } else {
-                        html += '<span title="' + shared.escHTML(JSON.stringify(details.data.light)) + '" style="cursor: default; font-style: italic;">(custom lighting pattern)</span>';
-                    }
-                    if (details.data.sound) html += "<br>Sound: " + details.data.sound;
-                } else if (typeof details.data.dimness != "undefined") {
-                    html += "Dimness: " + details.data.dimness;
-                    if (details.data.time) html += " over " + details.data.time + " seconds";
-                } else if (typeof details.data.state != "undefined") {
-                    switch (details.data.state) {
-                        case 1:
-                            html += "on";
-                            break;
-                        case 0:
-                            html += "off";
-                            break;
-                        case -1:
-                            html += "toggle";
-                            break;
-                    }
-                }
-                return html;
-            } else if (details.command == "sequence" && details.data) {
-                return "Sequence: " + shared.escHTML(details.data.sequencename || '""');
-            } else {
-                return "<i>" + shared.escHTML(details.command) + "</i>";
-            }
-        } else {
-            return "&nbsp;";
-        }
     },
     
     keyboard_action: function (key) {
@@ -733,7 +692,7 @@ var effects = {
             $("#effects_keyboard_editor_channeltoggled").show();
         } else {
             $("#effects_keyboard_editor_channeltoggled").hide();
-            $("#effects_keyboard_editor_action").html(this.keyboard_action_formatter(details)).show();
+            $("#effects_keyboard_editor_action").html(controlcmdinfo(details)).show();
         }
         
         this.toggle("keyboard", function () {

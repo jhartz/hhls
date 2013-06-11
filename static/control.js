@@ -307,3 +307,44 @@ function controlcmd(details) {
             break;
     }
 }
+
+function controlcmdinfo(details) {
+    if (details.command) {
+        if (details.command == "effect" && details.data) {
+            var html = '';
+            if (details.data.preset) {
+                html += 'Preset: ' + shared.escHTML(details.data.preset);
+            } else if (details.data.light) {
+                html += 'Light: ';
+                if (details.data.light == "auto") {
+                    html += 'auto';
+                } else {
+                    html += '<span title="' + shared.escHTML(JSON.stringify(details.data.light)) + '" style="cursor: default; font-style: italic;">(custom lighting pattern)</span>';
+                }
+                if (details.data.sound) html += '<br>Sound: ' + details.data.sound;
+            } else if (typeof details.data.dimness != "undefined") {
+                html += 'Dimness: ' + details.data.dimness;
+                if (details.data.time) html += ' over ' + details.data.time + ' seconds';
+            } else if (typeof details.data.state != "undefined") {
+                switch (details.data.state) {
+                    case 1:
+                        html += 'on';
+                        break;
+                    case 0:
+                        html += 'off';
+                        break;
+                    case -1:
+                        html += 'toggle';
+                        break;
+                }
+            }
+            return html;
+        } else if (details.command == "sequence" && details.data) {
+            return 'Sequence: ' + shared.escHTML(details.data.sequencename || '""');
+        } else {
+            return '<i>' + shared.escHTML(details.command) + '</i>';
+        }
+    } else {
+        return '&nbsp;';
+    }
+}
