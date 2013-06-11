@@ -3,6 +3,7 @@ var sequences = {
     running: null,
     starttime: 0,
     currently_editing: null,
+    currently_editing_sequence: null,
     
     init: function () {
         $("#ctrl_sequences > footer button").click(function () {
@@ -72,6 +73,16 @@ var sequences = {
                 $("#sequences_manage_editor_new_dimmed")[details.type == "dimmed" ? "show" : "hide"]();
             }
         }).change();
+        
+        $(document).on("click", ".sequences_manage_editor_deletebtn", function (event) {
+            var index = $(this).attr("data-index");
+            sequences.currently_editing_sequence.splice(index, 1);
+            sequences.editor_update_sequence();
+        });
+        
+        $("#sequences_manage_editor_new_add").click(function () {
+            sequences.editor_new_add();
+        });
     },
     
     toggle: function (newbie, oncomplete) {
@@ -114,6 +125,7 @@ var sequences = {
                 html += '<td>' + sequences.timefmt(settings.sequences[sequencename].length) + '</td>';
                 html += '<td><span class="lilbutton sequences_manage_tbody_editbtn" data-sequencename="' + shared.escHTML(sequencename) + '">Edit</span></td>';
                 html += '<td><span class="lilbutton sequences_manage_tbody_deletebtn" data-sequencename="' + shared.escHTML(sequencename) + '">Delete</span></td>';
+                html += '</tr>';
             }
         }
         $("#sequences_manage_tbody").html(html);
@@ -169,21 +181,85 @@ var sequences = {
         var details = {};
         if (sequencename && settings.sequences[sequencename]) details = settings.sequences[sequencename];
         if (!details.sequence) details.sequence = [];
+        
         sequences.currently_editing = sequencename || "";
+        sequences.currently_editing_sequence = details.sequence.slice(0); // to clone the array
         
         $("#sequences_manage_editor_name").val(sequencename || "");
         $("#sequences_manage_editor_length").val(details.length || "10");
-        
-        var html = '';
-        for (var i = 0; i < details.sequence.length; i++) {
-            html += '<tr><td>' + details.sequence[i].time + '</td><td>' + controlcmdinfo(details.sequence[i]) + '</td></tr>';
-        }
-        if (html == '') html = '<tr><td colspan="2">&nbsp;</td></tr>';
-        $("#sequences_manage_editor_sequence").html(html);
+        sequences.editor_update_sequence();
         
         this.toggle("manage", function () {
             $("#sequences_manage_editor").fadeIn();
         });
+    },
+    
+    editor_update_sequence: function () {
+        // Put sequence order by time
+        sequences.currently_editing_sequence.sort(function (a, b) {
+            return (a.time || 0) - (b.time || 0);
+        });
+        
+        var html = '';
+        for (var i = 0; i < sequences.currently_editing_sequence.length; i++) {
+            html += '<tr>';
+            html += '<td>' + sequences.currently_editing_sequence[i].time + '</td>';
+            var channel = "0";
+            if (sequences.currently_editing_sequence[i].data.channel) {
+                channel = sequences.currently_editing_sequence[i].data.channel;
+            }
+            if (channel == "0") channel = "Default Channel";
+            html += '<td>' + shared.escHTML(channel) + '</td>';
+            html += '<td>' + controlcmdinfo(sequences.currently_editing_sequence[i]) + '</td>';
+            html += '<td><span class="sequences_manage_editor_deletebtn lilbutton" data-index="' + i + '">Delete</span></td>';
+            html += '</tr>';
+        }
+        if (html == '') html = '<tr><td colspan="2">&nbsp;</td></tr>';
+        $("#sequences_manage_editor_sequence").html(html);
+        
+        // Last but not least, check that the length is acceptable
+        var length = Number($("#sequences_manage_editor_length").val());
+        if (isNaN(length) || length < 0) length = 0;
+        var finaltime = sequences.currently_editing_sequence[sequences.currently_editing_sequence.length - 1].time;
+        if (length < finaltime) length = finaltime;
+        $("#sequences_manage_editor_length").val(length);
+    },
+    
+    editor_new_add: function () {
+        var time = Number($("#sequences_manage_editor_new_time").val());
+        if (isNaN(time) || time < 0) {
+            alert("ERROR: Invalid time.");
+            return;
+        }
+        var channel = $("#sequences_manage_editor_new_channel").val(), channeldetails;
+        if (channel == "0") {
+            channeldetails = {type: "timed"};
+        } else if (!channel || !settings.channels.hasOwnProperty(channel)) {
+            alert("ERROR: Invalid channel.");
+            return;
+        } else {
+            channeldetails = settings.channels[channel];
+        }
+        
+        // We must be good
+        $("#sequences_manage_editor_new_time").val("");
+        var data = {
+            channel: channel
+        };
+        if (channeldetails.type && channeldetails.type == "toggled") {
+            data.state = Number($("#sequences_manage_editor_new_toggled_select").val());
+        } else if (channeldetails.type && channeldetails.type == "dimmed") {
+            data.preset = $("#sequences_manage_editor_new_dimmed_preset").val();
+        } else {
+            data.preset = $("#sequences_manage_editor_new_timed_preset").val();
+        }
+        
+        sequences.currently_editing_sequence.push({
+            time: time,
+            command: "effect",
+            data: data
+        });
+        sequences.editor_update_sequence();
     },
     
     editor_save: function () {
@@ -210,20 +286,24 @@ var sequences = {
         if (name != sequences.currently_editing && settings.sequences.hasOwnProperty(sequences.currently_editing)) {
             delete settings.sequences[sequences.currently_editing];
         }
-        sequences.currently_editing = null;
         
-        var sequence = [];
         settings.sequences[name] = {
             length: length,
-            sequence: sequence
+            sequence: sequences.currently_editing_sequence
         };
         conn.sendsetting("sequences");
+        
+        sequences.currently_editing = null;
+        sequences.currently_editing_sequence = null;
         
         $("#sequences_manage_editor").fadeOut();
         blockers.sequences_manage_editor = null;
     },
     
     editor_cancel: function () {
+        sequences.currently_editing = null;
+        sequences.currently_editing_sequence = null;
+        
         $("#sequences_manage_editor").fadeOut();
         blockers.sequences_manage_editor = null;
     },

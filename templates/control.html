@@ -259,18 +259,19 @@ var settings = {
                 <table class="pretty">
                     <thead><tr>
                         <th style="text-align: center;">Time</th>
+                        <th style="text-align: center;">Channel</th>
                         <th style="text-align: center;">Action</th>
                     </tr></thead>
                     <tbody id="sequences_manage_editor_sequence"></tbody>
                     <tfoot><tr>
                         <td><input id="sequences_manage_editor_new_time" type="number" min="0" size="3"></td>
+                        <td><select id="sequences_manage_editor_new_channel"></select></td>
                         <td>
-                            <div>Channel: <select id="sequences_manage_editor_new_channel"></select></div>
-                            <p id="sequences_manage_editor_new_timed" style="display: none;">Preset: <select id="sequences_manage_editor_new_timed_preset"></select></p>
-                            <p id="sequences_manage_editor_new_toggled" style="display: none;">State: <select id="sequences_manage_editor_new_toggled_select"><option value="1">on</option><option value="0">off</option><option value="-1">toggled</option></select></p>
-                            <p id="sequences_manage_editor_new_dimmed" style="display: none;">Preset: <select id="sequences_manage_editor_new_dimmed_preset"></select></p>
+                            <div id="sequences_manage_editor_new_timed" style="display: none;">Preset: <select id="sequences_manage_editor_new_timed_preset"></select></div>
+                            <div id="sequences_manage_editor_new_toggled" style="display: none;">State: <select id="sequences_manage_editor_new_toggled_select"><option value="1">on</option><option value="0">off</option><option value="-1">toggled</option></select></div>
+                            <div id="sequences_manage_editor_new_dimmed" style="display: none;">Preset: <select id="sequences_manage_editor_new_dimmed_preset"></select></div>
                         </td>
-                        <td><span id="sequences_manage_editor_new" class="lilbutton">Add</span></td>
+                        <td><span id="sequences_manage_editor_new_add" class="lilbutton">Add</span></td>
                     </tr></tfoot>
                 </table>
             </td></tr></tbody></table>
