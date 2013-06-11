@@ -1,7 +1,7 @@
 TODO
 
  - control:
-    - Finish the "edit sequence" thingie
+    - Test everything - a lot! Sequences, effects, keyboard shortcuts, all edge cases, ...
 
  - client2:
     - Implement FS/PointerLock so it's easy to go full screen and if pointer lock is enabled then screensaver/low power mode (screen dimming) SHOULDN'T happen (TODO: test this)
