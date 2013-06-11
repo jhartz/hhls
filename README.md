@@ -6,9 +6,9 @@ HHLS is a server-client system written entirely in JavaScript (node.js on the se
 
 Multiple computers throughout the building can connect to the server through a web browser as either a *control* (a computer that controls the effects) or a *client* (a computer that receives the effects and relays it to the external lighting). The *client* can be connected to external lighting or other electrical things in a variety of ways (in reality, the sky is the limit - common methods include the use of photoelectric switches positioned against the computer screen or software that hooks in with the HHLS API to control special hardware).
 
-Additionally, the *control* has built-in support for video presentations (and for syncing effects with the video), and any *control* that has a microphone can be used as an intercom system to broadcast an audio message to each computer connected as a *client*.
+The *control* allows the user to run effects on different channels to which the clients throughout the building are connected. It has simple systems for timed sequences of effects and keyboard shortcuts. Additionally, the *control* has built-in support for video presentations (and for syncing effects with the video).
 
-Another interesting feature of HHLS is a basic live camera monitoring system (entirely separate from the rest of the system). This allows a computer connected to the server to remotely monitor any computer with a webcam attached that is connected to the camera monitoring system.
+Another interesting feature of HHLS is a basic live camera monitoring system (entirely separate from the rest of the system). This allows a computer connected to the server to remotely monitor any computer with a webcam attached that is connected to the camera monitoring system. NOTE: Work on this is still in progress, and it is based on WebRTC, which is commonly only available in the beta or nightly builds of most browsers.
 
 ## License
 
