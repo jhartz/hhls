@@ -129,7 +129,7 @@ var video = {
             w('<body style="background-color: black; color: white;">');
             w('<video id="main_vid" class="all" preload="auto"></video>');
             w('<div id="msg_holder" class="all"><table style="width: 100%; height: 100%;"><tr><td>');
-            w('<div id="msg" style="text-align: center; background-color: black; opacity: .9;">Drag this window into your second workspace/desktop/etc. and<br><br><span id="goFS" class="btn">go fullscreen</span><br>or<br><span id="skipFS" class="btn">skip fullscreen</span></div>');
+            w('<div id="msg" style="text-align: center; background-color: black; opacity: .9; line-height: 150%;">Drag this window into your second workspace/desktop/etc. and go fullscreen:<br><i>Command-Shift-F</i> or <i>F11</i><br>(or <span id="goFS" class="btn">click here</span> if that doesn\'t work)<br><br><span id="skipFS" class="btn">Continue</span></div>');
             w('</td></tr></table></div>');
             w('</body>');
             w('</html>');

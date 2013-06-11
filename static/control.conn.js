@@ -213,8 +213,8 @@ var conn = {
         } else {
             var addr = window.location.protocol + "//" + window.location.hostname;
             if (window.location.port) addr += ":" + window.location.port;
-            addr += "/";
-            $("#client_list").html('No clients connected!<br><br>Direct your clients to ' + shared.escHTML(addr) + '<br>and click "client"');
+            addr += "/client";
+            $("#client_list").html('No clients connected!<br>Direct your clients to ' + shared.escHTML(addr));
         }
         
         effects.update_channelman();
