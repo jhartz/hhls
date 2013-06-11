@@ -62,6 +62,16 @@ var sequences = {
         $("#sequences_manage_editor_canceller").click(function () {
             sequences.editor_cancel();
         });
+        
+        $("#sequences_manage_editor_new_channel").change(function () {
+            var channel = $(this).val(), details = {type: "timed"};
+            if (channel != "0") details = settings.channels[channel];
+            if (details) {
+                $("#sequences_manage_editor_new_timed")[(details.type != "toggled" && details.type != "dimmed") ? "show" : "hide"]();
+                $("#sequences_manage_editor_new_toggled")[details.type == "toggled" ? "show" : "hide"]();
+                $("#sequences_manage_editor_new_dimmed")[details.type == "dimmed" ? "show" : "hide"]();
+            }
+        }).change();
     },
     
     toggle: function (newbie, oncomplete) {
@@ -166,8 +176,9 @@ var sequences = {
         
         var html = '';
         for (var i = 0; i < details.sequence.length; i++) {
-            html += '<tr><td style="border: 1px solid white;">' + details.sequence[i].time + '</td><td style="border: 1px solid white;">' + controlcmdinfo(details.sequence[i]) + '</td></tr>';
+            html += '<tr><td>' + details.sequence[i].time + '</td><td>' + controlcmdinfo(details.sequence[i]) + '</td></tr>';
         }
+        if (html == '') html = '<tr><td colspan="2">&nbsp;</td></tr>';
         $("#sequences_manage_editor_sequence").html(html);
         
         this.toggle("manage", function () {
