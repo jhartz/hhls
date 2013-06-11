@@ -158,11 +158,17 @@ var sequences = {
         
         var details = {};
         if (sequencename && settings.sequences[sequencename]) details = settings.sequences[sequencename];
+        if (!details.sequence) details.sequence = [];
         sequences.currently_editing = sequencename || "";
         
         $("#sequences_manage_editor_name").val(sequencename || "");
         $("#sequences_manage_editor_length").val(details.length || "10");
-        $("#sequences_manage_editor_sequence").html('');
+        
+        var html = '';
+        for (var i = 0; i < details.sequence.length; i++) {
+            html += '<tr><td style="border: 1px solid white;">' + details.sequence[i].time + '</td><td style="border: 1px solid white;">' + controlcmdinfo(details.sequence[i]) + '</td></tr>';
+        }
+        $("#sequences_manage_editor_sequence").html(html);
         
         this.toggle("manage", function () {
             $("#sequences_manage_editor").fadeIn();
