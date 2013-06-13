@@ -3,9 +3,6 @@ TODO
  - control:
     - Test everything - a lot! Sequences, effects, keyboard shortcuts, all edge cases, ...
 
- - client2:
-    - Implement FS/PointerLock so it's easy to go full screen and if pointer lock is enabled then screensaver/low power mode (screen dimming) SHOULDN'T happen (TODO: test this)
-
  - clientframe2:
     - automatic lighting based on sound for timed channels
     - show in "loaded sounds" only when audio is loaded
