@@ -43,6 +43,14 @@ table {
     color: white;
     height: 20px;
     overflow: hidden;
+    
+    /* So that when they double-click to go fullscreen and initiate pointer lock, we aren't left with something selected */
+    cursor: default;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 #status table td {
@@ -71,8 +79,8 @@ table {
     <div id="status">
         <table><tbody>
             <tr>
-                <td>{{location}}</td>
-                <td>{{name}}</td>{{#closebtn}}
+                <td title="Double-click to go full screen">{{location}}</td>
+                <td title="Double-click to go full screen">{{name}}</td>{{#closebtn}}
                 <td><span id="status_closeall" class="btn">Close All Connections</span></td>{{/closebtn}}
             </tr>
         </tbody></table>
