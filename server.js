@@ -97,12 +97,12 @@ function handler(req, res) {
     UTIL FUNCTIONS
 */
 
-// Pick the first directory from the arguments that exists
+// Pick the first directory from the arguments that exists, automatically resolving relative directories from the location of the script
 function pickExistingDir() {
     var dir = "";
     for (var i = 0; i < arguments.length; i++) {
         if (arguments[i]) {
-            dir = arguments[i];
+            dir = path.resolve(__dirname, arguments[i]);
             if (fs.existsSync(dir)) break;
         }
     }
