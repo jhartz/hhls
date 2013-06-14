@@ -26,6 +26,13 @@ config.SOUNDS_DIR = pickExistingDir(config.SOUNDS_DIR, "content/sounds");
 config.RESOURCES_DIR = pickExistingDir(config.RESOURCES_DIR, "content/resources");
 config.SETTINGS_DIR = pickExistingDir(config.SETTINGS_DIR, "content/settings");
 
+// These aren't normally set in config file
+config.TEMPLATES_DIR = pickExistingDir(config.TEMPLATES_DIR, "templates");
+config.STATIC_DIR = pickExistingDir(config.STATIC_DIR, "static");
+config.COMPONENTS_DIR = pickExistingDir(config.COMPONENTS_DIR, "components");
+
+// Update module config
+writer.setTemplateDir(config.TEMPLATES_DIR);
 jsonsettings.default_settings_dir = config.SETTINGS_DIR;
 
 io.configure(function () {
@@ -40,54 +47,65 @@ app.listen(config.PORT);
 
 function handler(req, res) {
     var url = url_module.parse(req.url, true);
+    
+    // Assuming /dir/file
+    // If we have "/mydir/mysubdir/myfile", dir=="mydir" and file=="mysubdir/myfile"
+    var dir = url.pathname.substring(1);
+    if (dir.indexOf("/") != -1) dir = dir.substring(0, dir.indexOf("/"));
+    var file = url.pathname.substring(dir.length + 2);
+    
+    // If it's looking for an event stream
     if (req.headers.accept && req.headers.accept == "text/event-stream") {
-        if (url.pathname == "/client/stream") {
+        if (dir == "client" && file == "stream") {
             serveStream(url, req, res);
         } else {
             writer.writeError(res, 406);
         }
-    } else if (url.pathname.substring(0, 8) == "/static/" || url.pathname.substring(0, 11) == "/resources/" || url.pathname.substring(0, 8) == "/videos/" || url.pathname.substring(0, 8) == "/sounds/") {
-        var filename = url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
-        if (filename.toLowerCase() == "readme") {
+    // All of our static content
+    } else if (dir == "static" || dir == "resources" || dir == "videos" || dir == "sounds") {
+        // No access to any URL containing ".." or any README files
+        if (("/" + file + "/").indexOf("/../") != -1 || path.basename(file).toLowerCase() == "readme") {
             writer.writeError(res, 404);
         } else {
-            var contentDir = url.pathname.substring(1);
-            contentDir = contentDir.substring(0, contentDir.indexOf("/"));
-            if (contentDir == "resources" && config.RESOURCES_DIR) {
-                contentDir = config.RESOURCES_DIR;
-            } else if (contentDir == "videos" && config.VIDEOS_DIR) {
-                contentDir = config.VIDEOS_DIR;
-            } else if (contentDir == "sounds" && config.SOUNDS_DIR) {
-                contentDir = config.SOUNDS_DIR;
-            }
-            staticserve.serve(req, res, filename, contentDir);
+            staticserve.serve(req, res, file, config[dir.toUpperCase() + "_DIR"]);
         }
-    } else if (url.pathname == "/") {
+    // The home page
+    } else if (dir == "") {
         serveResources(req, res);
-    } else if (url.pathname == "/control") {
+    // The /control stuff
+    } else if (dir == "control" && file == "") {
         serveControl(url, req, res);
-    } else if (url.pathname.substring(0, 8) == "/cameras") {
-        var urlpart = url.pathname.substring(9);
-        if (urlpart == "attacher") {
-            serveCamerasAttacher(url, req, res);
-        } else if (urlpart == "viewer") {
-            serveCamerasViewer(url, req, res);
-        } else {
-            writer.writeError(res, 404);
+    // The /client stuff
+    } else if (dir == "client") {
+        switch (file) {
+            case "":
+                serveClient(url, req, res);
+                break;
+            case "frame":
+                serveClientFrame(url, req, res);
+                break;
+            case "addon.xpi":
+                staticserve.zipfile(req, res, path.join(config.COMPONENTS_DIR, "addon"), "application/x-xpinstall");
+                break;
+            default:
+                writer.writeError(res, 404);
         }
-    } else if (url.pathname.substring(0, 7) == "/client") {
-        var urlpart = url.pathname.substring(8);
-        if (urlpart == "") {
-            serveClient(url, req, res);
-        } else if (urlpart == "frame") {
-            serveClientFrame(url, req, res);
-        } else if (urlpart == "addon.xpi") {
-            staticserve.zipfile(req, res, path.join("components", "addon"), "application/x-xpinstall");
-        } else {
-            writer.writeError(res, 404);
+    // The /cameras stuff
+    } else if (dir == "cameras") {
+        switch (file) {
+            case "attacher":
+                serveCamerasAttacher(url, req, res);
+                break;
+            case "viewer":
+                serveCamerasViewer(url, req, res);
+                break;
+            default:
+                writer.writeError(res, 404);
         }
-    } else if (url.pathname == "/test") {
+    // Our lovely test file
+    } else if (dir == "test" && file == "") {
         writer.write(res, "test.html");
+    // Anything else
     } else {
         writer.writeError(res, 404);
     }

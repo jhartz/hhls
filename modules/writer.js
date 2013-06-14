@@ -7,12 +7,15 @@ var path = require("path");
 // required modules
 var mu = require("mu2");
 
-mu.root = path.join(__dirname, "..", "templates");
 if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development") {
     mu.clearCache();
 } else {
     console.log("Using mu cache");
 }
+
+exports.setTemplateDir = function (dir) {
+    mu.root = dir;
+};
 
 // writer.write(res, template name, [template vars, [status], [headers]])
 exports.write = function (res, template, vars, status, headers) {
