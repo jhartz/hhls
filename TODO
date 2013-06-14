@@ -13,7 +13,6 @@ TODO
     - add a system to write executables to a pref so they stay between restarts
 
  - /client/addon.xpi (zipfile generation)
-    - fix issues (FF says its "corrupted" - maybe examine it in 7-zip?)
     - link to it in /client or on home page (probably not /client/frame, cause then it would look like a per-frame thing)
 
  - Camera Viewer:
