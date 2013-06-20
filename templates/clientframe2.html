@@ -91,11 +91,7 @@ var controller_exec = {{{controller_exec}}};
 <div id="options" style="position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-color: black; color: white; text-shadow: none; padding: 10px; overflow: auto; display: none;"><table style="width: 100%; height: 100%;"><tbody><tr><td>
     <div>
         <table class="bordered" style="margin: auto;"><tbody>
-            <tr>{{#sounds}}
-                <td valign="top">
-                    <div class="heading">Loaded Sounds:</div>
-                    <ul id="options_soundlist" style="max-width: 230px; padding: 0; margin: 0 15px;"></ul>
-                </td>{{/sounds}}
+            <tr>
                 <td valign="top">
                     <div id="hhls_keyholder" class="heading">Options:</div>
                     <div style="margin-left: 15px;">{{#sounds}}
@@ -118,7 +114,7 @@ var controller_exec = {{{controller_exec}}};
                 </td>
             </tr>
             <tr>
-                <td{{#sounds}} colspan="2"{{/sounds}}>
+                <td>
                     <div class="heading">Status History:</div>
                     <div style="max-height: 160px; overflow: auto; margin-left: 15px;"><table><tbody id="options_statushistory"></tbody></table></div>
                 </td>

@@ -187,8 +187,6 @@ window.onload = function () {
             var soundlist = document.getElementsByTagName("audio");
             for (var i = 0; i < soundlist.length; i++) {
                 sounds[soundlist[i].dataset.sound] = soundlist[i];
-                // TODO: run this below on the audio's onload (if it's not already loaded)
-                document.getElementById("options_soundlist").innerHTML += '<li>' + shared.escHTML(soundlist[i].dataset.sound) + '</li>';
             }
         }
         
