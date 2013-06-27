@@ -43,6 +43,7 @@ io.configure(function () {
     io.set("transports", ["websocket", "flashsocket", "htmlfile", "xhr-polling", "jsonp-polling"]);
 });
 
+console.log("Starting HHLS server on port " + config.PORT);
 app.listen(config.PORT);
 
 function handler(req, res) {
