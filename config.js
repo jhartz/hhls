@@ -2,7 +2,7 @@
 
 // Port on which to run the HTTP server
 // default: process.env.PORT || 8080
-exports.PORT = 8080;
+exports.PORT = 80;
 
 // Directory in which videos are stored (see examples/videos/README)
 // default: "content/videos"
