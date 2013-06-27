@@ -1,5 +1,9 @@
 window.onload = function () {
     if (document.getElementById && document.getElementById("customizer_span") && document.addEventListener && document.createElement) {
+        if (navigator.userAgent.indexOf("Firefox") != -1) {
+            document.getElementById("client_addon_container").style.display = "block";
+        }
+        
         document.getElementById("customizer_span").innerHTML += '<input id="customizer_input1" name="layout_x" size="2" type="number" min="1" max="9">x<input id="customizer_input2" name="layout_y" size="2" type="number" min="1" max="9">';
         
         document.getElementById("customizer_select").addEventListener("change", function (event) {

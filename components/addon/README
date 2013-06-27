@@ -1,0 +1,8 @@
+ADD-ON README
+-------------
+
+The HHLS client add-on is used to provide implementations for special devices for toggled channel clients (ie. instead of just making the screen flash, it can control a USB outlet or something similar). Also, it can be used to run executables on the client computer.
+
+To add your own devices, see the devices.jsm file. You can use Firefox APIs and XPCOM interfaces to control the device, or call external processes (through the nsIProcess XPCOM interface).
+
+To modify the functions that are made available to the HHLS client webpage, see the commands.jsm file.

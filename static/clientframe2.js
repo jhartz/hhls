@@ -59,20 +59,32 @@ function dim(percent) {
                 if (controller_exec && controller_exec.indexOf("::") != -1) {
                     var index = parseInt(controller_exec.substring(0, controller_exec.indexOf("::")), 10);
                     var sum = controller_exec.substring(controller_exec.indexOf("::") + 2);
-                    stuff.runExec(function (result) {
-                        if (!result.success) {
-                            status("ERROR sending state to exec: " + result.error);
-                        }
-                    }, [index, sum, state]);
+                    if (isNaN(index)) {
+                        status("ERROR parsing index from controller_exec!");
+                    } else {
+                        stuff.runExec([index, sum, state], function (result) {
+                            if (!result.success) {
+                                status("ERROR sending state to exec: " + result.error);
+                            }
+                        });
+                    }
                 } else {
                     status("ERROR parsing controller_exec!");
                 }
             } else {
-                stuff.setDevice(function (result) {
-                    if (!result.success) {
-                        status("ERROR sending state to device: " + result.error);
-                    }
-                }, [controller, state]);
+                var data;
+                try {
+                    data = JSON.parse(controller);
+                } catch (err) {}
+                if (data) {
+                    stuff.setDevice([data[0], data[1], state], function (result) {
+                        if (!result.success) {
+                            status("ERROR sending state to device: " + result.error);
+                        }
+                    });
+                } else {
+                    status("ERROR parsing controller!");
+                }
             }
         }
     }
@@ -129,6 +141,21 @@ window.onload = function () {
             var i_err = stuff.i;
             stuff = null;
             alert("ERROR: Authentication error with HHLS Client Add-on\nDetails:" + i_err);
+        }
+        
+        if (controller && stuff) {
+            document.getElementById("controller_icon").style.display = "inline";
+            var title = "External Controller: ";
+            if (controller == "exec") {
+                title += "Executable (" + controller_exec + ")";
+            } else {
+                var data;
+                try {
+                    data = JSON.parse(controller);
+                } catch (err) {}
+                title += data ? data[1] + " (" + data[0] + ")" : "error";
+            }
+            document.getElementById("controller_icon").setAttribute("title", title);
         }
         
         document.getElementById("options_btn").addEventListener("click", function (event) {

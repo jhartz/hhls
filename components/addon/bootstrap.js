@@ -20,6 +20,7 @@ function startup(data, reason) {
     try {
         var branch = Services.prefs.getDefaultBranch("");
         branch.setCharPref("extensions.hhls.server", "http://");
+        branch.setCharPref("extensions.hhls.executables", "[]");
     } catch (err) {
         Cu.reportError(err);
     }
@@ -78,25 +79,33 @@ function unloadWindow(win) {
     }
 }
 
-function run_client_command(name, callback, args) {
-    if (typeof client_commands != "undefined" && client_commands[name]) {
+function testProps(obj) {
+    // Make all properties of obj read-only if not already specified in __exposedProps__
+    if (typeof obj.__exposedProps__ == "undefined") obj.__exposedProps__ = {};
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop) && typeof obj.__exposedProps__[prop] == "undefined") {
+            obj.__exposedProps__[prop] = "r";
+        }
+    }
+}
+
+function run_client_command(name, args, callback) {
+    if (client_commands.hasOwnProperty(name) && typeof client_commands[name] == "function") {
         if (typeof callback != "function") callback = function () {};
         if (!Array.isArray(args)) args = [];
         
-        var return_obj = {};
-        var data = null;
-        Object.defineProperty(return_obj, "value", {
-            enumerable: true,
-            configurable: true,
-            get: function () {
-                return data;
-            },
-            set: function (val) {
-                data = val;
-                callback(data);
+        client_commands[name](args, function (result) {
+            if (Array.isArray(result)) {
+                for (var i = 0; i < result.length; i++) {
+                    if (typeof result[i] == "object" && typeof result[i].__exposedProps__ == "undefined") {
+                        testProps(result[i]);
+                    }
+                }
+            } else if (typeof result == "object" && typeof result.__exposedProps__ == "undefined") {
+                testProps(result);
             }
+            callback(result);
         });
-        client_commands[name](args, return_obj);
     }
 }
 
@@ -143,8 +152,13 @@ function handleContent(event) {
                             }
                             cmds.forEach(function (cmd) {
                                 if (cmd != "i") {
-                                    stuff[cmd] = function (callback, args) {
-                                        run_client_command(cmd, callback, args);
+                                    stuff[cmd] = function (args, callback) {
+                                        // "args" is optional
+                                        if (typeof callback == "undefined" && typeof args == "function") {
+                                            callback = args;
+                                            args = [];
+                                        }
+                                        run_client_command(cmd, args, callback);
                                     };
                                 }
                             });

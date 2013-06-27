@@ -14,9 +14,18 @@ window.onload = function () {
             event.preventDefault();
             
             stuff.detectDevices(function (devices) {
+                var id, label, html = '', errorhtml = '';
                 for (var i = 0; i < devices.length; i++) {
-                    document.getElementById("devicelist").innerHTML += '<input type="radio" id="controller_' + i + '" name="controller" value="' + shared.escHTML(devices[i].id) + '">&nbsp;<label for="controller_' + i + '">' + shared.escHTML(devices[i].label) + '</label><br>';
+                    if (devices[i].error) {
+                        errorhtml += '<strong>Error loading <code>' + shared.escHTML(devices[i].device) + '</code>: </strong>' + shared.escHTML(devices[i].error) + '<br>';
+                    } else {
+                        id = JSON.stringify([devices[i].device, devices[i].id]);
+                        label = devices[i].id + " (" + devices[i].device + ")";
+                        html += '<input type="radio" id="controller_' + i + '" name="controller" value="' + shared.escHTML(id) + '">&nbsp;<label for="controller_' + i + '">' + shared.escHTML(label) + '</label><br>';
+                    }
                 }
+                // Make sure errors show up last, after working devices
+                document.getElementById("devicelist").innerHTML = html + errorhtml;
             });
             
             var success = function (index, sum, path) {
@@ -57,19 +66,19 @@ window.onload = function () {
                             var index = parseInt(val.substring(0, val.indexOf("::")), 10);
                             var sum = val.substring(val.indexOf("::") + 2);
                             if (!isNaN(index) && sum) {
-                                stuff.getExecArgs(function (data) {
-                                    if (data.success) {
+                                stuff.getExecArgs([index, sum], function (result) {
+                                    if (result.success) {
                                         success(index, sum, option.getAttribute("data-path"));
-                                        window._exec_args = data.args;
-                                        if (data.args.length > 0) {
+                                        window._exec_args = result.args;
+                                        if (result.args.length > 0) {
                                             document.getElementById("controller_exec_ifOneArg").style.display = "none";
                                             document.getElementById("controller_exec_ifMultipleArgs").style.display = "inline";
                                             document.getElementById("controller_exec_arguments").innerHTML = "Arguments...";
                                         }
                                     } else {
-                                        alert("Error loading executable data: " + data.error);
+                                        alert("Error loading executable data: " + result.error);
                                     }
-                                }, [index, sum]);
+                                });
                             }
                         }
                         document.getElementById("controller_exec_prev").value = "nil";
@@ -85,20 +94,20 @@ window.onload = function () {
                 if (event.shiftKey) {
                     var path = prompt("Path:", window._exec_path || "");
                     if (path && shared.trim(path)) {
-                        stuff.setExec(function (data) {
-                            if (data.success) {
-                                success(data.index, data.sum, data.path);
+                        stuff.setExec([shared.trim(path)], function (result) {
+                            if (result.success) {
+                                success(result.index, result.sum, result.path);
                             } else {
-                                alert("Error setting file path: " + data.error);
+                                alert("Error setting file path: " + result.error);
                             }
-                        }, [shared.trim(path)]);
+                        });
                     }
                 } else {
-                    stuff.browse(function (data) {
-                        if (data.success) {
-                            success(data.index, data.sum, data.path);
-                        } else if (data.error) {
-                            alert("Error browsing for file: " + data.error);
+                    stuff.browse(function (result) {
+                        if (result.success) {
+                            success(result.index, result.sum, result.path);
+                        } else if (result.error) {
+                            alert("Error browsing for file: " + result.error);
                         }
                     });
                 }
@@ -127,7 +136,7 @@ window.onload = function () {
                         }
                     }
                     window._exec_args = newargs;
-                    stuff.setExecArgs(function (result) {
+                    stuff.setExecArgs([window._exec_index, window._exec_sum, window._exec_args], function (result) {
                         if (result.success) {
                             if (result.empty) {
                                 document.getElementById("controller_exec_ifOneArg").style.display = "inline";
@@ -141,7 +150,7 @@ window.onload = function () {
                         } else {
                             alert("Error setting arguments: " + result.error);
                         }
-                    }, [window._exec_index, window._exec_sum, window._exec_args]);
+                    });
                 } else {
                     alert("ERROR: Please browse for an executable first!");
                 }
@@ -156,6 +165,7 @@ window.onload = function () {
             };
             controller_exec_change();
             document.getElementById("controller_exec_option").addEventListener("change", controller_exec_change, false);
+            document.getElementById("devicelist").addEventListener("change", controller_exec_change, false);
             
             document.getElementById("use_controller").value = "yes";
             document.getElementById("controller_options").style.display = "block";

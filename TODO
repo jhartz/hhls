@@ -5,14 +5,6 @@ TODO
 
  - clientframe2:
     - automatic lighting based on sound for timed channels
-    - Implement device/controller stuff... Show a small icon on the page if it is being used with a controller or device (mouseover shows more info about the controller/device)
-
- - components/addon
-    - device detection and interaction
-    - add a system to write executables to a pref so they stay between restarts
-
- - /client/addon.xpi (zipfile generation)
-    - link to it in /client or on home page (probably not /client/frame, cause then it would look like a per-frame thing)
 
  - Camera Viewer:
     - Add option (in "options") for a time delay for the camera (like "20 seconds" or something) to delay the video (so we can have a camera on the people as they enter somewhere, and show it later)
