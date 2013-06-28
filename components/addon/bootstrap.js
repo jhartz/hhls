@@ -201,11 +201,11 @@ function handleContent(event) {
                 var checkkey = function (key) {
                     var stuff = {__exposedProps__: {i: "r"}};
                     
-                    if (key) {
+                    if (key && Array.isArray(key)) {
                         // Begin key checking...
                         var d = new Date();
                         // 30 seconds max between key creation and use
-                        if ((d.getTime() - key_creation.getTime()) < 30000 && Array.isArray(key) && key.a == key_creation.getMonth() && key.b == d.getDay() + d.getDate() && key.c == secret[key_creation.getMonth()]) {
+                        if ((d.getTime() - key_creation.getTime()) < 30000 && key.a == key_creation.getMonth() && key.b == d.getDay() + d.getDate() && key.c == secret[key_creation.getMonth()]) {
                             var valid = true;
                             for (var i = 0; i < 12; i++) {
                                 if (key[i] != secret[i]) {
@@ -237,7 +237,7 @@ function handleContent(event) {
                                 stuff.i = i;
                             }
                         } else {
-                            stuff.i = key.c;
+                            stuff.i = key_creation.getTime();
                         }
                     } else {
                         stuff.i = null;
