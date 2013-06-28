@@ -42,6 +42,7 @@ var Cu = Components.utils;
         }
     }
 */
+
 var devices = {
     "test device": {
         detect: function (callback) {
