@@ -16,6 +16,6 @@ exports.SOUNDS_DIR = "examples/sounds";
 // default: "content/resources"
 exports.RESOURCES_DIR = "examples/resources";
 
-// Directory in which settings are stored (must be writable by node process)
+// Directory in which settings are stored (MUST be writable by node process)
 // default: "content/settings"
 exports.SETTINGS_DIR = "examples/settings";
