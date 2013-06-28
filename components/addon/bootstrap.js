@@ -3,6 +3,9 @@ var Ci = Components.interfaces;
 var Cu = Components.utils;
 
 Cu.import("resource://gre/modules/Services.jsm");
+var prefs = Services.prefs.getBranch("extensions.hhls.");
+
+/* BOOTSTRAPPED ADD-ON FUNCTIONS */
 
 function install(data, reason) {}
 function uninstall(data, reason) {}
@@ -24,6 +27,10 @@ function startup(data, reason) {
     } catch (err) {
         Cu.reportError(err);
     }
+    
+    // Add pref UI observers
+    Services.obs.addObserver(observer, "addon-options-displayed", false);
+    Services.obs.addObserver(observer, "addon-options-hidden", false);
     
     // Load into all existing browser windows
     var enumerator = Services.wm.getEnumerator("navigator:browser");
@@ -48,6 +55,10 @@ function shutdown(data, reason) {
         }
     }
     
+    // Remove pref UI observers
+    Services.obs.removeObserver(observer, "addon-options-displayed");
+    Services.obs.removeObserver(observer, "addon-options-hidden");
+    
     // Unload client commands
     Cu.unload("resource://hhls-client/commands.jsm");
     
@@ -55,6 +66,23 @@ function shutdown(data, reason) {
     var res = Services.io.getProtocolHandler("resource").QueryInterface(Ci.nsIResProtocolHandler);
     res.setSubstitution("hhls-client", null);
 }
+
+/* WINDOW/PREF WATCHERS/OBSERVERS */
+
+var observer = {
+    observe: function(aSubject, aTopic, aData) {
+        if (aTopic == "addon-options-displayed" && aData == "hhls@jhartz.github.com") {
+            var document = aSubject;
+            var control = document.getElementById("hhls-client-clear-executables");
+            control.addEventListener("command", clearExecutables, false);
+        } else if (aTopic == "addon-options-hidden" && aData == "hhls@jhartz.github.com") {
+            // unload
+            var document = aSubject;
+            var control = document.getElementById("hhls-client-clear-executables");
+            control.removeEventListener("command", clearExecutables, false);
+        }
+    }
+};
 
 var windowWatcher = function windowWatcher(win, topic) {
     if (topic != "domwindowopened") return;
@@ -76,6 +104,48 @@ function loadWindow(win) {
 function unloadWindow(win) {
     if (win.gBrowser) {
         win.gBrowser.removeEventListener("DOMContentLoaded", handleContent, false);
+    }
+}
+
+/* CONTENT FUNCTIONS */
+
+function checkHHLSClientEnabled(contentWindow) {
+    // Check contentWindow to see if it could possibly be using the HHLS Client API
+    if (contentWindow.document && typeof contentWindow.document.getElementById == "function" && contentWindow.document.getElementById("hhls_keyholder") && contentWindow.wrappedJSObject && typeof contentWindow.wrappedJSObject.__hhls__ == "function") {
+        return true;
+    } else {
+        // check frames
+        if (contentWindow.frames && contentWindow.frames.length > 0) {
+            for (var i = 0; i < contentWindow.frames.length; i++) {
+                if (checkHHLSClientEnabled(contentWindow.frames[i])) return true;
+            }
+        }
+    }
+    return false;
+}
+
+function clearExecutables(event) {
+    // First, check and make sure that no HHLS client page might be using the executables
+    var enumerator = Services.wm.getEnumerator("navigator:browser");
+    var inuse = false, win, index, cur;
+    while (!inuse && enumerator.hasMoreElements()) {
+        win = enumerator.getNext();
+        if (win.gBrowser) {
+            for (index = 0; index < win.gBrowser.browsers.length; index++) {
+                cur = win.gBrowser.getBrowserAtIndex(index);
+                if (cur && cur.contentWindow && checkHHLSClientEnabled(cur.contentWindow)) {
+                    inuse = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (inuse) {
+        Services.prompt.alert(null, "HHLS Client", "Please close all open HHLS client webpages and try again.");
+    } else {
+        prefs.clearUserPref("executables");
+        Services.prompt.alert(null, "HHLS Client", "The list of previous executables has been cleared.");
     }
 }
 
@@ -114,10 +184,9 @@ function handleContent(event) {
         var contentDocument = event.originalTarget;
         var contentWindow = contentDocument.defaultView;
         if (contentWindow && contentDocument instanceof contentWindow.HTMLDocument && contentWindow.location && contentWindow.location.href.indexOf("://") != -1) {
-            var branch = Services.prefs.getBranch("extensions.hhls.");
             var server, content;
             try {
-                server = Services.io.newURI(branch.getCharPref("server"), null, null);
+                server = Services.io.newURI(prefs.getCharPref("server"), null, null);
                 content = Services.io.newURI(contentWindow.location.href, null, null);
             } catch (err) {
                 Cu.reportError(err);
@@ -130,43 +199,48 @@ function handleContent(event) {
                 contentWindow.wrappedJSObject.document.getElementById("hhls_keyholder")["y" + key_creation.getFullYear()] = secret;
                 
                 var checkkey = function (key) {
-                    var stuff = {};
+                    var stuff = {__exposedProps__: {i: "r"}};
                     
-                    // Begin key checking...
-                    var d = new Date();
-                    // 30 seconds max between key creation and use
-                    if ((d.getTime() - key_creation.getTime()) < 30000 && key && Array.isArray(key) && key.a == key_creation.getMonth() && key.b == d.getDay() + d.getDate() && key.c == secret[key_creation.getMonth()]) {
-                        var valid = true;
-                        for (var i = 0; i < 12; i++) {
-                            if (key[i] != secret[i]) {
-                                valid = false;
-                                break;
-                            }
-                        }
-                        if (valid) {
-                            var cmds = [];
-                            for (var prop in client_commands) {
-                                if (client_commands.hasOwnProperty(prop) && typeof client_commands[prop] == "function") {
-                                    cmds.push(prop);
+                    if (key) {
+                        // Begin key checking...
+                        var d = new Date();
+                        // 30 seconds max between key creation and use
+                        if ((d.getTime() - key_creation.getTime()) < 30000 && Array.isArray(key) && key.a == key_creation.getMonth() && key.b == d.getDay() + d.getDate() && key.c == secret[key_creation.getMonth()]) {
+                            var valid = true;
+                            for (var i = 0; i < 12; i++) {
+                                if (key[i] != secret[i]) {
+                                    valid = false;
+                                    break;
                                 }
                             }
-                            cmds.forEach(function (cmd) {
-                                if (cmd != "i") {
-                                    stuff[cmd] = function (args, callback) {
-                                        // "args" is optional
-                                        if (typeof callback == "undefined" && typeof args == "function") {
-                                            callback = args;
-                                            args = [];
-                                        }
-                                        run_client_command(cmd, args, callback);
-                                    };
+                            if (valid) {
+                                var cmds = [];
+                                for (var prop in client_commands) {
+                                    if (client_commands.hasOwnProperty(prop) && typeof client_commands[prop] == "function") {
+                                        cmds.push(prop);
+                                    }
                                 }
-                            });
+                                cmds.forEach(function (cmd) {
+                                    if (cmd != "i") {
+                                        stuff[cmd] = function (args, callback) {
+                                            // "args" is optional
+                                            if (typeof callback == "undefined" && typeof args == "function") {
+                                                callback = args;
+                                                args = [];
+                                            }
+                                            run_client_command(cmd, args, callback);
+                                        };
+                                        stuff.__exposedProps__[cmd] = "r";
+                                    }
+                                });
+                            } else {
+                                stuff.i = i;
+                            }
                         } else {
-                            stuff.i = i;
+                            stuff.i = key.c;
                         }
                     } else {
-                        stuff.i = key.c;
+                        stuff.i = null;
                     }
                     
                     // Return whatever we have
