@@ -123,34 +123,37 @@ window.onload = function () {
                         if (oldargs.length) oldargs += " ";
                         oldargs += window._exec_args[i].replace(/ /g, "\\ ");
                     }
-                    var args = (prompt("Enter any extra arguments (space-separated)\nEscape literal spaces with a backslash", oldargs) || "").split(" ");
-                    var newargs = [], withnext = "";
-                    for (var i = 0; i < args.length; i++) {
-                        if (args[i]) {
-                            if (args[i].charAt(args[i].length - 1) == "\\") {
-                                withnext = args[i].substring(0, args[i].length - 1) + " ";
-                            } else {
-                                newargs.push(withnext + args[i]);
-                                withnext = "";
+                    var args = prompt("Enter any extra arguments (space-separated)\nEscape literal spaces with a backslash", oldargs);
+                    if (args !== null) {
+                        args = (args || "").split(" ");
+                        var newargs = [], withnext = "";
+                        for (var i = 0; i < args.length; i++) {
+                            if (args[i]) {
+                                if (args[i].charAt(args[i].length - 1) == "\\") {
+                                    withnext = args[i].substring(0, args[i].length - 1) + " ";
+                                } else {
+                                    newargs.push(withnext + args[i]);
+                                    withnext = "";
+                                }
                             }
                         }
+                        window._exec_args = newargs;
+                        stuff.setExecArgs([window._exec_index, window._exec_sum, window._exec_args], function (result) {
+                            if (result.success) {
+                                if (result.empty) {
+                                    document.getElementById("controller_exec_ifOneArg").style.display = "inline";
+                                    document.getElementById("controller_exec_ifMultipleArgs").style.display = "none";
+                                    document.getElementById("controller_exec_arguments").innerHTML = "Arguments";
+                                } else {
+                                    document.getElementById("controller_exec_ifOneArg").style.display = "none";
+                                    document.getElementById("controller_exec_ifMultipleArgs").style.display = "inline";
+                                    document.getElementById("controller_exec_arguments").innerHTML = "Arguments...";
+                                }
+                            } else {
+                                alert("Error setting arguments: " + result.error);
+                            }
+                        });
                     }
-                    window._exec_args = newargs;
-                    stuff.setExecArgs([window._exec_index, window._exec_sum, window._exec_args], function (result) {
-                        if (result.success) {
-                            if (result.empty) {
-                                document.getElementById("controller_exec_ifOneArg").style.display = "inline";
-                                document.getElementById("controller_exec_ifMultipleArgs").style.display = "none";
-                                document.getElementById("controller_exec_arguments").innerHTML = "Arguments";
-                            } else {
-                                document.getElementById("controller_exec_ifOneArg").style.display = "none";
-                                document.getElementById("controller_exec_ifMultipleArgs").style.display = "inline";
-                                document.getElementById("controller_exec_arguments").innerHTML = "Arguments...";
-                            }
-                        } else {
-                            alert("Error setting arguments: " + result.error);
-                        }
-                    });
                 } else {
                     alert("ERROR: Please browse for an executable first!");
                 }
