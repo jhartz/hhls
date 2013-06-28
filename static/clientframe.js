@@ -123,7 +123,7 @@ window.onload = function () {
                         if (oldargs.length) oldargs += " ";
                         oldargs += window._exec_args[i].replace(/ /g, "\\ ");
                     }
-                    var args = prompt("Enter any extra arguments (space-separated)\nEscape literal spaces with a backslash", oldargs);
+                    var args = prompt("Enter any extra arguments (space-separated)\nEscape literal spaces with a backslash (\\)", oldargs);
                     if (args !== null) {
                         args = (args || "").split(" ");
                         var newargs = [], withnext = "";
