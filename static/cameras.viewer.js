@@ -55,6 +55,7 @@ function layoutCameras() {
     var container = document.createElement("div");
     for (var i = 0; i < cameras.length; i++) {
         container.appendChild(cameras[i]);
+        cameras[i].play();
     }
     cam_container.appendChild(container);
     while (cam_container.childNodes.length > 1) {

@@ -54,6 +54,7 @@ function addCamera() {
             video.src = stream;
         }
         container.appendChild(video);
+        video.play();
         
         h2.addEventListener("click", function () {
             var newname = prompt("Name:", streams[streamIndex].name);

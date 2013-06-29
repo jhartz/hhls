@@ -1,15 +1,20 @@
-TODO
+HHLS TODO
+---------
 
- - control:
+control:
     - Test everything - a lot! Sequences, effects, keyboard shortcuts, all edge cases, ...
 
- - clientframe2:
+clientframe2:
     - automatic lighting based on sound for timed channels
 
- - Camera Viewer:
-    - Add option (in "options") for a time delay for the camera (like "20 seconds" or something) to delay the video (so we can have a camera on the people as they enter somewhere, and show it later)
-    - Onclick on the actual video should be play/pause, and if we do this also have a "back to live feed" button - maybe a "play" arrow with a vertical line on the right... >|
+camera system:
+    - Upgrade WebRTC system to use new RTCPeerConnection...
+        - https://hacks.mozilla.org/category/webrtc/
+        - http://www.html5rocks.com/en/tutorials/webrtc/basics/
+        - http://biswebrtc.blogspot.com/2013/02/start-developing-using.html
+        - view-source:http://webrtc.googlecode.com/svn/trunk/samples/js/demos/html/pc1.html
+        - view-source:https://apprtc.appspot.com/ (https://apprtc.appspot.com/js/main.js)
 
-Alternatives to the HTML5/WebRTC camera system:
- - http://goalbit.sourceforge.net/ (Windows-only)
- - VLC streaming
+    - Camera Viewer:
+        - Add option (in "options") for a time delay for the camera (like "20 seconds" or something) to delay the video (so we can have a camera on the people as they enter somewhere, and show it later)
+        - Onclick on the actual video should be play/pause, and if we do this also have a "back to live feed" button - maybe a "play" arrow with a vertical line on the right... >|
