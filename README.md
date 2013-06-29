@@ -20,22 +20,27 @@ Another interesting feature of HHLS is a basic live camera monitoring system (en
 
 ## Pre-reqs
 
-The computer acting as the server must have a recent version of [node.js](http://www.nodejs.org/) and [npm](https://npmjs.org/) (usually installed with node.js). Additionally, to install dependencies and start the server, you should have basic experience using the terminal.
+The computer acting as the server must have a recent version of [node.js](http://www.nodejs.org/) and [npm](https://npmjs.org/) (usually installed with node.js).
+
+HHLS has a few node.js dependencies; to install these, run `npm install` in a terminal in the root directory of the codebase. Also, make sure the submodule in `modules/jsonsettings/` is there (if you cloned the git repo, run `git submodule init` and/or `git submodule update`).
 
 Any computers connecting to the server as a *control* or a *client* must have a modern web browser, such as the latest version of Firefox or Chrome. The HHLS Client Add-on (optional) requires Firefox 14 or later.
 
+## Configuring HHLS
+
+Aside from diving into the code, HHLS only offers a few basic configuration options, stored in the `config.js` file.
+
+- `exports.PORT` is the port on which the HTTP server will run.
+- `exports.VIDEOS_DIR` is a directory containing videos for use by the HHLS *control*, if you choose to use this feature (see step 3 in "Getting Started" below and `examples/videos/README`).
+- `exports.SOUNDS_DIR` is a directory containing any sounds used as part of the effects (see `examples/sounds/README`).
+- `exports.RESOURCES_DIR` is a directory containing any downloads or resources that should be made available to other computers on the network (see step 2 in "Getting Started" below and `examples/resources/README`).
+- `exports.SETTINGS_DIR` is a directory where the HHLS server stores its data; it **must** be writable by the node process.
+
 ## Getting Started
 
-1. Install the node.js dependencies by running `npm install` inside the root directory. Also, make sure the submodule in `modules/jsonsettings/` is there (if you cloned the git repo, run `git submodule init` and/or `git submodule update`).
-2. If desired, modify the config in `config.js`.
-    - `exports.PORT` is the port on which the HTTP server will run.
-    - `exports.VIDEOS_DIR` is a directory containing videos for use by the HHLS *control*, if you choose to use this feature.
-    - `exports.SOUNDS_DIR` is a directory containing any sounds used as part of the effects.
-    - `exports.RESOURCES_DIR` is a directory containing any downloads or resources that should be made available to other computers on the network (see step 4).
-    - `exports.SETTINGS_DIR` is a directory where the HHLS server stores its data; it **must** be writable by the node process.
-3. Start the server by running `scripts/dev` or `node server.js`.
-4. From a web browser on the server or another computer on the network, connect to the server through the port specified in `config.js` (example: `http://my.server.ip.here:8080`). If all goes well, you will reach a page with two sections: on the left are links to the different parts of HHLS, and on the right are a list of the files available for download from the directory specified by `exports.RESOURCES_DIR` in `config.js`. This can be used as a simple system for distributing necessary files to other computers on the network.
-5. Start by clicking "Control" to go the control page. This page is broken up into sections; to minimize an opened section, click its title bar, or to maximize a minimized section, click its button in the bar at the bottom of the page. Using the sections on the control page, you can...
+1. After taking care of the pre-reqs and configuration (above), start the server by running `scripts/dev` or `node server.js`.
+2. From a web browser on the server or another computer on the network, connect to the server through the port specified in `config.js` (example: `http://my.server.ip.here:8080`). If all goes well, you will reach a page with two sections: on the left are links to the different parts of HHLS, and on the right are a list of the files available for download from the directory specified by `exports.RESOURCES_DIR` in `config.js`. This can be used as a simple system for distributing necessary files to other computers on the network.
+3. Start by clicking "Control" to go the control page. This page is broken up into sections; to minimize an opened section, click its title bar, or to maximize a minimized section, click its button in the bar at the bottom of the page. Using the sections on the control page, you can...
     - set up different channels on which clients can listen ("Manage Channels" button in "Effects Controller" section)
     - manually send effects to clients ("Effects Controller" section)
     - make keyboard shortcuts for effects ("Keyboard Shortcuts" button in "Effects Controller") 
@@ -43,7 +48,7 @@ Any computers connecting to the server as a *control* or a *client* must have a 
     - show a video (optionally on another monitor or screen) with effects synced to it; see `examples/videos/README` ("Video" section)
     - show an embedded client page in the control page for testing ("Mini-Client" section)
     - see details about any clients connected to the server ("Server Connection" section)
-6. On other computers, use a web browser to connect to the server (like in step 4), but instead of clicking "Control", click "Client". Here, after entering details to differentiate this client from the others, you can set up the client to listen on any of the channels that you created in step 5, bullet 1. Additionally, if you're using Firefox, you can install the HHLS Client Add-on  (see `components/addon/README`) for more ways to control devices using the client.
+4. On other computers, use a web browser to connect to the server (like in step 2), but instead of clicking "Control", click "Client". Here, after entering details to differentiate this client from the others, you can set up the client to listen on any of the channels that you created in step 3, bullet 1. Additionally, if you're using Firefox, you can install the HHLS Client Add-on  (see `components/addon/README`) for more ways to control devices using the client.
 
 This is the simplest way to get started using HHLS. However, HHLS is not a one-method-fits-all system. From here, you must figure out how you can make HHLS work for your needs. If you have any questions, feel free to contact me ([jhartz](https://github.com/jhartz) on GitHub), or if you find any bugs or have any ideas to improve HHLS, please [file an issue report on GitHub](https://github.com/jhartz/hhls/issues).
 

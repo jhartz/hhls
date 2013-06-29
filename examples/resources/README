@@ -1,4 +1,4 @@
-This directory contains files that are listed on the home page.
+This directory contains files that are listed on the HHLS server's home page.
 Basically, it is a simple basic file-sharing system.
 
 The directory name can be configured in config.js

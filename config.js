@@ -1,4 +1,5 @@
 // Haunted House Logistics Server - config file
+// For more details, see the "Configuring HHLS" section in README.md
 
 // Port on which to run the HTTP server
 // default: process.env.PORT || 8080
