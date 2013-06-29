@@ -119,7 +119,7 @@ var video = {
             var w = function (t) { video.winref.document.write(t); };
             w('<html>');
             w('<head>');
-            w('<title>Video - Haunted House</title>');
+            w('<title>Video - HHLS</title>');
             w('<style>');
             w('.btn { cursor: pointer; text-decoration: underline; }');
             w('.btn:hover { text-decoration: none; }');
