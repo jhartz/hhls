@@ -326,6 +326,12 @@ var effects = {
                             alert("ERROR: Invalid lighting pattern!\nDetails: " + err);
                             return;
                         }
+                        for (var i = 0; i < light.length; i++) {
+                            if (typeof light[i] != "number") {
+                                alert("ERROR: Item " + (i + 1) + " is not a number!");
+                                return;
+                            }
+                        }
                     }
                     if (reason == "keyboard") {
                         this.keyboard_editor({
