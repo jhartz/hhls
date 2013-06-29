@@ -6,7 +6,8 @@ var socket,
     streams = [];
 
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-window.URL = window.URL || window.webkitURL;
+window.URL = window.URL || window.webkitURL || window.mozURL;
+window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 
 function sendStreams() {
     var streamsList = [];
@@ -45,7 +46,13 @@ function addCamera() {
         var video = document.createElement("video");
         video.id = "video" + streamIndex;
         video.autoplay = true;
-        video.src = window.URL.createObjectURL(stream);
+        if (typeof video.mozSrcObject != "undefined") {
+            video.mozSrcObject = stream;
+        } else if (window.URL) {
+            video.src = window.URL.createObjectURL(stream);
+        } else {
+            video.src = stream;
+        }
         container.appendChild(video);
         
         h2.addEventListener("click", function () {

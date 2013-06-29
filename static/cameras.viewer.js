@@ -7,7 +7,8 @@ var initialized = false,
     attachers_streams = [],  // pc = attachers_streams[attacherIndex][streamIndex][peerIndex]
     cameras = [];
 
-window.URL = window.URL || window.webkitURL;
+window.URL = window.URL || window.webkitURL || window.mozURL;
+window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 
 function openOptions() {
     for (var attacherIndex = 0; attacherIndex < attachers_streams.length; streamIndex++) {
@@ -185,7 +186,13 @@ window.onload = function () {
                 pc.onaddstream = function (event) {
                     var video = document.createElement("video");
                     video.autoplay = true;
-                    video.src = window.URL.createObjectURL(event.stream);
+                    if (typeof video.mozSrcObject != "undefined") {
+                        video.mozSrcObject = event.stream;
+                    } else if (window.URL) {
+                        video.src = window.URL.createObjectURL(event.stream);
+                    } else {
+                        video.src = event.stream;
+                    }
                     cameras.push(video);
                     layoutCameras();
                 };
