@@ -45,7 +45,7 @@ Any computers connecting to the server as a *control* or a *client* must have a 
     - see details about any clients connected to the server ("Server Connection" section)
 6. On other computers, use a web browser to connect to the server (like in step 4), but instead of clicking "Control", click "Client". Here, after entering details to differentiate this client from the others, you can set up the client to listen on any of the channels that you created in step 5, bullet 1. Additionally, if you're using Firefox, you can install the HHLS Client Add-on  (see `components/addon/README`) for more ways to control devices using the client.
 
-This is the simplest way to get started using HHLS. However, HHLS is not a one-method-fits-all system. From here, you must figure out how you can make HHLS work for your needs. If you have any questions, feel free to contact me ([jhartz](https://github.com/jhartz) on GitHub, or jhartz@outlook.com), or if you find any bugs or have any ideas to improve HHLS, please [file an issue report on GitHub](https://github.com/jhartz/hhls/issues).
+This is the simplest way to get started using HHLS. However, HHLS is not a one-method-fits-all system. From here, you must figure out how you can make HHLS work for your needs. If you have any questions, feel free to contact me ([jhartz](https://github.com/jhartz) on GitHub), or if you find any bugs or have any ideas to improve HHLS, please [file an issue report on GitHub](https://github.com/jhartz/hhls/issues).
 
 ## License
 
