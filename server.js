@@ -395,6 +395,12 @@ function serveClient(url, req, res) {
                 iframe.height = "(100% - 20px) / " + yval + " - 2px";
                 iframe.left = "100% / " + xval + " * " + (x - 1);
                 iframe.width = "100% / " + xval + " - 2px";
+                iframe.borderradius = false;
+                if (url.query && typeof url.query.roundedbottom != "undefined" && y == yval) {
+                    if (x == 1 && xval == 1) iframe.borderradius = "0 0 9px 9px";
+                    else if (x == 1) iframe.borderradius = "0 0 0 9px";
+                    else if (x == xval) iframe.borderradius = "0 0 9px 0";
+                }
                 iframes.push(iframe);
             }
         }
@@ -410,7 +416,8 @@ function serveClient(url, req, res) {
             name: name,
             location: location,
             hostname: hostname,
-            styling: !(url.query && typeof url.query.nostyle != "undefined")
+            styling: !(url.query && typeof url.query.nostyle != "undefined"),
+            roundedbottom: (url.query && typeof url.query.roundedbottom != "undefined")
         };
         if (url.query && fquery(url.query.layout) && fquery(url.query.layout).trim().search(/^[1-9]x[1-9]$/) != -1) {
             vars.layout = fquery(url.query.layout).trim();
