@@ -17,8 +17,8 @@
 .flippanel {
     max-width: 100%;
     min-width: 170px;
-    height: 190px;
-    margin: 14px 10px 0;
+    height: 152px;
+    margin: 14px 4px 0;
     position: relative;
     font-size: .8em;
     
@@ -32,7 +32,13 @@
     box-shadow: 2px 2px 5px #ccc;
     padding: 0 15px 15px 15px;
     border-radius: 6px;
-    margin-top: 20px;
+    overflow: auto;
+    height: 100%;
+    width: -webkit-calc(100% - 30px);
+    width: -moz-calc(100% - 30px);
+    width: calc(100% - 30px);
+    position: relative;
+    top: -2px;
     
     background-color: #DDDDDD;
     background-image: -webkit-linear-gradient(top, #DDDDDD, #F7F7F7);
@@ -45,8 +51,8 @@
 .flippanel > div > ul {
     list-style-type: none;
     position: relative;
-    top: -19px;
     padding: 0 8px;
+    z-index: 999;
 }
 
 .flippanel > div > ul > li {
@@ -75,9 +81,6 @@
     box-shadow: none;
 }
 
-.flippanel > div > ul > li:first-child:hover {
-}
-
 .flippanel > div > ul > li:last-child {
     float: right;
     border-bottom-style: solid;
@@ -85,13 +88,16 @@
     top: -1px;
 }
 
-.flippanel > div.front {
+.flippanel > div.front, .flippanel > div.back {
     position: absolute;
-    top: 0;
+    top: -19px;
     left: 0;
-    z-index: 800;
     width: 100%;
     height: inherit;
+}
+
+.flippanel > div.front {
+    z-index: 800;
     
     -webkit-transform: rotateX(0deg) rotateY(0deg);
     -moz-transform: rotateX(0deg) rotateY(0deg);
@@ -121,12 +127,7 @@
 }
 
 .flippanel > div.back {
-    position: absolute;
-    top: 0;
-    left: 0;
     z-index: 700;
-    width: 100%;
-    height: inherit;
     
     -webkit-transform: rotateY(-180deg);
     -moz-transform: rotateY(-180deg);
