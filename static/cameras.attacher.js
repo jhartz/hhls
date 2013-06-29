@@ -75,14 +75,14 @@ function addCamera() {
         document.getElementById("content").appendChild(container);
     }, function (err) {
         status("ERROR: getUserMedia failed!\nMake sure your camera is connected.");
-        typeof console != "undefined" && console.log("getUserMedia ERROR:", err);
+        console.log("getUserMedia ERROR:", err);
     });
 }
 
 function addPeer(streamIndex, viewerIndex) {
     var peerIndex = streams[streamIndex].peers.length;
     var pc = new webkitPeerConnection00(null, function onIceCandidate(candidate, moreToFollow) {
-        typeof console != "undefined" && console.log("Found Ice Candidate:", candidate);
+        console.log("Found Ice Candidate:", candidate);
         if (candidate) {
             socket.emit("to viewer", {
                 destination: viewerIndex,

@@ -2,7 +2,8 @@ function status(msg) {
     document.getElementById("status").innerHTML = shared.escHTML(msg, true);
 }
 
-var initialized = false,
+var socket,
+    initialized = false,
     attachers = [],
     attachers_streams = [],  // pc = attachers_streams[attacherIndex][streamIndex][peerIndex]
     cameras = [];
