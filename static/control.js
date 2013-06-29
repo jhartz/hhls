@@ -190,10 +190,8 @@ function toggle(section, newelem, oncomplete) {
                 opacity: 0.1,
                 "z-index": "999"
             }).show();
-            //$oldelem.find(".panel:visible").addClass("wasvisible").hide();
             $newelem.animate({left: 0, opacity: 1}, function () {
                 $oldelem.hide();
-                //$oldelem.find(".wasvisible").show().removeClass("wasvisible");
                 $newelem.css({
                     position: "",
                     left: "",
@@ -224,10 +222,8 @@ function toggle(section, newelem, oncomplete) {
                 "z-index": "999"
             });
             $newelem.show();
-            //$newelem.find(".panel:visible").addClass("wasvisible").hide();
             $oldelem.animate({left: width + "px", opacity: 0.1}, function () {
                 $oldelem.hide();
-                //$newelem.find(".wasvisible").show().removeClass("wasvisible");
                 $oldelem.css({
                     position: "",
                     left: "",
