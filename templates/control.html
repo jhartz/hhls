@@ -53,9 +53,9 @@ var settings = {
         <form id="effects_form">
             <table id="effects_table" class="topped" style="width: 100%; border-collapse: collapse;"><tbody>
                 <tr>
-                    <td style="width: 50%;"><div id="effects_channellist" class="panelbox" style="height: 174px;">Loading...</div></td>
+                    <td style="width: 50%;"><div id="effects_channellist" class="panel" style="height: 174px;">Loading...</div></td>
                     <td style="width: 50%;">
-                        <div id="effects_timedpanel" class="panel effects_panel">
+                        <div id="effects_timedpanel" class="flippanel effects_panel">
                             <div class="front">
                                 <ul><li>Preset</li><li class="effects_tocustom">Custom</li></ul>
                                 <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_timed"></select><p style="text-align: right;"><span class="lilbutton effects_preset_customize">Customize</span></p></div>
@@ -83,13 +83,13 @@ var settings = {
                                 </div>
                             </div>
                         </div>
-                        <div id="effects_toggledpanel" class="panelbox effects_panel" style="display: none; height: 174px; text-align: center;">
+                        <div id="effects_toggledpanel" class="panel effects_panel" style="display: none; height: 174px; text-align: center;">
                             <table style="margin: auto;"><tbody>
                                 <tr><td><button id="effects_toggledpanel_on">On</button></td><td><button id="effects_toggledpanel_off">Off</button></td></tr>
                                 <tr><td colspan="2"><button id="effects_toggledpanel_toggle">Toggle</button></td></tr>
                             </tbody></table>
                         </div>
-                        <div id="effects_dimmedpanel" class="panel effects_panel" style="display: none;">
+                        <div id="effects_dimmedpanel" class="flippanel effects_panel" style="display: none;">
                             <div class="front">
                                 <ul><li>Preset</li><li class="effects_tocustom">Custom</li></ul>
                                 <div style="text-align: center;"><br style="clear: both;"><select id="effects_preset_dimmed"></select><p style="text-align: right;"><span class="lilbutton effects_preset_customize">Customize</span></p></div>
@@ -216,17 +216,17 @@ var settings = {
             <table id="sequences_table" class="topped" style="width: 100%; border-collapse: collapse;"><tbody>
                 <tr>
                     <td style="width: 50%;">
-                        <div id="sequences_list" class="panelbox">Loading...</div>
+                        <div id="sequences_list" class="panel">Loading...</div>
                         <div style="text-align: center;"><button id="sequences_play">Play</button></div>
                     </td>
                     <td style="width: 50%;">
-                        <div id="sequences_playing" class="panelbox" style="position: relative; display: none;">
+                        <div id="sequences_playing" class="panel" style="position: relative; display: none;">
                             <div id="sequences_playing_title">Now Playing</div>
                             <div id="sequences_playing_time" style="text-align: center; padding-top: 10px; font-size: 90%;">00:00.00 / 00:00.00</div>
                             <div id="sequences_playing_progress" style="background-color: black; position: absolute; left: 0; right: 0; bottom: 0; font-size: 10px;">&nbsp;</div>
                             <div style="font-size: 10px;">&nbsp;</div>
                         </div>
-                        <div id="sequences_queue" class="panelbox" style="display: none;">
+                        <div id="sequences_queue" class="panel" style="display: none;">
                             <h3 style="text-align: center;">Queue</h3>
                             <ol id="sequences_queue_content"></ol>
                         </div>

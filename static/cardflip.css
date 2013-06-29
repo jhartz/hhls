@@ -1,4 +1,4 @@
-.panelbox {
+.panel {
     max-width: 100%;
     border: 1px solid #A3A1A2;
     padding: 10px;
@@ -14,7 +14,7 @@
     background-image: linear-gradient(to bottom, #DDDDDD, #F7F7F7);
 }
 
-.panel {
+.flippanel {
     max-width: 100%;
     min-width: 170px;
     height: 190px;
@@ -27,7 +27,7 @@
     perspective: 600px;
 }
 
-.panel > div > div {
+.flippanel > div > div {
     border: 1px solid #A3A1A2;
     box-shadow: 2px 2px 5px #ccc;
     padding: 0 15px 15px 15px;
@@ -42,14 +42,14 @@
     background-image: linear-gradient(to bottom, #DDDDDD, #F7F7F7);
 }
 
-.panel > div > ul {
+.flippanel > div > ul {
     list-style-type: none;
     position: relative;
     top: -19px;
     padding: 0 8px;
 }
 
-.panel > div > ul > li {
+.flippanel > div > ul > li {
     margin: 0;
     float: left;
     border: 1px solid #A3A1A2;
@@ -66,26 +66,26 @@
     background-image: linear-gradient(to bottom, #F7F7F7, #DDDDDD);
 }
 
-.panel > div > ul > li:hover {
+.flippanel > div > ul > li:hover {
     box-shadow: 0 -2px 4px #ccc;
 }
 
-.panel > div > ul > li:first-child {
+.flippanel > div > ul > li:first-child {
     cursor: default;
     box-shadow: none;
 }
 
-.panel > div > ul > li:first-child:hover {
+.flippanel > div > ul > li:first-child:hover {
 }
 
-.panel > div > ul > li:last-child {
+.flippanel > div > ul > li:last-child {
     float: right;
     border-bottom-style: solid;
     position: relative;
     top: -1px;
 }
 
-.panel > div.front {
+.flippanel > div.front {
     position: absolute;
     top: 0;
     left: 0;
@@ -111,7 +111,7 @@
     -o-transition: all .4s ease-in-out;
     transition: all .4s ease-in-out;
 }
-.panel.flip > div.front {
+.flippanel.flip > div.front {
     z-index: 800;
     
     -webkit-transform: rotateY(180deg);
@@ -120,7 +120,7 @@
     transform: rotateY(180deg);
 }
 
-.panel > div.back {
+.flippanel > div.back {
     position: absolute;
     top: 0;
     left: 0;
@@ -147,7 +147,7 @@
     transition: all .4s ease-in-out;
 }
 
-.panel.flip > div.back {
+.flippanel.flip > div.back {
     z-index: 900;
     
     -webkit-transform: rotateX(0deg) rotateY(0deg);
