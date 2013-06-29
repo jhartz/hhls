@@ -249,7 +249,7 @@ var video = {
             if (track) {
                 var trackElem = document.createElement("track");
                 trackElem.kind = "subtitles";
-                trackElem.default = true;
+                trackElem["default"] = true;
                 trackElem.src = vid + "." + track;
                 trackElem.addEventListener("load", function () {
                     // Use our own system of showing cues

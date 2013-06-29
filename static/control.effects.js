@@ -168,7 +168,8 @@ var effects = {
         });
         
         $("#effects_keyboard_new_action").change(function () {
-            $("#effects_keyboard_new_channel")[["next", "stop"].indexOf($(this).val()) != -1 ? "show" : "hide"]();
+            var val = $(this).val();
+            $("#effects_keyboard_new_channel")[(val == "next" || val == "stop") ? "show" : "hide"]();
             $("#effects_keyboard_new_sequence")[$(this).val() == "sequence" ? "show" : "hide"]();
         }).change();
         
@@ -746,7 +747,7 @@ var effects = {
                 command: action,
                 data: {}
             };
-            if (["next", "stop"].indexOf(action) != -1) details.data.channel = $("#effects_keyboard_new_channel_select").val() || "0";
+            if (action == "next" || action == "stop") details.data.channel = $("#effects_keyboard_new_channel_select").val() || "0";
             if (action == "sequence") details.data.sequencename = $("#effects_keyboard_new_sequence_select").val();
             this.keyboard_editor(details);
         }
