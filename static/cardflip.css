@@ -9,6 +9,9 @@
     background-color: #DDDDDD;
     background-image: -webkit-linear-gradient(top, #DDDDDD, #F7F7F7);
     background-image: -moz-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: -o-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: -ms-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: linear-gradient(to bottom, #DDDDDD, #F7F7F7);
 }
 
 .panel {
@@ -21,6 +24,7 @@
     
     -webkit-perspective: 600px;
     -moz-perspective: 600px;
+    perspective: 600px;
 }
 
 .panel > div > div {
@@ -33,6 +37,9 @@
     background-color: #DDDDDD;
     background-image: -webkit-linear-gradient(top, #DDDDDD, #F7F7F7);
     background-image: -moz-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: -o-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: -ms-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: linear-gradient(to bottom, #DDDDDD, #F7F7F7);
 }
 
 .panel > div > ul {
@@ -54,6 +61,9 @@
     background-color: #F7F7F7;
     background-image: -webkit-linear-gradient(top, #F7F7F7, #DDDDDD);
     background-image: -moz-linear-gradient(top, #F7F7F7, #DDDDDD);
+    background-image: -o-linear-gradient(top, #F7F7F7, #DDDDDD);
+    background-image: -ms-linear-gradient(top, #F7F7F7, #DDDDDD);
+    background-image: linear-gradient(to bottom, #F7F7F7, #DDDDDD);
 }
 
 .panel > div > ul > li:hover {
@@ -84,15 +94,21 @@
     height: inherit;
     
     -webkit-transform: rotateX(0deg) rotateY(0deg);
-    -webkit-transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
-    
     -moz-transform: rotateX(0deg) rotateY(0deg);
-    -moz-transform-style: preserve-3d;
-    -moz-backface-visibility: hidden;
+    -o-transform: rotateX(0deg) rotateY(0deg);
+    transform: rotateX(0deg) rotateY(0deg);
     
-    -moz-transition: all .4s ease-in-out;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    
     -webkit-transition: all .4s ease-in-out;
+    -moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
     transition: all .4s ease-in-out;
 }
 .panel.flip > div.front {
@@ -100,6 +116,8 @@
     
     -webkit-transform: rotateY(180deg);
     -moz-transform: rotateY(180deg);
+    -o-transform: rotateY(180deg);
+    transform: rotateY(180deg);
 }
 
 .panel > div.back {
@@ -111,15 +129,21 @@
     height: inherit;
     
     -webkit-transform: rotateY(-180deg);
-    -webkit-transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
-    
     -moz-transform: rotateY(-180deg);
-    -moz-transform-style: preserve-3d;
-    -moz-backface-visibility: hidden;
+    -o-transform: rotateY(-180deg);
+    transform: rotateY(-180deg);
     
-    -moz-transition: all .4s ease-in-out;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    
     -webkit-transition: all .4s ease-in-out;
+    -moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
     transition: all .4s ease-in-out;
 }
 
@@ -128,4 +152,6 @@
     
     -webkit-transform: rotateX(0deg) rotateY(0deg);
     -moz-transform: rotateX(0deg) rotateY(0deg);
+    -o-transform: rotateX(0deg) rotateY(0deg);
+    transform: rotateX(0deg) rotateY(0deg);
 }

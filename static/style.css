@@ -92,6 +92,9 @@ section > header, section > footer {
     background-color: #EDEFEE;
     background-image: -webkit-linear-gradient(top, #FAFCFB, #EDEFEE);
     background-image: -moz-linear-gradient(top, #FAFCFB, #EDEFEE);
+    background-image: -o-linear-gradient(top, #FAFCFB, #EDEFEE);
+    background-image: -ms-linear-gradient(top, #FAFCFB, #EDEFEE);
+    background-image: linear-gradient(to bottom, #FAFCFB, #EDEFEE);
 }
 
 section > header {
@@ -120,8 +123,8 @@ section.flatfooter > footer {
 section > div {
     height: 100%;
     max-height: 100%;
-    max-height: -moz-calc(100% - 20px);
     max-height: -webkit-calc(100% - 20px);
+    max-height: -moz-calc(100% - 20px);
     max-height: calc(100% - 20px);
     overflow: auto;
     padding: 10px;
@@ -201,6 +204,9 @@ button {
     background-color: #F7F7F7;
     background-image: -webkit-linear-gradient(top, #F7F7F7, #DDDDDD);
     background-image: -moz-linear-gradient(top, #F7F7F7, #DDDDDD);
+    background-image: -o-linear-gradient(top, #F7F7F7, #DDDDDD);
+    background-image: -ms-linear-gradient(top, #F7F7F7, #DDDDDD);
+    background-image: linear-gradient(to bottom, #F7F7F7, #DDDDDD);
 }
 
 button[disabled] {
@@ -219,6 +225,9 @@ button:active, button.active {
     background-color: #DDDDDD;
     background-image: -webkit-linear-gradient(top, #DDDDDD, #F7F7F7);
     background-image: -moz-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: -o-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: -ms-linear-gradient(top, #DDDDDD, #F7F7F7);
+    background-image: linear-gradient(to bottom, #DDDDDD, #F7F7F7);
     box-shadow: -2px -2px 5px #ccc;
     margin: 5px 3px 3px 5px;
 }
@@ -345,6 +354,7 @@ div.bottomcorner {
 .preflash {
     -webkit-transition: background-color .2s linear;
     -moz-transition: background-color .2s linear;
+    -o-transition: background-color .2s linear;
     transition: background-color .2s linear;
 }
 
