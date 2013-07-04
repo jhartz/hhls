@@ -5,7 +5,7 @@ control:
     - Test everything - a lot! Sequences, effects, keyboard shortcuts, all edge cases, ...
 
 clientframe2:
-    - automatic lighting based on sound for timed channels
+    - automatic lighting based on sound for timed channels (Web Audio API); see templates/test.html and https://developer.tizen.org/documentation/articles/advanced-web-audio-api-usage
 
 camera system:
     - Upgrade WebRTC system to use new RTCPeerConnection...
