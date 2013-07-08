@@ -6,7 +6,6 @@
 <title>Control - HHLS</title>
 <link rel="stylesheet" type="text/css" href="/static/style.css">
 <link rel="stylesheet" type="text/css" href="/static/panel.css">
-<script type="text/javascript" src="/static/html5shiv.js"></script>
 <style type="text/css">
 .visual_cue {
     font-size: 16pt;
@@ -18,7 +17,9 @@
     border-top: none;
 }
 </style>
-<script type="text/javascript" src="/static/jquery.js"></script>{{#videos}}
+<script type="text/javascript" src="/static/jquery.js"></script>
+<!-- TODO: Test using migrate plugin, then remove it -->
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>{{#videos}}
 <script type="text/javascript" src="/static/popcorn.js"></script>{{/videos}}
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/static/shared.js"></script>
