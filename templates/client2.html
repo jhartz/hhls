@@ -77,13 +77,14 @@ table {
 <div id="loading" style="text-align: center;"><noscript><p>ERROR: JavaScript is required to view this page.</p></noscript></div>
 <div id="maincontent" style="display: none;">
     <div id="status">
-        <table><tbody>
+        <table id="statustable"><tbody>
             <tr>
                 <td title="Double-click to go full screen">{{location}}</td>
                 <td title="Double-click to go full screen">{{name}}</td>{{#closebtn}}
                 <td><span id="status_closeall" class="btn">Close All Connections</span></td>{{/closebtn}}
             </tr>
         </tbody></table>
+        <div id="batterywarning" style="text-align: center; display: none;"><strong>WARNING:</strong> Your battery has <span id="batterywarning20">less than 20%</span><span id="batterywarning10" style="display: none; font-style: italic;">less than <strong>10%</strong></span> remaining! &nbsp; &nbsp; <span id="batterywarning_close" class="btn" style="font-style: italic;">Close</span></div>
     </div>
 
     <div id="iframeholder">

@@ -57,6 +57,36 @@ window.onload = function () {
                 elem.requestFullscreen();
             }, false);
         }
+        
+        // Low battery warning, useful for when fullscreen
+        navigator.battery = navigator.battery || navigator.mozBattery || navigator.webkitBattery;
+        if (navigator.battery && navigator.battery.addEventListener) {
+            (function () {
+                var wasClosed = false, prevLevel = Infinity;
+                navigator.battery.addEventListener("levelchange", function (event) {
+                    var level = navigator.battery.level * 100;
+                    if (level < 20) {
+                        if (!wasClosed || (prevLevel >= 10 && level < 10)) {
+                            document.getElementById("batterywarning").style.display = "block";
+                            document.getElementById("statustable").style.display = "none";
+                            document.getElementById("batterywarning20").style.display = (level < 10) ? "none" : "inline";
+                            document.getElementById("batterywarning10").style.display = (level < 10) ? "inline" : "none";
+                            wasClosed = false;
+                        }
+                    } else {
+                        document.getElementById("batterywarning").style.display = "none";
+                        document.getElementById("statustable").style.display = "";
+                        if (level >= 21) wasClosed = false;
+                    }
+                    prevLevel = level;
+                }, false);
+                document.getElementById("batterywarning_close").addEventListener("click", function (event) {
+                    document.getElementById("batterywarning").style.display = "none";
+                    document.getElementById("statustable").style.display = "";
+                    wasClosed = true;
+                }, false);
+            })();
+        }
     } else {
         document.getElementById("loading").innerHTML = "ERROR: Your browser does not support some of the JavaScript features required by this page.<br>Please upgrade to a more modern browser.";
     }
