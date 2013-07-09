@@ -661,27 +661,6 @@ var effects = {
         if (settings.keyboard[key]) {
             var details = settings.keyboard[key];
             controlcmd(details);
-            /*
-            switch (details.command) {
-                case "effect":
-                    if (details.data.preset) {
-                        this.sendpreset(details.data.channel || "0", details.data.preset);
-                    } else if (details.data.light) {
-                        this.sendpattern(details.data.channel || "0", details.data.light, details.data.sound || null);
-                    } else if (typeof details.data.dimness != "undefined") {
-                        this.sendpattern(details.data.channel || "0", details.data.dimness, details.data.time || 0);
-                    } else if (typeof details.data.state != "undefined") {
-                        this.sendtoggle(details.data.channel || "0", details.data.state);
-                    }
-                    break;
-                case "next":
-                    this.next(details.data.channel || "0");
-                    break;
-                case "stop":
-                    this.stop(details.data.channel || "0");
-                    break;
-            }
-            */
         }
     },
     
