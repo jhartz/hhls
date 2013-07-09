@@ -304,6 +304,37 @@ function controlcmd(details) {
     }
 }
 
+function controlcmdlength(details) {
+    if (!details.data) details.data = {};
+    switch (details.command) {
+        case "effect":
+            var data;
+            if (details.data.preset && settings.presets.hasOwnProperty(details.data.preset)) {
+                data = settings.presets[details.data.preset];
+            } else {
+                data = details.data;
+            }
+            if (data.light) {
+                // TODO: What about the possibility that the sound lasts longer than the light?
+                var sum = 0;
+                for (var i = 0; i < data.light.length; i++) {
+                    sum += data.light[i];
+                }
+                sum = sum / 1000; // convert from ms to sec
+                return sum;
+            } else if (typeof data.time != "undefined") {
+                return data.time;
+            }
+            break;
+        case "sequence":
+            if (details.data.sequencename && settings.sequences.hasOwnProperty(details.data.sequencename)) {
+                return sequences.getLength(settings.sequences[details.data.sequencename]);
+            }
+            break;
+    }
+    return 0;
+}
+
 function controlcmdinfo(details) {
     if (details.command) {
         if (details.command == "effect" && details.data) {

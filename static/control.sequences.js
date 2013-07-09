@@ -52,10 +52,6 @@ var sequences = {
             sequences.editor_open();
         });
         
-        $("#sequences_manage_editor_length_help").click(function () {
-            alert("Enter the length of this sequence in seconds. All the actions in the sequence must happen during the length. Nothing should still be happening after the length has passed.");
-        });
-        
         $("#sequences_manage_editor_submitter").click(function () {
             sequences.editor_save();
         });
@@ -122,7 +118,7 @@ var sequences = {
             if (settings.sequences.hasOwnProperty(sequencename)) {
                 html += '<tr>';
                 html += '<td>' + shared.escHTML(sequencename) + '</td>';
-                html += '<td>' + sequences.timefmt(settings.sequences[sequencename].length) + '</td>';
+                html += '<td>' + sequences.timefmt(sequences.getLength(settings.sequences[sequencename])) + '</td>';
                 html += '<td><span class="lilbutton sequences_manage_tbody_editbtn" data-sequencename="' + shared.escHTML(sequencename) + '">Edit</span></td>';
                 html += '<td><span class="lilbutton sequences_manage_tbody_deletebtn" data-sequencename="' + shared.escHTML(sequencename) + '">Delete</span></td>';
                 html += '</tr>';
@@ -186,7 +182,6 @@ var sequences = {
         sequences.currently_editing_sequence = details.sequence.slice(0); // to clone the array
         
         $("#sequences_manage_editor_name").val(sequencename || "");
-        $("#sequences_manage_editor_length").val(details.length || "10");
         sequences.editor_update_sequence();
         
         this.toggle("manage", function () {
@@ -214,15 +209,11 @@ var sequences = {
             html += '<td><span class="sequences_manage_editor_deletebtn lilbutton" data-index="' + i + '">Delete</span></td>';
             html += '</tr>';
         }
-        if (html == '') html = '<tr><td colspan="2">&nbsp;</td></tr>';
+        if (html == '') html = '<tr><td colspan="3">&nbsp;</td></tr>';
         $("#sequences_manage_editor_sequence").html(html);
         
-        // Last but not least, check that the length is acceptable
-        var length = Number($("#sequences_manage_editor_length").val());
-        if (isNaN(length) || length < 0) length = 0;
-        var finaltime = sequences.currently_editing_sequence[sequences.currently_editing_sequence.length - 1].time;
-        if (length < finaltime) length = finaltime;
-        $("#sequences_manage_editor_length").val(length);
+        // Last but not least, update the length
+        $("#sequences_manage_editor_length").text(sequences.getLength({sequence:sequences.currently_editing_sequence}));
     },
     
     editor_new_add: function () {
@@ -264,7 +255,6 @@ var sequences = {
     
     editor_save: function () {
         var name = $.trim($("#sequences_manage_editor_name").val());
-        var length = Number($("#sequences_manage_editor_length").val());
         if (name.replace(/ /g, "").length < 2) {
             alert("Please specify a name");
             return;
@@ -277,10 +267,6 @@ var sequences = {
             alert("ERROR: Name must start with a letter.");
             return;
         }
-        if (isNaN(length) || length <= 0) {
-            alert("ERROR: Invalid length.");
-            return;
-        }
         
         // If we're still here, save it
         if (name != sequences.currently_editing && settings.sequences.hasOwnProperty(sequences.currently_editing)) {
@@ -288,7 +274,6 @@ var sequences = {
         }
         
         settings.sequences[name] = {
-            length: length,
             sequence: sequences.currently_editing_sequence
         };
         conn.sendsetting("sequences");
@@ -320,6 +305,18 @@ var sequences = {
         return minutes + ":" + seconds + "." + tenths;
     },
     
+    getLength: function (details) {
+        var length = 0;
+        if (details && details.sequence && details.sequence.length) {
+            var time;
+            for (var i = 0; i < details.sequence.length; i++) {
+                time = details.sequence[i].time + controlcmdlength(details.sequence[i]);
+                if (time > length) length = time;
+            }
+        }
+        return length;
+    },
+    
     add: function (sequencename) {
         sequences.queue.push(sequencename);
         sequences.run();
@@ -330,8 +327,10 @@ var sequences = {
             sequences.starttime = (new Date()).getTime();
             var sequencename = sequences.queue.shift();
             var details = settings.sequences[sequencename];
+            var length = sequences.getLength(details);
+            var length_fmt = sequences.timefmt(length);
             $("#sequences_playing_title").text(sequencename);
-            $("#sequences_playing_time").text("0:00.0 / " + sequences.timefmt(details.length));
+            $("#sequences_playing_time").text("0:00.0 / " + length_fmt);
             $("#sequences_playing_progress").css("width", "0%");
             $("#sequences_playing").show();
             for (var i = 0; i < details.sequence.length; i++) {
@@ -339,15 +338,15 @@ var sequences = {
             }
             sequences.running = setInterval(function () {
                 var elapsed = ((new Date()).getTime() - sequences.starttime) / 1000;
-                $("#sequences_playing_time").text(sequences.timefmt(elapsed) + " / " + sequences.timefmt(details.length));
-                var percent = Math.min((elapsed / details.length) * 100, 100);
+                $("#sequences_playing_time").text(sequences.timefmt(elapsed) + " / " + length_fmt);
+                var percent = Math.min((elapsed / length) * 100, 100);
                 $("#sequences_playing_progress").css("width", percent + "%");
             }, 100);
             setTimeout(function () {
                 clearInterval(sequences.running);
                 sequences.running = null;
                 sequences.run();
-            }, parseInt(details.length * 1000, 10));
+            }, parseInt(length * 1000, 10));
         }
         
         sequences.genqueue();
