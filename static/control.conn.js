@@ -4,7 +4,7 @@ var conn = {
     
     init: function () {
         if (typeof JSON == "undefined" || typeof JSON.stringify != "function") {
-            this.showmsg("ERROR: Your browser does not support JSON.\nPlease upgrade to a more modern browser.");
+            conn.showmsg("ERROR: Your browser does not support JSON.\nPlease upgrade to a more modern browser.");
         } else {
             /*
             $("#conn_cancel").click(function () {
@@ -60,23 +60,23 @@ var conn = {
                 } catch (err) {}
             });
             
-            this.socket = io.connect("/control");
+            conn.socket = io.connect("/control");
             
-            this.socket.on("connecting", function () {
+            conn.socket.on("connecting", function () {
                 conn.showmsg("Connecting to server...");
             });
-            this.socket.on("connect", function () {
+            conn.socket.on("connect", function () {
                 conn.showmsg("Connected to server");
                 conn.onConnection();
                 // In case this gets shown again (if there's an error, disconnect, etc.)
                 $(".statuser").text("Server connection necessary");
             });
-            this.socket.on("connect_failed", function () {
+            conn.socket.on("connect_failed", function () {
                 conn.showmsg("Failed to establish connection to server");
                 conn.onNoConnection();
             });
             
-            this.socket.on("message", function (message) {
+            conn.socket.on("message", function (message) {
                 try {
                     var msg = $.parseJSON(message);
                 } catch (err) {
@@ -109,23 +109,23 @@ var conn = {
                 }
             });
             
-            this.socket.on("disconnect", function () {
+            conn.socket.on("disconnect", function () {
                 conn.showmsg("Disconnected from server");
                 conn.onNoConnection();
             });
-            this.socket.on("error", function () {
+            conn.socket.on("error", function () {
                 conn.showmsg("Error connecting to server");
                 conn.onNoConnection();
             });
-            this.socket.on("reconnect", function () {
+            conn.socket.on("reconnect", function () {
                 conn.showmsg("Reconnected to server");
                 conn.onConnection();
             });
-            this.socket.on("reconnecting", function () {
+            conn.socket.on("reconnecting", function () {
                 conn.showmsg("Reconnecting to server...");
                 conn.onNoConnection();
             });
-            this.socket.on("reconnect_failed", function () {
+            conn.socket.on("reconnect_failed", function () {
                 conn.showmsg("Failed to reconnect to server");
                 conn.onNoConnection();
             });
@@ -150,13 +150,13 @@ var conn = {
     
     sendmsg: function (jsonmsg) {
         var msg = JSON.stringify(jsonmsg);
-        if (this.socket && this.socket.send) {
-            this.socket.send(msg);
+        if (conn.socket && conn.socket.send) {
+            conn.socket.send(msg);
         }
     },
     
     sendsetting: function (setting) {
-        this.sendmsg({
+        conn.sendmsg({
             about: "settings",
             data: {
                 setting: setting,
@@ -177,7 +177,7 @@ var conn = {
     
     showlist: function (list) {
         $("#client_title > span").text("Connected Clients");
-        this.used_channels = {};
+        conn.used_channels = {};
         if (list.length > 0) {
             var html = '';
             for (var i = 0; i < list.length; i++) {
@@ -185,10 +185,10 @@ var conn = {
                     for (var x = 1; x <= list[i].x; x++) {
                         if (list[i].frames[x] && list[i].frames[x][y] && list[i].frames[x][y].channel) {
                             channel = list[i].frames[x][y].channel;
-                            if (!this.used_channels.hasOwnProperty(channel)) {
-                                this.used_channels[channel] = 1;
+                            if (!conn.used_channels.hasOwnProperty(channel)) {
+                                conn.used_channels[channel] = 1;
                             } else {
-                                this.used_channels[channel] += 1;
+                                conn.used_channels[channel] += 1;
                             }
                         }
                     }

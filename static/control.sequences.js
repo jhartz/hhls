@@ -15,9 +15,9 @@ var sequences = {
         });
         
         // Load settings
-        this.update_channels();
-        this.update_presets();
-        this.update_sequences();
+        sequences.update_channels();
+        sequences.update_presets();
+        sequences.update_sequences();
         
         $("#sequences_form").submit(function (event) {
             event.preventDefault();
@@ -184,7 +184,7 @@ var sequences = {
         $("#sequences_manage_editor_name").val(sequencename || "");
         sequences.editor_update_sequence();
         
-        this.toggle("manage", function () {
+        sequences.toggle("manage", function () {
             $("#sequences_manage_editor").fadeIn();
         });
     },

@@ -19,7 +19,7 @@ var video = {
         if (typeof testelem.canPlayType != "function") {
             $("#video_openwin").html("<div>ERROR: Your browser does not support some of the HTML5 and JavaScript features required by the video player.</div><div>Please upgrade to a more modern browser to use the video player.</div>");
         } else {
-            this.vid = document.getElementById("video_vid");
+            video.vid = document.getElementById("video_vid");
             
             $(window).on("unload beforeunload", function () {
                 video.closewin();
@@ -113,9 +113,9 @@ var video = {
     
     openwin: function (skip) {
         if (skip) {
-            this.nowinref = true;
+            video.nowinref = true;
         } else {
-            this.winref = window.open("", "", "width=800,height=" + Math.floor(800 * (screen.height / screen.width)) + ",menubar=no,toolbar=no,location=no,personalbar=no,status=no");
+            video.winref = window.open("", "", "width=800,height=" + Math.floor(800 * (screen.height / screen.width)) + ",menubar=no,toolbar=no,location=no,personalbar=no,status=no");
             var w = function (t) { video.winref.document.write(t); };
             w('<html>');
             w('<head>');
@@ -133,18 +133,18 @@ var video = {
             w('</td></tr></table></div>');
             w('</body>');
             w('</html>');
-            this.winref.document.close();
-            this.winref.onunload = function () {
+            video.winref.document.close();
+            video.winref.onunload = function () {
                 if (typeof video != "undefined" && typeof video.closewin == "function") {
                     video.closewin();
                 } else if (window.opener && window.opener.video && typeof window.opener.video.closewin == "function") {
                     window.opener.video.closewin();
                 }
             };
-            this.winref.document.getElementById("skipFS").onclick = function () {
+            video.winref.document.getElementById("skipFS").onclick = function () {
                 video.winref.document.getElementById("msg_holder").style.display = "none";
             };
-            this.winref.document.getElementById("goFS").onclick = function () {
+            video.winref.document.getElementById("goFS").onclick = function () {
                 var elem = video.winref.document.getElementById("main_vid");
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
@@ -159,38 +159,38 @@ var video = {
             };
         }
         
-        if (this.nowinref || this.winref) {
-            this.toggle("selection");
+        if (video.nowinref || video.winref) {
+            video.toggle("selection");
         }
     },
     
     closewin: function () {
         try {
-            if (this.winref) this.winref.close();
+            if (video.winref) video.winref.close();
         } catch (err) {}
-        this.winref = null;
-        this.stopVideo();
-        this.nowinref = false;
-        this.toggle("openwin");
+        video.winref = null;
+        video.stopVideo();
+        video.nowinref = false;
+        video.toggle("openwin");
     },
     
     stopVideo: function () {
-        if (this.pop) Popcorn.destroy(this.pop);
-        this.clearcue();
-        this.vid.pause();
-        this.vid.src = "";
-        this.clearTracks();
-        if (this.winref) {
-            this.winref.document.getElementById("main_vid").pause();
-            this.winref.document.getElementById("main_vid").src = "";
+        if (video.pop) Popcorn.destroy(video.pop);
+        video.clearcue();
+        video.vid.pause();
+        video.vid.src = "";
+        video.clearTracks();
+        if (video.winref) {
+            video.winref.document.getElementById("main_vid").pause();
+            video.winref.document.getElementById("main_vid").src = "";
         }
         $("#video_selection_back").hide();
-        this.toggle("selection");
+        video.toggle("selection");
     },
     
     clearTracks: function () {
         $("#video_vid track").remove();
-        var tracks = this.vid.textTracks;
+        var tracks = video.vid.textTracks;
         if (tracks) {
             for (var i = 0; i < tracks.length; i++) {
                 for (var j = 0; k < tracks[i].cues.length; j++) {
@@ -201,12 +201,12 @@ var video = {
     },
     
     playVideo: function (vid, formats, control, track) {
-        //this.stopVideo();
+        //video.stopVideo();
         if (vid && formats && formats.length > 0) {
             var ext = "";
             var maybe = [];
             for (var i = 0; i < formats.length; i++) {
-                var canplay = this.vid.canPlayType(formats[i][1]);
+                var canplay = video.vid.canPlayType(formats[i][1]);
                 if (canplay == "probably") {
                     ext = formats[i][0];
                     break;
@@ -219,22 +219,22 @@ var video = {
                     ext = maybe[0];
                 } else {
                     alert("ERROR: This video is not available in a format supported by your browser.");
-                    this.stopVideo();
+                    video.stopVideo();
                     return;
                 }
             }
             
             var url = vid + "." + ext;
-            this.clearTracks();
-            if (this.vid.currentTime) this.vid.currentTime = 0;
-            this.vid.src = url;
-            this.vid.load();
+            video.clearTracks();
+            if (video.vid.currentTime) video.vid.currentTime = 0;
+            video.vid.src = url;
+            video.vid.load();
             
-            if (this.winref) {
+            if (video.winref) {
                 // More details for video syncing are in video.init()
-                if (this.winref.document.getElementById("main_vid").currentTime) this.winref.document.getElementById("main_vid").currentTime = 0;
-                this.winref.document.getElementById("main_vid").src = url;
-                this.winref.document.getElementById("main_vid").load();
+                if (video.winref.document.getElementById("main_vid").currentTime) video.winref.document.getElementById("main_vid").currentTime = 0;
+                video.winref.document.getElementById("main_vid").src = url;
+                video.winref.document.getElementById("main_vid").load();
                 setTimeout(function loopsieloopsieloo() {
                     if (video.winref.document.getElementById("main_vid").readyState) {
                         video.winref.document.getElementById("main_vid").muted = true;
@@ -268,27 +268,27 @@ var video = {
                         video.cue(cues);
                     }, false);
                 }, false);
-                $(this.vid).append(trackElem);
+                $(video.vid).append(trackElem);
             }
             
             if (control && control.length) {
                 // TODO: Instead of Popcorn, just use TextTracks
                 // (supported in Chrome dev)
                 /*
-                var controlTrack = this.vid.addTextTrack("metadata");
+                var controlTrack = video.vid.addTextTrack("metadata");
                 for (var j = 0; j < control.length; j++) {
-                    controlTrack.addCue(this.addControl(control[j]));
+                    controlTrack.addCue(video.addControl(control[j]));
                 }
                 */
                 
-                this.pop = Popcorn("#video_vid");
+                video.pop = Popcorn("#video_vid");
                 for (var j = 0; j < control.length; j++) {
-                    this.addControl(control[j]);
+                    video.addControl(control[j]);
                 }
             }
             
             $("#video_selection_back").show();
-            this.toggle("playing");
+            video.toggle("playing");
         }
     },
     
@@ -309,7 +309,7 @@ var video = {
         
         var time = control.time;
         if (time) time = Popcorn.util.toSeconds(time);
-        this.pop.cue(time, function (options) {
+        video.pop.cue(time, function (options) {
             controlcmd(control);
         });
     },
@@ -319,23 +319,23 @@ var video = {
             case "play":
             case "pause":
             case "play/pause":
-                this.vid[this.vid.paused ? "play" : "pause"]();
+                video.vid[video.vid.paused ? "play" : "pause"]();
                 break;
             case "stop":
-                this.stopVideo();
+                video.stopVideo();
                 break;
             case "vol up":
             case "volume up":
-                this.vid.volume += 0.1;
+                video.vid.volume += 0.1;
                 break;
             case "vol down":
             case "volume down":
-                this.vid.volume -= 0.1;
+                video.vid.volume -= 0.1;
                 break;
             case "mute":
             case "unmute":
             case "mute/unmute":
-                this.vid.muted = !this.vid.muted;
+                video.vid.muted = !video.vid.muted;
                 break;
         }
     },
@@ -343,16 +343,16 @@ var video = {
     adjust: function () {
         if (!$("#ctrl_video").is(".minimized") && $("#video_playing").css("display") != "none") {
             // Adjust width/height of video preview
-            $(this.vid).css("width", "1px").css("height", "1px");
+            $(video.vid).css("width", "1px").css("height", "1px");
             
             var maxwidth = $("#ctrl_video").width();
             var maxheight = $("#ctrl_video").height();
             
             var ratio;
-            if (this.RESIZE_VIDEO_TO_SCREEN_DIMENSIONS) {
+            if (video.RESIZE_VIDEO_TO_SCREEN_DIMENSIONS) {
                 ratio = screen.width / screen.height;
-            } else if (this.vid.videoWidth && this.vid.videoHeight) {
-                ratio = this.vid.videoWidth / this.vid.videoHeight;
+            } else if (video.vid.videoWidth && video.vid.videoHeight) {
+                ratio = video.vid.videoWidth / video.vid.videoHeight;
             }
             var width, height;
             if (ratio) {
@@ -369,7 +369,7 @@ var video = {
                 width = maxwidth;
                 height = maxheight;
             }
-            $(this.vid).css("width", width + "px").css("height", height + "px");
+            $(video.vid).css("width", width + "px").css("height", height + "px");
         }
     },
     
@@ -389,9 +389,9 @@ var video = {
         var $container = $("#visual_cue_container");
         if (cues.length == 0) {
             if ($container.is(":visible")) {
-                this.clearcue(true);
+                video.clearcue(true);
             } else {
-                this.clearcue();
+                video.clearcue();
             }
         } else {
             var new_cue_map = {};

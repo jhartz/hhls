@@ -242,10 +242,10 @@ var effects = {
         });
         
         // Load settings
-        this.update_channels();
-        this.update_keyboard();
-        this.update_presets();
-        this.update_sequences();
+        effects.update_channels();
+        effects.update_keyboard();
+        effects.update_presets();
+        effects.update_sequences();
         
         $("#effects_form").submit(function (event) {
             event.preventDefault();
@@ -262,30 +262,30 @@ var effects = {
     },
     
     checkinputs: function (reason) {
-        if (this.details.type == "toggled") {
+        if (effects.details.type == "toggled") {
             if (reason == "keyboard") {
-                this.keyboard_editor({
+                effects.keyboard_editor({
                     command: "effect",
                     data: {
-                        channel: this.channel
+                        channel: effects.channel
                     }
                 }, true);
             }
         } else {
-            if (!this.oncustom[this.details.type]) {
+            if (!effects.oncustom[effects.details.type]) {
                 if (reason == "keyboard") {
-                    this.keyboard_editor({
+                    effects.keyboard_editor({
                         command: "effect",
                         data: {
-                            channel: this.channel,
-                            preset: $("#effects_preset_" + this.details.type).val()
+                            channel: effects.channel,
+                            preset: $("#effects_preset_" + effects.details.type).val()
                         }
                     });
                 } else {
-                    this.sendpreset(this.channel, $("#effects_preset_" + this.details.type).val());
+                    effects.sendpreset(effects.channel, $("#effects_preset_" + effects.details.type).val());
                 }
             } else {
-                if (this.details.type == "dimmed") {
+                if (effects.details.type == "dimmed") {
                     var dimness = Number($("#effects_custom_dimness").val());
                     var time = Number($("#effects_custom_time").val() || 0);
                     if (isNaN(dimness) || dimness > 100 || dimness < 0) {
@@ -296,21 +296,21 @@ var effects = {
                         return;
                     } else {
                         if (reason == "keyboard") {
-                            this.keyboard_editor({
+                            effects.keyboard_editor({
                                 command: "effect",
                                 data: {
-                                    channel: this.channel,
+                                    channel: effects.channel,
                                     dimness: dimness,
                                     time: time
                                 }
                             });
                         } else if (reason == "preset") {
-                            this.save_preset({
+                            effects.save_preset({
                                 dimness: dimness,
                                 time: time
                             });
                         } else {
-                            this.sendpattern(this.channel, dimness, time);
+                            effects.sendpattern(effects.channel, dimness, time);
                         }
                     }
                 } else {
@@ -335,21 +335,21 @@ var effects = {
                         }
                     }
                     if (reason == "keyboard") {
-                        this.keyboard_editor({
+                        effects.keyboard_editor({
                             command: "effect",
                             data: {
-                                channel: this.channel,
+                                channel: effects.channel,
                                 light: light,
                                 sound: sound || null
                             }
                         });
                     } else if (reason == "preset") {
-                        this.save_preset({
+                        effects.save_preset({
                             light: light,
                             sound: sound || null
                         });
                     } else {
-                        this.sendpattern(this.channel, light, sound || null);
+                        effects.sendpattern(effects.channel, light, sound || null);
                     }
                 }
             }
@@ -371,12 +371,12 @@ var effects = {
     
     update_channel_details: function () {
         var $selected = $("input[name=effects_channellist]:checked", "#effects_form");
-        this.channel = $selected.val();
-        this.details = settings.channels[this.channel] || {type: "timed"};
-        if (!this.details.type) this.details.type = "timed";
+        effects.channel = $selected.val();
+        effects.details = settings.channels[effects.channel] || {type: "timed"};
+        if (!effects.details.type) effects.details.type = "timed";
         $("div.effects_panel").hide();
-        $("#effects_" + this.details.type + "panel").show();
-        $(".onlywhennotoggle")[this.details.type == "toggled" ? "hide" : "show"]();
+        $("#effects_" + effects.details.type + "panel").show();
+        $(".onlywhennotoggle")[effects.details.type == "toggled" ? "hide" : "show"]();
     },
     
     update_channels: function () {
@@ -407,7 +407,7 @@ var effects = {
         $("input[name=effects_channellist]", "#effects_form").each(function () {
             if (this.value == selected_channel) this.checked = true;
         });
-        this.update_channel_details();
+        effects.update_channel_details();
         
         
         // Update the list of channels in the add keyboard shortcut dropdown
@@ -437,11 +437,11 @@ var effects = {
         // Re-select previously selected channel
         $("#effects_keyboard_new_channel_select").val(selected_channel);
         
-        this.update_channelman();
+        effects.update_channelman();
     },
     
     update_channelman: function () {
-        var usedin_default = this.channel_used_in("0", "Yes", "&nbsp;");
+        var usedin_default = effects.channel_used_in("0", "Yes", "&nbsp;");
         var html = '<tr><td class="disabled">Default Channel</td><td class="disabled">timed</td><td style="text-align: center;">' + usedin_default.keyboard + '</td><td style="text-align: center;">' + usedin_default.sequences + '</td><td style="text-align: center;">' + usedin_default.video + '</td><td style="text-align: center;">' + usedin_default.clients + '</td></tr>';
         for (var channel in settings.channels) {
             if (settings.channels.hasOwnProperty(channel)) {
@@ -454,7 +454,7 @@ var effects = {
                     type = "dimmed";
                     css = "color: blue;";
                 }
-                var usedin = this.channel_used_in(channel, "Yes", "&nbsp;");
+                var usedin = effects.channel_used_in(channel, "Yes", "&nbsp;");
                 html += '<tr><td title="' + shared.escHTML(details.description || channel) + '" style="' + shared.escHTML(css) + '">' + shared.escHTML(channel) + '</td><td>' + type + '</td><td style="text-align: center;">' + usedin.keyboard + '</td><td style="text-align: center;">' + usedin.sequences + '</td><td style="text-align: center;">' + usedin.video + '</td><td style="text-align: center;">' + usedin.clients + '</td>';
                 if (usedin.nothing) {
                     html += '<td><span class="lilbutton effects_channels_editor" data-channel="' + shared.escHTML(channel) + '">Edit</span>&nbsp;<span class="lilbutton effects_channels_deleter" data-channel="' + shared.escHTML(channel) + '">Delete</span></td>';
@@ -553,13 +553,13 @@ var effects = {
         var details = settings.channels[channel];
         if (details) {
             blockers.effects_channels_editor = "Please finish editing the channel before exiting.";
-            this.channels_currentlyediting = channel;
+            effects.channels_currentlyediting = channel;
             
             $("#effects_channels_editor_name").val(channel);
             $("#effects_channels_editor_type").val(details.type).change();
             $("#effects_channels_editor_desc").val(details.description || "");
             
-            this.toggle("channels", function () {
+            effects.toggle("channels", function () {
                 $("#effects_channels_editor").fadeIn();
             });
         }
@@ -569,11 +569,11 @@ var effects = {
         var name = $.trim($("#effects_channels_editor_name").val());
         var type = $("#effects_channels_editor_type").val();
         var desc = $.trim($("#effects_channels_editor_desc").val());
-        if (this.check_channel_inputs(name, type, desc, this.channels_currentlyediting)) {
-            if (name != this.channels_currentlyediting && settings.channels.hasOwnProperty(this.channels_currentlyediting)) {
-                delete settings.channels[this.channels_currentlyediting];
+        if (effects.check_channel_inputs(name, type, desc, effects.channels_currentlyediting)) {
+            if (name != effects.channels_currentlyediting && settings.channels.hasOwnProperty(effects.channels_currentlyediting)) {
+                delete settings.channels[effects.channels_currentlyediting];
             }
-            this.channels_currentlyediting = null;
+            effects.channels_currentlyediting = null;
             var details = {type: type};
             if (desc) details.description = desc;
             settings.channels[name] = details;
@@ -586,7 +586,7 @@ var effects = {
     },
     
     channels_editor_cancel: function () {
-        this.channels_currentlyediting = null;
+        effects.channels_currentlyediting = null;
         $("#effects_channels_editor").fadeOut();
         blockers.effects_channels_editor = null;
     },
@@ -603,7 +603,7 @@ var effects = {
         
         var prevselected = $("#effects_keyboard_editor_key").val();
         $("#effects_keyboard_editor_key").empty();
-        this.keyboard_valid = [];
+        effects.keyboard_valid = [];
         
         var html = "", i;
         var checkkey = function (key) {
@@ -654,7 +654,7 @@ var effects = {
         $("#effects_keyboard_editor_key").val(prevselected);
         $("#effects_keyboard_tbody").html(html);
         
-        this.update_channelman();
+        effects.update_channelman();
     },
     
     keyboard_action: function (key) {
@@ -666,7 +666,7 @@ var effects = {
     
     keyboard_editor: function (details, istoggled) {
         blockers.effects_keyboard_editor = "Please finish editing the keyboard shortcut before exiting.";
-        this.keyboard_currentlyediting = details;
+        effects.keyboard_currentlyediting = details;
         
         if (details.data.channel) {
             $("#effects_keyboard_editor_channel").text(details.data.channel == "0" ? "Default Channel" : details.data.channel);
@@ -681,14 +681,14 @@ var effects = {
             $("#effects_keyboard_editor_action").html(controlcmdinfo(details)).show();
         }
         
-        this.toggle("keyboard", function () {
+        effects.toggle("keyboard", function () {
             $("#effects_keyboard_editor").fadeIn();
         });
     },
     
     keyboard_editor_save: function () {
         var key = $("#effects_keyboard_editor_key").val();
-        settings.keyboard[key] = this.keyboard_currentlyediting;
+        settings.keyboard[key] = effects.keyboard_currentlyediting;
         if ($("#effects_keyboard_editor_channeltoggled").css("display") != "none") {
             if (!settings.keyboard[key].data) settings.keyboard[key].data = {};
             settings.keyboard[key].data.state = Number($("#effects_keyboard_editor_state").val());
@@ -711,7 +711,7 @@ var effects = {
     },
     
     keyboard_new: function (sequencename) {
-        this.toggle("keyboard", function () {
+        effects.toggle("keyboard", function () {
             $("#effects_keyboard_new").fadeIn();
         });
     },
@@ -728,7 +728,7 @@ var effects = {
             };
             if (action == "next" || action == "stop") details.data.channel = $("#effects_keyboard_new_channel_select").val() || "0";
             if (action == "sequence") details.data.sequencename = $("#effects_keyboard_new_sequence_select").val();
-            this.keyboard_editor(details);
+            effects.keyboard_editor(details);
         }
     },
     
@@ -753,7 +753,7 @@ var effects = {
         // Re-select previously selected sequence
         if (selected_sequence) $("#effects_keyboard_new_sequence_select").val(selected_sequence);
         
-        this.update_channelman();
+        effects.update_channelman();
     },
     
     update_presets: function () {
@@ -815,7 +815,7 @@ var effects = {
         if (settings.presets[id]) {
             var preset = settings.presets[id];
             var dimmed = !!(details && details.type && details.type == "dimmed");
-            this.sendpattern(channel, dimmed ? preset.dimness : preset.light, dimmed ? preset.time : preset.sound);
+            effects.sendpattern(channel, dimmed ? preset.dimness : preset.light, dimmed ? preset.time : preset.sound);
         } else {
             alert("ERROR: Invalid preset: " + id);
         }
