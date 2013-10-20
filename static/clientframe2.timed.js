@@ -119,8 +119,9 @@ function runseq() {
                         stop_light();
                     }, Math.floor(sound.duration * 1000));
                 } else {
-                    alert("TODO!");
+                    status("TODO: Automatic Lighting!");
                     // TODO: fade the background light-dark-etc. based on volume of sound
+                    // (see TODO in root of codebase)
                 }
             } else {
                 // No light or sound
