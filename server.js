@@ -21,6 +21,7 @@ var config = require("./config"),
 
 // Default config
 if (!config.PORT) config.PORT = process.env.PORT || 8080;
+if (typeof config.debug != "boolean") config.debug = !!(process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() == "development");
 config.VIDEOS_DIR = pickExistingDir(config.VIDEOS_DIR, "content/videos");
 config.SOUNDS_DIR = pickExistingDir(config.SOUNDS_DIR, "content/sounds");
 config.RESOURCES_DIR = pickExistingDir(config.RESOURCES_DIR, "content/resources");
@@ -362,7 +363,7 @@ function serveClient(url, req, res) {
         }
         
         var cid = clients.length;
-        console.log("SERVING CLIENT: " + cid);
+        if (config.debug) console.log("SERVING CLIENT: " + cid);
         clients.push({
             active: false,
             name: name,
@@ -535,7 +536,7 @@ function serveStream(url, req, res) {
                 "Connection": "keep-alive"
             });
             
-            console.log("SERVING STREAM: " + cid + ":" + x + "x" + y);
+            if (config.debug) console.log("SERVING STREAM: " + cid + ":" + x + "x" + y);
             
             clients[cid].active = true;
             if (!clients[cid].frames[x]) clients[cid].frames[x] = {};
@@ -566,7 +567,7 @@ function serveStream(url, req, res) {
 }
 
 function disconnect(cid, x, y) {
-    console.log("stream DISCONNECT: " + cid + ":" + x + "x" + y);
+    if (config.debug) console.log("stream DISCONNECT: " + cid + ":" + x + "x" + y);
     clients[cid].frames[x][y].active = false;
     if (clients[cid].frames[x][y].res) {
         clients[cid].frames[x][y].res.end();
