@@ -6,6 +6,7 @@ control:
 
 clientframe2:
     - automatic lighting based on sound for timed channels (Web Audio API); see templates/test.html and https://developer.tizen.org/documentation/articles/advanced-web-audio-api-usage
+        - Example of Web Audio API: http://www.chromeexperiments.com/detail/word-problems/
 
 camera system:
     - Upgrade WebRTC system to use new RTCPeerConnection...
